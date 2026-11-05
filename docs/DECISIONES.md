@@ -22,4 +22,17 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 
 ## Decisiones de diseño (las suman las sesiones de bocetos)
 
-_Pendiente: las agregan S1, S2 y S3._
+_Pendiente: las agregan S1 y S2._
+
+### S3 — Pago y comprobante (boceto: https://claude.ai/artifact/MPTpXVf7zC2SYCWAJna4fR)
+
+| # | Decisión | Por defecto mientras tanto | Bloquea |
+|---|---|---|---|
+| S3: 1 | **¿Versión A "Directo" o B "Con pausa"?** A va del formulario a Mercado Pago. B pide solo nombre y mail, muestra "Ya estás anotado/a, falta el pago" y ofrece "Pagar después: te mando el link por mail" | El backend sirve para las dos. Recomiendo A para el lanzamiento (menos pasos con una fecha tan cerca) y probar B como A/B si hay tráfico | Landing final |
+| S3: 2 | **Si elegís B: plantilla `link_pago`** para "Pagar después". Hay que escribirla y aprobarla, y decidir si sale aunque la persona no marque el consentimiento (es un mail que pidió) | No existe: el botón "Pagar después" no se construye hasta que decidas | Versión B |
+| S3: 3 | **Plantillas `confirmacion_entrada` y `aviso_manu`.** Están en borrador. Sin aprobar, la entrada se emite y se ve en `/entrada`, pero no sale ningún mail. Si la persona no dejó nombre, el saludo queda "Hola, , ¿cómo estás?": ¿lo cambiamos a "Hola, ¿cómo estás?" | Borrador | **Cobrar** |
+| S3: 4 | **Reenvío "ya tenés tu entrada".** Como nadie recibe dos veces la misma plantilla, si la persona ya recibió la confirmación, el reenvío no sale. ¿Querés una plantilla aparte (`reenvio_entrada`)? | Se intenta con `confirmacion_entrada`; si ya salió, la pantalla dice "Ya tenés tu entrada" y la persona puede escribirte | — |
+| S3: 5 | **Botón "Avisarme por Instagram" en el comprobante** (D2) | Apagado: la confirmación llega por mail y a vos te llega el aviso | — |
+| S3: 6 | **Reservas falsas.** Cada mail nuevo que toca "pagar" reserva un lugar 20 min. Alguien con mala intención podría agotar el cupo un rato con mails inventados. Hay un límite de 5 intentos por minuto por IP | Límite por IP + reserva de 20 min (D9). Si pasa, se baja `hold_minutes` desde el panel | — |
+| S3: 7 | **Dos migraciones para que S0 revise y aplique** (no están aplicadas): `20261105000102` corrige un bug de `upsert_lead`, que falla con "person_id is ambiguous" cada vez que llega con la cookie `vid` (rompe el formulario y el pago); `20261105000101` hace que `aviso_manu` salga una vez por compra y no una sola vez en toda la venta | Sin aplicar. **La 102 es urgente**: sin ella no se guarda ningún lead que venga de la web | **Cobrar** y formulario |
+| S3: 8 | **Perfil de auditoría por server action** en `/entrada` en vez de `POST /api/entrada/perfil`, para no salir de las carpetas de S3. Mismo contrato `{ o, perfil }` | Server action | — |
