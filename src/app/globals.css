@@ -1,0 +1,18 @@
+/* Tokens de marca (fuente: docs/referencia/landing-boceto.html y docs/contexto/reglas-y-metodo.md). */
+:root {
+  --oscuro: #2d2828; --crema: #fffdf6; --rojo: #d0443f; --mostaza: #dda51e;
+  --oscuro-2: #3a3434; --linea-o: #5a5252; --linea-c: #e4dccb; --gris-c: #5e5757; --gris-o: #c9c2b6;
+  --rojo-hover: #b93832;
+  --sans: var(--font-poppins), "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: var(--font-garamond), "EB Garamond", Georgia, "Times New Roman", serif;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--oscuro); color: var(--crema); font-family: var(--sans); font-size: 17px; line-height: 1.55; }
+/* EB Garamond nunca en itálica (regla de marca). */
+em, i { font-style: normal; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid var(--mostaza); outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

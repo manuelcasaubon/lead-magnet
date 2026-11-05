@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tu entrada</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Poppins:wght@400;500;600;800;900&display=swap">
+<style>
+/* Página de retorno de Mercado Pago: la entrada sale impresa y se baja en PDF. */
+:root{
+  --oscuro:#2d2828;--crema:#fffdf6;--rojo:#d0443f;--mostaza:#dda51e;
+  --linea-c:#e4dccb;--gris-c:#5e5757;--gris-o:#c9c2b6;
+  --sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--oscuro);color:var(--crema);font-family:var(--sans);font-size:16px;line-height:1.5;
+  padding:clamp(24px,5vw,48px) max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+main{max-width:440px;margin-inline:auto;display:grid;gap:24px}
+.marca{font-weight:800;letter-spacing:-.03em;margin:0}
+h1{font-weight:900;text-transform:uppercase;letter-spacing:-.045em;word-spacing:.14em;line-height:.95;margin:0;font-size:clamp(2.5rem,12vw,3.6rem);text-wrap:balance}
+.bajada{font-family:var(--serif);font-size:1.3rem;line-height:1.3;color:var(--mostaza);margin:10px 0 0}
+
+/* La impresora */
+.impresora{position:relative}
+.ranura{position:relative;z-index:2;height:18px;background:#191616;border-radius:6px;box-shadow:inset 0 -3px 0 #000}
+.salida{overflow:hidden;margin:-9px 10px 0;padding-top:9px}
+.ticket{background:var(--crema);color:var(--oscuro);padding:22px 22px 26px;
+  background-image:radial-gradient(circle at 8px 100%,var(--oscuro) 6px,transparent 6.5px);
+  background-size:16px 8px;background-repeat:repeat-x;background-position:bottom -1px left}
+.imprime .ticket{animation:imprimir 2.1s steps(26,end) both}
+@keyframes imprimir{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.ticket h2{margin:0;font-weight:900;letter-spacing:-.04em;line-height:1.05;font-size:1.5rem;text-wrap:balance}
+.sub{margin:4px 0 16px;font-family:var(--serif);font-size:1.1rem;color:var(--rojo)}
+dl{margin:0;display:grid;border-top:2px dashed var(--oscuro)}
+.dato{display:grid;grid-template-columns:7.2em minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--linea-c)}
+dt{font-size:.74rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris-c);padding-top:2px}
+dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.nota{margin:14px 0 0;font-size:.8rem;line-height:1.4;color:var(--gris-c)}
+.sello{display:inline-block;margin-top:14px;padding:3px 10px;border:2px solid var(--rojo);color:var(--rojo);font-weight:800;font-size:.8rem;letter-spacing:.06em;transform:rotate(-2deg)}
+
+.acciones{display:grid;gap:12px;opacity:0}
+.listo .acciones{opacity:1;transition:opacity .4s}
+.boton{appearance:none;border:0;cursor:pointer;display:block;width:100%;background:var(--rojo);color:var(--crema);font:800 1rem var(--sans);letter-spacing:-.02em;text-decoration:none;padding:15px 22px;border-radius:4px;text-align:center}
+.boton:hover{background:#b93832}
+.boton.sec{background:transparent;box-shadow:inset 0 0 0 2px var(--gris-o)}
+.boton.sec:hover{background:#3a3434}
+.boton:focus-visible{outline:3px solid var(--mostaza);outline-offset:3px}
+.aviso{margin:0;font-size:.92rem;color:var(--gris-o)}
+.oculto{display:none}
+@media (prefers-reduced-motion:reduce){.imprime .ticket{animation:none}.listo .acciones{transition:none}}
+</style>
+</head>
+<body>
+<!-- Make reemplaza el contenido por los datos del pago ya verificado, en JSON y en base64.
+     El texto se escribe con textContent, así que un nombre raro no puede romper la página. -->
+<script id="datos" type="text/plain">DATOS_DEL_PAGO</script>
+
+<main id="app">
+  <p class="marca">Manu Casaubon</p>
+  <div>
+    <h1 id="titulo"></h1>
+    <p class="bajada" id="bajada"></p>
+  </div>
+  <div class="impresora" id="impresora">
+    <div class="ranura"></div>
+    <div class="salida">
+      <section class="ticket" aria-label="Comprobante de entrada">
+        <h2 id="evento"></h2>
+        <p class="sub">Comprobante de entrada</p>
+        <dl id="lista"></dl>
+        <p class="nota">Este comprobante no es una factura. Mostralo el día del evento.</p>
+        <span class="sello oculto" id="sello">EJEMPLO</span>
+      </section>
+    </div>
+  </div>
+  <div class="acciones">
+    <button class="boton" id="pdf" type="button">Descargar comprobante en PDF</button>
+    <a class="boton sec" href="https://ig.me/m/casaubon.ar?text=PAGU%C3%89">Avisarme por Instagram</a>
+    <p class="aviso" id="avisoPdf">También te llega el comprobante de Mercado Pago a tu mail.</p>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Datos fijos del evento: el nombre se cambia acá cuando Manu lo elija.
+const EVENTO = {
+  nombre: "Cómo destacar con tu marca personal en 2027",
+  fecha: "Miércoles 18/11/26, de 18 a 21 h",
+  puertas: "17:45",
+  lugar: "Niceto Vega 4601, Palermo Soho, CABA"
+};
+const EJEMPLO = {
+  estado: "approved", nombre: "Nombre de ejemplo", email: "ejemplo@correo.com",
+  operacion: "0000000000", fechaPago: "05/11/26", monto: "ARS 00.000"
+};
+
+function leerDatos() {
+  const crudo = document.getElementById("datos").textContent.trim();
+  if (!crudo || crudo === "DATOS_DEL_PAGO") return null;
+  try {
+    const bytes = Uint8Array.from(atob(crudo), c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch (e) { return null; }
+}
+
+const real = leerDatos();
+const esEjemplo = !real;
+const pago = real || EJEMPLO;
+const aprobado = pago.estado === "approved";
+
+const filas = [
+  ["Nombre", pago.nombre],
+  ["Mail", pago.email],
+  ["Cuándo", EVENTO.fecha],
+  ["Puertas", EVENTO.puertas + " h"],
+  ["Dónde", EVENTO.lugar],
+  ["Pagaste", pago.monto],
+  ["Fecha de pago", pago.fechaPago],
+  ["Operación", pago.operacion]
+].filter(f => f[1]);
+
+const $ = id => document.getElementById(id);
+$("titulo").textContent = aprobado ? "Tu lugar está reservado" : "Tu pago está en proceso";
+$("bajada").textContent = aprobado
+  ? "Te espero el 18/11. Guardá tu comprobante."
+  : "Cuando Mercado Pago lo apruebe, te confirmo el lugar.";
+$("evento").textContent = EVENTO.nombre;
+for (const [k, v] of filas) {
+  const fila = document.createElement("div"); fila.className = "dato";
+  const dt = document.createElement("dt"); dt.textContent = k;
+  const dd = document.createElement("dd"); dd.textContent = v;
+  fila.append(dt, dd); $("lista").append(fila);
+}
+if (esEjemplo) $("sello").classList.remove("oculto");
+if (!aprobado) { $("pdf").classList.add("oculto"); }
+
+// Arranca la impresión y muestra los botones cuando termina.
+const app = $("app"), reducir = matchMedia("(prefers-reduced-motion:reduce)").matches;
+if (reducir) app.classList.add("listo");
+else {
+  app.classList.add("imprime");
+  document.querySelector(".ticket").addEventListener("animationend", () => app.classList.add("listo"), { once: true });
+}
+
+function bajarPDF() {
+  if (!window.jspdf) { $("avisoPdf").textContent = "No se pudo armar el PDF. Sacale una captura a tu comprobante."; return; }
+  const doc = new window.jspdf.jsPDF({ unit: "mm", format: [105, 165] });
+  const rojo = [208, 68, 63], oscuro = [45, 40, 40], gris = [94, 87, 87], crema = [255, 253, 246];
+  doc.setFillColor(...crema); doc.rect(0, 0, 105, 165, "F");
+  doc.setFillColor(...oscuro); doc.rect(0, 0, 105, 24, "F");
+  doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(...crema);
+  doc.text("Manu Casaubon", 10, 11);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+  doc.text("Comprobante de entrada", 10, 17);
+  doc.setFont("helvetica", "bold"); doc.setFontSize(17); doc.setTextColor(...oscuro);
+  const tit = doc.splitTextToSize(EVENTO.nombre, 85);
+  doc.text(tit, 10, 36);
+  let y = 36 + tit.length * 7 + 2;
+  doc.setDrawColor(...oscuro); doc.setLineDashPattern([1.2, 1.2], 0); doc.line(10, y, 95, y); doc.setLineDashPattern([], 0);
+  y += 7;
+  for (const [k, v] of filas) {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.setTextColor(...gris);
+    doc.text(k.toUpperCase(), 10, y);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(...oscuro);
+    const val = doc.splitTextToSize(String(v), 58);
+    doc.text(val, 37, y);
+    y += Math.max(1, val.length) * 4.6 + 3;
+  }
+  doc.setFontSize(7.5); doc.setTextColor(...gris);
+  doc.text("Este comprobante no es una factura. Mostralo el día del evento.", 10, 157);
+  if (esEjemplo) {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(...rojo);
+    doc.text("EJEMPLO", 95, 36, { align: "right" });
+  }
+  doc.save("comprobante-entrada-18-11.pdf");
+}
+$("pdf").addEventListener("click", bajarPDF);
+</script>
+</body>
+</html>
