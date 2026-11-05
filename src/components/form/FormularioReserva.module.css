@@ -1,0 +1,45 @@
+/* Formulario de reserva: tarjeta crema sobre el oscuro de la landing, como la "entrada" del boceto. */
+.form {
+  color-scheme: light; display: grid; gap: 18px; background: var(--crema); color: var(--oscuro);
+  border-radius: 6px; padding: clamp(20px, 5vw, 28px); max-width: 30rem; width: 100%;
+}
+.pasos { display: grid; gap: 8px; font-size: .78rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--gris-c); }
+.pasos p { margin: 0; }
+.barra { height: 4px; background: var(--linea-c); border-radius: 2px; overflow: hidden; }
+.barra span { display: block; height: 100%; background: var(--rojo); transition: width .25s ease; }
+.resumen { margin: 0; font-size: .95rem; color: var(--gris-c); overflow-wrap: anywhere; }
+.resumen strong { color: var(--oscuro); font-weight: 600; }
+.cambiar { background: none; border: 0; padding: 4px 2px; min-height: 44px; font: inherit; font-weight: 600; color: var(--rojo); text-decoration: underline; cursor: pointer; }
+.campo { display: grid; gap: 6px; min-width: 0; }
+.label { font-weight: 800; letter-spacing: -.02em; font-size: 1rem; }
+.opcional { font-weight: 400; color: var(--gris-c); letter-spacing: 0; }
+.ayuda { margin: -2px 0 0; font-family: var(--serif); font-size: 1.02rem; color: var(--gris-c); }
+.input {
+  font: inherit; font-size: 1.0625rem; color: var(--oscuro); background: #fff;
+  border: 1.5px solid #b9b0a2; border-radius: 4px; padding: 11px 13px; min-height: 48px; width: 100%;
+}
+.input::placeholder { color: #8a8178; }
+.input:focus-visible { outline: 3px solid var(--mostaza); outline-offset: 1px; border-color: var(--oscuro); }
+.input[aria-invalid="true"] { border-color: var(--rojo); }
+textarea.input { resize: vertical; min-height: 88px; }
+.error { margin: 0; min-height: 0; font-size: .92rem; font-weight: 600; color: #a8322e; }
+.error:empty { display: none; }
+.check { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; font-size: .97rem; line-height: 1.4; }
+.check input { width: 24px; height: 24px; margin: 1px 0 0; accent-color: var(--rojo); }
+.check label { padding-block: 2px; cursor: pointer; }
+.boton {
+  font: inherit; font-weight: 800; letter-spacing: -.02em; font-size: 1.08rem; background: var(--rojo); color: var(--crema);
+  border: 0; border-radius: 4px; padding: 15px 22px; min-height: 52px; cursor: pointer; width: 100%;
+}
+.boton:hover { background: var(--rojo-hover); }
+.boton:disabled { opacity: .7; cursor: progress; }
+.errorServidor { margin: 0; font-weight: 600; color: #a8322e; }
+.errorServidor:empty { display: none; }
+.ig { margin: 0; font-size: .95rem; color: var(--gris-c); text-align: center; }
+.ig a { color: var(--oscuro); font-weight: 700; display: inline-block; padding-block: 12px; }
+.listo { background: var(--crema); color: var(--oscuro); border-radius: 6px; padding: 28px; max-width: 30rem; display: grid; gap: 6px; }
+.listo p { margin: 0; }
+.listoTitulo { font-weight: 900; text-transform: uppercase; letter-spacing: -.05em; font-size: 2.2rem; line-height: .9; }
+.trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+@media (prefers-reduced-motion: reduce) { .barra span { transition: none; } }

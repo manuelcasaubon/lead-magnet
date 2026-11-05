@@ -1,0 +1,318 @@
+<title>Formulario de reserva</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Poppins:wght@400;600;800;900&display=swap">
+<style>
+/* Layout: barra de control fija arriba; debajo, el formulario dentro de un marco de celular de 390 px y al lado la nota "Qué medimos". Marca fija de Manu (un solo look oscuro). */
+:root{
+  --oscuro:#2d2828; --crema:#fffdf6; --rojo:#d0443f; --mostaza:#dda51e;
+  --oscuro-2:#3a3434; --linea-o:#5a5252; --linea-c:#e4dccb; --gris-c:#5e5757; --gris-o:#c9c2b6;
+  --error:#a8322e; --blanco:#ffffff; --borde-input:#b9b0a2;
+  --sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--oscuro);color:var(--crema);font-family:var(--sans);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--oscuro-2)}
+p{margin:0}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--mostaza);outline-offset:3px}
+
+.control{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--oscuro-2);border-bottom:1px solid var(--linea-o);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.control>div{max-width:1040px;margin-inline:auto;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.grupo{display:flex;gap:4px;background:var(--oscuro);border-radius:6px;padding:3px}
+.grupo button{background:none;border:0;color:var(--gris-o);font-weight:600;font-size:.9rem;padding:8px 12px;border-radius:4px;cursor:pointer;min-height:40px}
+.grupo button[aria-pressed="true"]{background:var(--crema);color:var(--oscuro)}
+.sim{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--gris-o);cursor:pointer}
+.sim input{width:20px;height:20px;accent-color:var(--rojo)}
+.marca{font-weight:800;letter-spacing:-.03em;margin-right:auto}
+
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.escenario{max-width:1040px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:start}
+@media (max-width:860px){.escenario{grid-template-columns:minmax(0,1fr)}}
+
+h1{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;word-spacing:.12em;line-height:.9;margin:0;font-size:clamp(2rem,6vw,3rem);text-wrap:balance}
+.sub{font-family:var(--serif);font-size:1.25rem;color:var(--mostaza);margin-top:8px}
+
+/* Marco de celular */
+.marco{width:100%;max-width:100%}
+.marco.cel{width:390px;border:10px solid #151212;border-radius:38px;background:var(--oscuro);overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.marco.cel .pantalla{height:740px;overflow-y:auto}
+.pantalla{padding:22px 18px 28px;display:grid;gap:18px}
+.marco:not(.cel) .pantalla{padding:0}
+.contexto{display:grid;gap:6px}
+.contexto .ancla{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-o)}
+.contexto h2{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;line-height:.9;font-size:2.1rem;margin:0}
+.contexto p{color:var(--gris-o);font-size:.95rem}
+
+/* Formulario (mismo diseño que src/components/form/FormularioReserva.module.css) */
+form,.listo{color-scheme:light;display:grid;gap:18px;background:var(--crema);color:var(--oscuro);border-radius:6px;padding:22px;max-width:30rem;width:100%}
+.pasos{display:grid;gap:8px;font-size:.78rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris-c)}
+.barra{height:4px;background:var(--linea-c);border-radius:2px;overflow:hidden}
+.barra span{display:block;height:100%;background:var(--rojo);transition:width .25s ease}
+.resumen{font-size:.95rem;color:var(--gris-c);overflow-wrap:anywhere}
+.resumen strong{color:var(--oscuro);font-weight:600}
+.cambiar{background:none;border:0;padding:4px 2px;min-height:44px;font-weight:600;color:var(--rojo);text-decoration:underline;cursor:pointer}
+.campo{display:grid;gap:6px;min-width:0}
+.campo label{font-weight:800;letter-spacing:-.02em}
+.opc{font-weight:400;color:var(--gris-c);letter-spacing:0}
+.ayuda{margin-top:-2px;font-family:var(--serif);font-size:1.02rem;color:var(--gris-c)}
+.input{font:inherit;font-size:1.0625rem;color:var(--oscuro);background:var(--blanco);border:1.5px solid var(--borde-input);border-radius:4px;padding:11px 13px;min-height:48px;width:100%}
+.input::placeholder{color:#8a8178}
+.input:focus-visible{outline:3px solid var(--mostaza);outline-offset:1px;border-color:var(--oscuro)}
+.input[aria-invalid="true"]{border-color:var(--rojo)}
+textarea.input{resize:vertical;min-height:88px}
+.error{font-size:.92rem;font-weight:600;color:var(--error)}
+.error:empty{display:none}
+.check{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;font-size:.97rem;line-height:1.4}
+.check input{width:24px;height:24px;margin:1px 0 0;accent-color:var(--rojo)}
+.check label{cursor:pointer}
+.boton{font-weight:800;letter-spacing:-.02em;font-size:1.08rem;background:var(--rojo);color:var(--crema);border:0;border-radius:4px;padding:15px 22px;min-height:52px;cursor:pointer;width:100%}
+.boton:hover{background:#b93832}
+.boton:disabled{opacity:.7;cursor:progress}
+.boton .giro{display:inline-block;width:1em;height:1em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-2px;margin-right:8px;animation:g .7s linear infinite}
+@keyframes g{to{transform:rotate(1turn)}}
+.alerta{font-weight:600;color:var(--error);background:#fbe9e7;border-radius:4px;padding:10px 12px}
+.alerta:empty{display:none}
+.ig{font-size:.95rem;color:var(--gris-c);text-align:center}
+.ig a{color:var(--oscuro);font-weight:700;display:inline-block;padding-block:12px}
+.listo .t{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;font-size:2.2rem;line-height:.9}
+.otra{background:none;border:1.5px solid var(--oscuro);color:var(--oscuro);border-radius:4px;padding:10px 14px;font-weight:600;cursor:pointer;justify-self:start;min-height:44px}
+
+/* Nota "Qué medimos" */
+.nota{display:grid;gap:18px;min-width:0}
+.medimos{background:var(--oscuro-2);border:1px solid var(--linea-o);border-radius:6px;padding:18px 20px;color:var(--gris-o);display:grid;gap:10px;font-size:.93rem}
+.medimos h3,.cambia h3{margin:0;font-weight:800;letter-spacing:-.02em;font-size:1.05rem;color:var(--crema)}
+.medimos ul,.cambia ul{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.medimos code,.log code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;color:var(--mostaza)}
+.cambia{display:grid;gap:10px;font-size:.95rem;color:var(--gris-o)}
+.log{background:#1f1b1b;border-radius:6px;padding:12px 14px;font-size:.82rem;max-height:220px;overflow:auto;display:grid;gap:4px;color:var(--gris-o)}
+.log:empty::before{content:"Tocá el formulario y acá aparecen los eventos que se mandarían a /api/t (nunca el valor de los campos).";color:var(--gris-o)}
+@media (max-width:440px){.marco.cel{width:100%;border:0;border-radius:0;box-shadow:none}.marco.cel .pantalla{height:auto;padding-inline:0}}
+.vacio{font-size:.8rem;color:var(--gris-o)}
+@media (prefers-reduced-motion:reduce){.barra span{transition:none}.boton .giro{animation:none}}
+</style>
+
+<div class="control"><div>
+  <span class="marca">Formulario · boceto</span>
+  <div class="grupo" role="group" aria-label="Versión">
+    <button type="button" data-ver="A" aria-pressed="true">A · Un paso</button>
+    <button type="button" data-ver="B" aria-pressed="false">B · Dos pasos</button>
+  </div>
+  <div class="grupo" role="group" aria-label="Vista">
+    <button type="button" data-vista="cel" aria-pressed="true">Celular</button>
+    <button type="button" data-vista="esc" aria-pressed="false">Escritorio</button>
+  </div>
+  <label class="sim"><input type="checkbox" id="simError"> Simular error del servidor</label>
+</div></div>
+
+<main><div class="escenario">
+  <div class="marco cel" id="marco"><div class="pantalla">
+    <div class="contexto">
+      <p class="ancla">#reservar</p>
+      <h2>Reservá tu lugar</h2>
+      <p>Miércoles 18/11, de 18 a 21 h, en Palermo Soho. Solo 30 lugares. USD 27 en pesos.</p>
+    </div>
+    <div id="raiz"></div>
+  </div></div>
+
+  <div class="nota">
+    <div>
+      <h1 id="titulo">Versión A: un paso</h1>
+      <p class="sub" id="bajada">Todo en una pantalla y un solo botón.</p>
+    </div>
+    <div class="cambia">
+      <h3>Qué cambia entre A y B</h3>
+      <ul>
+        <li><b>A</b> pide nombre, mail, WhatsApp e Instagram o web juntos. Menos clics, pero la primera impresión es más larga.</li>
+        <li><b>B</b> pide solo el mail para empezar. El mail ya queda guardado aunque no termine, así se puede escribirle después. El nombre y el resto van en el paso 2. No pide WhatsApp y suma "¿Qué te gustaría resolver?".</li>
+        <li>El botón final: <b>A</b> "Reservar mi lugar"; <b>B</b> "Ir a pagar".</li>
+      </ul>
+    </div>
+    <div class="medimos" id="medimos"></div>
+    <div>
+      <h3 style="margin:0 0 8px;font-weight:800;font-size:1.05rem">Eventos de esta prueba</h3>
+      <div class="log" id="log" aria-live="off"></div>
+    </div>
+    <p class="vacio">Es un boceto: no guarda nada. El formulario real ya está construido en <code>/prueba/formulario</code> y guarda en la base.</p>
+  </div>
+</div></main>
+
+<script>
+(() => {
+  const CONSENT = "Quiero recibir mails sobre la clase. Me puedo dar de baja cuando quiera.";
+  const IG = "https://ig.me/m/casaubon.ar?text=TALLER";
+  const RE = {
+    email: /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/, tel: /^\+?[\d\s]{6,22}$/,
+    ig: /^@?[A-Za-z0-9._]{1,30}$/, url: /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/\S*)?$/i,
+  };
+  const CAMPOS = {
+    nombre: { label: "Nombre", attrs: 'type="text" autocomplete="name"' },
+    email: { label: "Mail", attrs: 'type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="nombre@gmail.com"' },
+    telefono: { label: "WhatsApp", ayuda: "Por si hay un cambio de último momento.", attrs: 'type="tel" autocomplete="tel" inputmode="tel" placeholder="+54 9 11 1234 5678"' },
+    marca: { label: "Instagram o web de tu marca", ayuda: "Para tu auditoría.", attrs: 'type="text" autocomplete="url" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="@tuusuario o tuweb.com"' },
+    objetivo: { label: "¿Qué te gustaría resolver en la clase?", area: true },
+  };
+  const MSJ = {
+    email: { required: "Escribí tu mail.", invalid: "Revisá el mail: falta algo (por ejemplo, nombre@gmail.com)." },
+    nombre: { required: "Escribí tu nombre." },
+    telefono: { invalid: "Usá solo números, espacios y el + del código de país." },
+    marca: { invalid: "Escribí tu usuario de Instagram (@tuusuario) o la dirección de tu web." },
+  };
+  const VERS = {
+    A: { variante: "un-paso", titulo: "Versión A: un paso", bajada: "Todo en una pantalla y un solo botón.",
+      pantallas: [[["nombre", 1], ["email", 1], ["telefono", 0], ["marca", 0]]], final: "Reservar mi lugar" },
+    B: { variante: "dos-pasos", titulo: "Versión B: dos pasos", bajada: "Primero el mail, después el resto.",
+      pantallas: [[["email", 1]], [["nombre", 1], ["marca", 0], ["objetivo", 0]]], final: "Ir a pagar" },
+  };
+  const MEDIMOS = {
+    A: `<h3>Qué medimos en A</h3><ul>
+      <li><code>form_view</code> cuando el formulario aparece en pantalla.</li>
+      <li><code>form_start</code> en el primer toque.</li>
+      <li><code>form_field_focus</code> y <code>form_field_blur</code> por campo, con "completo" y "válido". Nunca lo que escribió.</li>
+      <li><code>form_error</code> con el campo y el tipo de error.</li>
+      <li><code>form_submit</code> y, en el servidor, <code>lead_created</code>.</li>
+      <li><code>instagram_click</code> en "Mandame TALLER".</li>
+      <li>Con esto sale el campo donde más se abandona: el último que tocó quien empezó y no envió.</li></ul>`,
+    B: `<h3>Qué medimos en B</h3><ul>
+      <li>Lo mismo que en A, con el número de paso en cada evento.</li>
+      <li><code>lead_created</code> dos veces: con <code>step=mail</code> al terminar el paso 1 y con <code>step=final</code> al terminar.</li>
+      <li>La comparación clave: cuántos pasan del paso 1 al 2 y cuántos terminan, contra la tasa de A.</li>
+      <li><code>instagram_click</code> en "Mandame TALLER".</li></ul>`,
+  };
+
+  let ver = "A", paso = 0, vals = {}, errs = {}, empezo = false, estado = "editando", errServ = "";
+  const $ = (s) => document.querySelector(s);
+  const raiz = $("#raiz"), log = $("#log");
+  const guardar = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const leer = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
+  function track(name, props) {
+    const li = document.createElement("div");
+    li.innerHTML = `<code>${name}</code> ${Object.entries(props || {}).map(([k, v]) => `${k}=${v}`).join(" ")}`;
+    log.prepend(li);
+  }
+  function validar(c, v, oblig) {
+    v = (v || "").trim();
+    if (!v) return oblig ? "required" : null;
+    if (c === "email") return RE.email.test(v) ? null : "invalid";
+    if (c === "telefono") return RE.tel.test(v) ? null : "invalid";
+    if (c === "marca") return RE.ig.test(v) || RE.url.test(v) ? null : "invalid";
+    return null;
+  }
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  const base = () => ({ variant: VERS[ver].variante, step: paso + 1 });
+
+  function render() {
+    const V = VERS[ver], P = V.pantallas, ultimo = paso === P.length - 1;
+    $("#titulo").textContent = V.titulo; $("#bajada").textContent = V.bajada; $("#medimos").innerHTML = MEDIMOS[ver];
+    if (estado === "listo") {
+      raiz.innerHTML = `<div class="listo" role="status"><p class="t">¡Listo!</p><p>Te escribimos con el link de pago.</p>
+        <p class="vacio" style="color:var(--gris-c)">En la versión final, acá se pasa directo a Mercado Pago.</p>
+        <button type="button" class="otra" id="otra">Probar de nuevo</button></div>`;
+      $("#otra").onclick = () => { reset(); render(); };
+      return;
+    }
+    const cargando = estado === "enviando";
+    let h = `<form novalidate aria-busy="${cargando}">`;
+    if (P.length > 1) h += `<div class="pasos"><p aria-live="polite">Paso ${paso + 1} de ${P.length}</p><div class="barra" aria-hidden="true"><span style="width:${(paso + 1) / P.length * 100}%"></span></div></div>`;
+    if (paso > 0) h += `<p class="resumen">Mail: <strong>${esc(vals.email)}</strong> <button type="button" class="cambiar" id="cambiar">Cambiar</button></p>`;
+    for (const [c, oblig] of P[paso]) {
+      const F = CAMPOS[c], e = errs[c], id = `f-${c}`;
+      const desc = [F.ayuda ? `${id}-a` : "", e ? `${id}-e` : ""].filter(Boolean).join(" ");
+      h += `<div class="campo"><label for="${id}">${F.label}${oblig ? "" : ' <span class="opc">(opcional)</span>'}</label>`;
+      if (F.ayuda) h += `<p class="ayuda" id="${id}-a">${F.ayuda}</p>`;
+      const a = `id="${id}" data-c="${c}" class="input" ${e ? 'aria-invalid="true"' : ""} ${desc ? `aria-describedby="${desc}"` : ""} ${oblig ? "required" : ""}`;
+      h += F.area ? `<textarea ${a} rows="3">${esc(vals[c])}</textarea>` : `<input ${a} ${F.attrs} value="${esc(vals[c])}">`;
+      h += `<p class="error" id="${id}-e" aria-live="polite">${e ? (MSJ[c]?.[e] || "") : ""}</p></div>`;
+    }
+    if (ultimo) h += `<div class="check"><input type="checkbox" id="f-consent" data-c="consentimiento" ${vals.consentimiento ? "checked" : ""}><label for="f-consent">${CONSENT}</label></div>`;
+    h += `<button class="boton" ${cargando ? "disabled" : ""}>${cargando ? '<span class="giro" aria-hidden="true"></span>Guardando…' : ultimo ? V.final : "Seguir"}</button>`;
+    h += `<p class="alerta" role="alert">${errServ}</p>`;
+    h += `<p class="ig">¿Preferís por Instagram? <a href="${IG}" target="_blank" rel="noopener noreferrer" id="ig">Mandame TALLER</a></p></form>`;
+    raiz.innerHTML = h;
+    wire();
+  }
+
+  function obligatorio(c) { return VERS[ver].pantallas[paso].some(([k, o]) => k === c && o); }
+
+  function wire() {
+    const form = raiz.querySelector("form");
+    form.querySelectorAll("[data-c]").forEach((el) => {
+      const c = el.dataset.c;
+      el.addEventListener("focus", () => {
+        if (!empezo) { empezo = true; track("form_start", base()); }
+        track("form_field_focus", { ...base(), field: c });
+      });
+      el.addEventListener("input", () => {
+        vals[c] = el.type === "checkbox" ? el.checked : el.value;
+        if (errs[c] && !validar(c, el.value, obligatorio(c))) { delete errs[c]; refrescarError(c); }
+      });
+      el.addEventListener("change", () => { if (el.type === "checkbox") vals[c] = el.checked; });
+      el.addEventListener("blur", () => {
+        if (c === "consentimiento") { track("form_field_blur", { ...base(), field: c, filled: !!vals[c], valid: true }); return; }
+        const v = (el.value || "").trim(), e = validar(c, v, obligatorio(c));
+        track("form_field_blur", { ...base(), field: c, filled: v.length > 0, valid: !e });
+        if (v) { if (e) { errs[c] = e; track("form_error", { ...base(), field: c, code: e }); } else delete errs[c]; refrescarError(c); }
+      });
+    });
+    $("#ig").onclick = () => track("instagram_click", { place: "formulario", variant: VERS[ver].variante });
+    const cb = $("#cambiar"); if (cb) cb.onclick = () => { paso = 0; errServ = ""; render(); $("#f-email").focus(); };
+    form.addEventListener("submit", enviar);
+  }
+
+  function refrescarError(c) {
+    const el = $(`#f-${c}`), p = $(`#f-${c}-e`); if (!el || !p) return;
+    const e = errs[c];
+    p.textContent = e ? (MSJ[c]?.[e] || "") : "";
+    if (e) el.setAttribute("aria-invalid", "true"); else el.removeAttribute("aria-invalid");
+    const ayuda = CAMPOS[c].ayuda ? `f-${c}-a` : "";
+    const d = [ayuda, e ? `f-${c}-e` : ""].filter(Boolean).join(" ");
+    if (d) el.setAttribute("aria-describedby", d); else el.removeAttribute("aria-describedby");
+  }
+
+  function enviar(ev) {
+    ev.preventDefault();
+    if (estado === "enviando") return;
+    const V = VERS[ver], P = V.pantallas[paso];
+    errs = {}; errServ = "";
+    for (const [c, o] of P) { const e = validar(c, vals[c], o); if (e) errs[c] = e; }
+    const malos = Object.keys(errs);
+    if (malos.length) {
+      malos.forEach((c) => track("form_error", { ...base(), field: c, code: errs[c], on_submit: true }));
+      render(); $(`#f-${malos[0]}`).focus(); return;
+    }
+    const ultimo = paso === V.pantallas.length - 1;
+    track("form_submit", { ...base(), final: ultimo, consent: !!vals.consentimiento });
+    estado = "enviando"; render();
+    setTimeout(() => {
+      if ($("#simError").checked) {
+        estado = "editando"; errServ = "No pudimos guardar tus datos. Probá de nuevo en un rato.";
+        track("form_error", { ...base(), field: "servidor", code: "server_error" }); render(); return;
+      }
+      track("lead_created", { ...base(), servidor: "sí", step: ultimo ? "final" : "mail" });
+      if (ultimo) { estado = "listo"; render(); return; }
+      paso++; estado = "editando"; render(); $(`#f-${V.pantallas[paso][0][0]}`).focus();
+    }, 900);
+  }
+
+  function reset() { paso = 0; vals = {}; errs = {}; empezo = false; estado = "editando"; errServ = ""; }
+
+  function setVer(v) {
+    ver = v; reset(); guardar("form-boceto-ver", v);
+    document.querySelectorAll("[data-ver]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.ver === v)));
+    render(); track("form_view", { variant: VERS[v].variante });
+  }
+  function setVista(v) {
+    $("#marco").classList.toggle("cel", v === "cel"); guardar("form-boceto-vista", v);
+    document.querySelectorAll("[data-vista]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.vista === v)));
+  }
+  document.querySelectorAll("[data-ver]").forEach((b) => b.onclick = () => setVer(b.dataset.ver));
+  document.querySelectorAll("[data-vista]").forEach((b) => b.onclick = () => setVista(b.dataset.vista));
+  // El marco de 390 px no entra en pantallas angostas: ahí se muestra directo.
+  const vistaGuardada = leer("form-boceto-vista");
+  setVista(vistaGuardada || (window.innerWidth < 440 ? "esc" : "cel"));
+  setVer(leer("form-boceto-ver") === "B" ? "B" : "A");
+})();
+</script>

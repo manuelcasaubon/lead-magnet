@@ -23,3 +23,15 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 ## Decisiones de diseño (las suman las sesiones de bocetos)
 
 _Pendiente: las agregan S1, S2 y S3._
+
+### S2 — Formulario ([boceto A/B](https://claude.ai/artifact/E9BUStmJjqnDZaLe1pXB7u))
+
+| # | Pregunta | Por defecto mientras tanto |
+|---|---|---|
+| S2:1 | **¿A (un paso) o B (dos pasos)?** ¿O los dos en el A/B del final (S7)? | A en la landing; B queda lista para el A/B |
+| S2:2 | **En B, el mail del paso 1 se guarda antes del nombre y del consentimiento.** Sirve para escribirle a quien no terminó. ¿Te parece bien? | Se guarda como lead sin consentimiento: no recibe la campaña de venta hasta que marque la casilla |
+| S2:3 | **WhatsApp.** A lo pide como opcional, con la ayuda "Por si hay un cambio de último momento". B no lo pide. ¿Lo pedimos? ¿Te sirve ese texto? | Opcional en A, fuera de B |
+| S2:4 | **"¿Qué te gustaría resolver en la clase?"** está solo en B. ¿Lo sumamos a A? Te puede servir para preparar la clase y la auditoría | Solo en B |
+| S2:5 | **Texto del botón final.** A dice "Reservar mi lugar" y B "Ir a pagar". Con el pago conectado (S3), los dos llevan a Mercado Pago | Se mantienen así |
+| S2:6 | **Mensaje si el pago todavía no está conectado:** "¡Listo! Te escribimos con el link de pago". Promete un mail que hoy nadie manda. Con S3 conectado no aparece | Solo se ve en `/prueba/formulario` |
+| S2:7 | **Instagram o web en un solo campo.** "@usuario" o "usuario" va como Instagram; algo con punto, como "juan.perez", se toma como web. ¿Preferís dos campos separados? | Un campo |
