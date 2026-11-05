@@ -4,7 +4,7 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 
 | # | Decisión | Por defecto mientras tanto | Bloquea |
 |---|---|---|---|
-| D1 | **Dominio de la landing.** ¿Subdominio de `comunicatumarca.com` (p. ej. `clase.comunicatumarca.com`) o el `.vercel.app`? | Se trabaja en `*.vercel.app` (preview) | Difusión |
+| D1 | ~~Dominio de la landing~~ **Decidido (5/11):** `evento.comunicatumarca.com`. DNS en Hostinger: un CNAME `evento` al valor que muestra Vercel. Proyecto Vercel `lead-magnet` (`prj_LiVXyC6pnvJarxq7e0PxztlpTqzc`), creado por Manu | — | — |
 | D1b | **Seguimiento de aperturas y clics en Resend.** Hoy está apagado en `info.comunicatumarca.com`. Prenderlo cambia la configuración del dominio y los links pasan por un redireccionador | Apagado: se miden entregas, rebotes, quejas y bajas, pero no aperturas ni clics | Métricas de mails |
 | D2 | **Formulario y "Mandame TALLER".** ¿El formulario reemplaza al DM o conviven? | Conviven: formulario como CTA principal y "¿Preferís por Instagram?" como link secundario medido (`instagram_click`). Las ventas por DM se cargan en el panel con fuente `instagram_dm` | Landing final |
 | D3 | **Precio en pesos y comisión.** ¿Cuántos ARS? ¿Absorbés la comisión de MP? | `price_ars` vacío = no se puede pagar. `absorb_fee = true` | **Cobrar** |
@@ -18,6 +18,8 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 | D11 | **Permisos de Joaco, Fer y Axel.** | Casos marcados "pendiente de permiso". No salen en producción sin el permiso | Landing final |
 | D12 | **Sala.** Niceto Vega 4601 no figura entre las sedes de Working&Co | — | Logística |
 | D13 | **Repo privado.** Hoy `lead-magnet` es público. Se cambia en GitHub → Settings → General → Danger Zone → *Change visibility* | — | Seguridad |
+| D15 | **Plan de Vercel.** La cuenta está en Hobby, que es para uso no comercial. Para vender entradas conviene Pro (USD 20 por mes). En Hobby, el cron de mails corre una vez por día | Hobby | Venta |
+| D16 | **Rama de producción.** La rama principal de GitHub quedó en `claude/charming-allen-ywp6of` porque fue la primera que se subió. Propuesta: crear `main` y usarla como rama de producción en Vercel | — | Deploys |
 | D14 | **Esfuerzo de las sesiones.** Las sesiones se crean con Opus 5.5. El nivel de esfuerzo "medio" no se puede fijar al crearlas: se ajusta en cada sesión con `/effort` | — | — |
 
 ## Decisiones de diseño (las suman las sesiones de bocetos)

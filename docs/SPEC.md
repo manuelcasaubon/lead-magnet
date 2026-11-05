@@ -338,5 +338,6 @@ Ver `.env.example`. Las carga Manu. Preview usa las credenciales de prueba de MP
 - [ ] Plantillas `confirmacion_entrada` y `aviso_manu` aprobadas.
 - [ ] Compra real completa: pago → retorno → comprobante → PDF → mail → aviso a Manu → aparece en el panel.
 - [ ] Devolución de esa compra desde MP → la entrada queda cancelada.
-- [ ] Dominio conectado (D1) y `NEXT_PUBLIC_SITE_URL` actualizado.
+- [ ] Dominio `evento.comunicatumarca.com` verificado en Vercel y `NEXT_PUBLIC_SITE_URL=https://evento.comunicatumarca.com` en Production.
+- [ ] Plan de Vercel apto para uso comercial (D15).
 - [ ] Repo privado.
