@@ -1,0 +1,617 @@
+<title>Bocetos landing 18/11</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Clase en vivo presencial de 3 horas con Manu Casaubon. Miércoles 18/11, 18 a 21 h, Palermo Soho. Planificación 2027 y auditoría de tu marca. 30 lugares.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Poppins:wght@400;500;600;800;900&display=swap">
+<!--
+  SEO previsto para la versión final (no se aplica en el boceto):
+  <title>Cómo destacar con tu marca personal en 2027 · Clase en vivo con Manu Casaubon</title>
+  <meta name="description" content="Clase en vivo presencial de 3 horas. Miércoles 18/11, 18 a 21 h, Palermo Soho. Planificación 2027 y auditoría de tu marca. 30 lugares.">
+  OG image 1200×630: fondo oscuro, título en Poppins 900 crema, promesa en mostaza, tira con fecha y lugar (ver bosquejo al pie).
+
+  JSON-LD:
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "Cómo destacar con tu marca personal en 2027",
+    "description": "De que nadie te conozca a que te llamen a vos. Clase en vivo presencial de 3 horas.",
+    "startDate": "2026-11-18T18:00:00-03:00",
+    "endDate": "2026-11-18T21:00:00-03:00",
+    "doorTime": "2026-11-18T17:45:00-03:00",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "location": {
+      "@type": "Place",
+      "name": "Palermo Soho",
+      "address": { "@type": "PostalAddress", "streetAddress": "Niceto Vega 4601", "addressLocality": "CABA", "addressCountry": "AR" }
+    },
+    "organizer": { "@type": "Person", "name": "Manu Casaubon", "url": "https://www.youtube.com/@manuelcasaubon" },
+    "performer": { "@type": "Person", "name": "Manu Casaubon" },
+    "offers": { "@type": "Offer", "price": "[precio en ARS: D3]", "priceCurrency": "ARS", "availability": "https://schema.org/InStock", "url": "[URL final: D1]" },
+    "maximumAttendeeCapacity": 30
+  }
+  </script>
+-->
+<style>
+/* Una entrada y la escena del speaker. Bandas oscuro/crema a todo el ancho, títulos apretados.
+   Boceto de un solo tema (marca oscura). Tipografía con cqi para que el marco de celular se vea real. */
+:root{
+  --oscuro:#2d2828; --crema:#fffdf6; --rojo:#d0443f; --mostaza:#dda51e;
+  --oscuro-2:#3a3434; --linea-o:#5a5252; --linea-c:#e4dccb; --gris-c:#5e5757; --gris-o:#c9c2b6;
+  --rojo-hover:#b93832; --mesa:#1f1c1c;
+  --sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--mesa);color:var(--crema);font-family:var(--sans);font-size:17px;line-height:1.55}
+em,i{font-style:normal}
+p{margin:0}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--mostaza);outline-offset:3px}
+.crema a:focus-visible,.crema button:focus-visible,.crema input:focus-visible,.crema summary:focus-visible{outline-color:var(--oscuro)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* ---------- Barra del boceto (no es parte de la landing) ---------- */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--mesa)}
+.mando{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--mesa);border-bottom:1px solid var(--linea-o);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;
+  display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.mando .nombre{font-weight:800;letter-spacing:-.03em;font-size:.95rem}
+.mando .nombre span{color:var(--gris-o);font-weight:500}
+.grupo{display:flex;border:1px solid var(--linea-o);border-radius:6px;overflow:hidden}
+.grupo button{font:inherit;font-size:.88rem;font-weight:600;background:transparent;color:var(--gris-o);border:0;padding:9px 14px;min-height:44px;cursor:pointer}
+.grupo button+button{border-left:1px solid var(--linea-o)}
+.grupo button[aria-pressed="true"]{background:var(--crema);color:var(--oscuro)}
+.grupo button:focus-visible{outline-offset:-3px}
+.mandos{display:flex;flex-wrap:wrap;gap:10px}
+.leyenda{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 0;
+  max-width:1020px;margin-inline:auto;color:var(--gris-o);font-size:.9rem}
+.leyenda b{color:var(--crema)}
+
+/* ---------- Marco ---------- */
+.mesa{padding-block:16px 48px}
+.lienzo{container-type:inline-size;margin-inline:auto;width:100%;background:var(--oscuro)}
+.mesa[data-vista="celular"] .lienzo{width:390px;max-width:calc(100% - 32px);border:1px solid var(--linea-o);border-radius:22px;overflow:clip}
+
+/* ---------- Landing ---------- */
+.banda{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:clamp(48px,9cqi,96px)}
+.banda>div{max-width:980px;margin-inline:auto}
+.crema{background:var(--crema);color:var(--oscuro)}
+.oscuro{background:var(--oscuro);color:var(--crema)}
+h1,h2{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;word-spacing:.12em;line-height:.88;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.4rem,10.4cqi,5.9rem);line-height:.92}
+h2{font-size:clamp(2.1rem,8cqi,4.4rem)}
+.bajada{font-family:var(--serif);font-size:clamp(1.3rem,3.4cqi,1.7rem);line-height:1.3;color:var(--mostaza)}
+.marca{font-weight:800;letter-spacing:-.03em;font-size:1rem;display:flex;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;color:var(--gris-o)}
+.marca b{color:var(--crema);font-weight:800}
+.hero{padding-block-start:clamp(28px,5cqi,48px)}
+.hero>div{display:grid;gap:clamp(24px,5cqi,44px)}
+.promesa{font-weight:800;letter-spacing:-.04em;line-height:1.1;font-size:clamp(1.4rem,4.4cqi,2.3rem);color:var(--mostaza);max-width:22em;text-wrap:balance;margin-top:clamp(14px,3cqi,24px)}
+.resumen{max-width:38em;color:var(--gris-o)}
+
+.entrada{display:grid;grid-template-columns:repeat(4,1fr) auto;background:var(--crema);color:var(--oscuro);border-radius:6px}
+.dato{padding:16px 18px;min-width:0;border-right:1px solid var(--linea-c)}
+.dato span,.etq{display:block;font-size:.74rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-c)}
+.dato strong{display:block;font-weight:800;font-size:1.2rem;letter-spacing:-.03em;line-height:1.15;margin-top:4px}
+.talon{display:flex;align-items:center;padding:14px 18px;border-left:2px dashed var(--oscuro);margin-left:-1px}
+.boton{display:inline-block;background:var(--rojo);color:var(--crema);font:inherit;font-weight:800;font-size:1.1rem;letter-spacing:-.02em;text-decoration:none;
+  padding:14px 22px;min-height:48px;border:0;border-radius:4px;text-align:center;line-height:1.2;cursor:pointer}
+.boton:hover{background:var(--rojo-hover)}
+.secundario{color:var(--gris-o);font-size:.95rem}
+.secundario a{color:var(--crema);font-weight:600}
+.crema .secundario{color:var(--gris-c)}
+.crema .secundario a{color:var(--oscuro)}
+.aviso{font-size:.94rem;color:var(--gris-o);max-width:44em}
+
+/* VSL: póster con la escena en texto */
+.vsl{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--oscuro-2);border:1px solid var(--linea-o);border-radius:6px;overflow:hidden;
+  display:grid;align-content:end;padding:clamp(16px,4cqi,32px);gap:12px}
+.vsl .escena{font-weight:900;letter-spacing:-.04em;line-height:1.05;font-size:clamp(1.15rem,4.2cqi,2.2rem);max-width:20em;text-wrap:balance}
+.vsl .escena em{color:var(--mostaza)}
+.vsl .pie{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.play{width:56px;height:56px;border-radius:50%;border:0;background:var(--rojo);display:grid;place-items:center;cursor:pointer;flex:none}
+.play:hover{background:var(--rojo-hover)}
+.play svg{width:20px;height:20px;margin-left:4px;fill:var(--crema)}
+.chip{display:inline-block;font-size:.74rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:3px;background:var(--mostaza);color:var(--oscuro)}
+.vsl .estado{font-size:.9rem;color:var(--gris-o)}
+.vsl-subt{position:absolute;top:clamp(12px,3cqi,20px);left:clamp(16px,4cqi,32px);font-size:.74rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-o)}
+@container (max-width:460px){.vsl{aspect-ratio:4/5}}
+
+.frase{font-weight:900;letter-spacing:-.05em;line-height:1;font-size:clamp(1.8rem,6.4cqi,3.3rem);max-width:17em;text-wrap:balance}
+.frase em{color:var(--rojo)}
+.texto{max-width:40em;margin-top:22px;color:var(--gris-c)}
+
+.preguntas{list-style:none;margin:clamp(24px,4cqi,36px) 0 0;padding:0;border-top:2px solid var(--crema)}
+.preguntas li{font-weight:900;letter-spacing:-.05em;line-height:1.05;font-size:clamp(1.5rem,5.4cqi,2.7rem);padding-block:16px;border-bottom:1px solid var(--linea-o);text-wrap:balance}
+.remate{margin-top:22px;font-family:var(--serif);font-size:clamp(1.3rem,3.4cqi,1.7rem);line-height:1.3;color:var(--mostaza)}
+
+.lleva{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,4cqi,40px) clamp(28px,5cqi,56px);margin-top:clamp(24px,4cqi,36px)}
+.lleva>div{min-width:0;border-top:2px solid var(--oscuro);padding-top:14px}
+.lleva h3,.dos h3{margin:0 0 6px;font-weight:800;letter-spacing:-.03em;font-size:clamp(1.2rem,2.8cqi,1.5rem);line-height:1.15}
+.lleva p{color:var(--gris-c)}
+
+/* Reglas del juego (D6) */
+.reglas{list-style:none;margin:clamp(24px,4cqi,36px) 0 0;padding:0;display:grid;gap:12px}
+.reglas li{border:2px dashed var(--linea-o);border-radius:6px;padding:18px;display:grid;gap:4px;min-width:0}
+.reglas b{font-weight:800;letter-spacing:-.02em;color:var(--mostaza)}
+.reglas span{color:var(--gris-o);font-size:.95rem}
+.crema .reglas li{border-color:var(--gris-c)}
+.crema .reglas b{color:var(--rojo)}
+.crema .reglas span{color:var(--gris-c)}
+
+.prog{display:grid;margin-top:clamp(28px,5cqi,44px);border-top:2px solid var(--crema)}
+.fila{display:grid;grid-template-columns:5.2rem minmax(0,1fr);gap:8px 24px;padding-block:22px;border-bottom:1px solid var(--linea-o)}
+.hora{font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--mostaza);font-size:1.15rem;line-height:1.3}
+.fila h3{margin:0;font-weight:800;font-size:clamp(1.3rem,3.4cqi,1.75rem);letter-spacing:-.04em;line-height:1.1}
+.fila p{margin-top:6px;color:var(--gris-o);max-width:38em}
+.nivel{font-family:var(--serif);font-size:1.06rem;color:var(--mostaza)}
+
+.dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,5cqi,56px);margin-top:clamp(24px,4cqi,36px)}
+ul.lista{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+ul.lista li{padding-left:1.1em;position:relative}
+ul.lista li::before{content:"";position:absolute;left:0;top:.62em;width:.45em;height:.45em;background:var(--rojo)}
+.no li::before{background:var(--linea-c)!important;outline:1px solid var(--gris-c)}
+
+.casos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,4cqi,36px);margin-top:clamp(24px,4cqi,36px)}
+.caso{min-width:0;border-top:2px solid var(--oscuro);padding-top:14px}
+.caso strong{display:block;font-weight:900;letter-spacing:-.05em;line-height:1;font-size:clamp(1.7rem,4cqi,2.3rem)}
+.caso h3{margin:10px 0 4px;font-weight:800;letter-spacing:-.02em;font-size:1.02rem}
+.caso p{color:var(--gris-c);font-size:.98rem}
+.permiso{display:inline-block;margin-top:10px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--rojo);color:var(--rojo);border-radius:3px}
+.chico{margin-top:22px;font-size:.92rem;color:var(--gris-c)}
+
+.bio{display:grid;gap:16px;max-width:42em;margin-top:22px}
+.bio p{color:var(--gris-o)}
+
+.faq{display:grid;margin-top:clamp(24px,4cqi,36px);border-top:2px solid var(--oscuro)}
+.oscuro .faq{border-top-color:var(--crema)}
+details{border-bottom:1px solid var(--linea-c);padding-block:4px}
+.oscuro details{border-bottom-color:var(--linea-o)}
+summary{cursor:pointer;font-weight:800;letter-spacing:-.02em;padding-block:14px;font-size:1.08rem;min-height:44px}
+details>p{padding-bottom:16px;color:var(--gris-c);max-width:40em}
+.oscuro details>p{color:var(--gris-o)}
+details a{color:var(--rojo);font-weight:600}
+.oscuro details a{color:var(--mostaza)}
+
+/* Programa en acordeón (B) */
+.prog-ac{margin-top:clamp(24px,4cqi,36px);border-top:2px solid var(--crema)}
+.prog-ac summary{display:grid;grid-template-columns:4.4rem minmax(0,1fr);gap:4px 16px;align-items:baseline}
+.prog-ac summary .hora{font-size:1.05rem}
+.prog-ac summary small{display:block;font-family:var(--serif);font-weight:400;font-size:1rem;color:var(--mostaza);letter-spacing:0}
+.prog-ac details>p{padding-left:calc(4.4rem + 16px)}
+
+/* Formulario embebido (forma del formulario A de S2, solo visual) */
+.form{display:grid;gap:16px;max-width:30rem;width:100%;background:var(--crema);color:var(--oscuro);border-radius:6px;padding:clamp(18px,5cqi,28px)}
+.campo{display:grid;gap:6px}
+.campo label{font-weight:600;font-size:.95rem}
+.campo label small{font-weight:400;color:var(--gris-c)}
+.campo input{font:inherit;font-size:1rem;color:var(--oscuro);background:#fff;border:1.5px solid var(--gris-c);border-radius:4px;padding:11px 12px;min-height:48px;width:100%}
+.campo .ayuda{font-size:.85rem;color:var(--gris-c)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;color:var(--gris-c)}
+.consent input{width:22px;height:22px;margin:2px 0 0;flex:none;accent-color:var(--rojo)}
+.form .boton{width:100%}
+.form .estado{font-size:.9rem;color:var(--gris-c);min-height:1.4em}
+.final>div{display:grid;gap:22px;justify-items:start}
+
+/* Tira compacta + contador (B) */
+.tira{display:flex;flex-wrap:wrap;gap:6px 0;font-weight:800;letter-spacing:-.02em;font-size:1.05rem}
+.tira span{padding-right:12px;margin-right:12px;border-right:1px solid var(--linea-o)}
+.tira span:last-child{border-right:0;margin-right:0}
+.reserva{display:grid;gap:14px;justify-items:start}
+.contador{font-weight:900;letter-spacing:-.04em;font-size:clamp(1.5rem,5cqi,2.2rem);line-height:1}
+.contador b{color:var(--mostaza)}
+.nota-base{font-size:.85rem;color:var(--gris-o);border-left:3px solid var(--mostaza);padding-left:10px}
+
+/* Barra fija de celular (A) */
+.barra{position:sticky;bottom:0;z-index:5;background:var(--oscuro);border-top:1px solid var(--linea-o);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.barra p{font-weight:800;letter-spacing:-.02em;font-size:.95rem;line-height:1.2}
+.barra p span{display:block;font-weight:500;color:var(--gris-o);font-size:.82rem}
+.barra .boton{padding:12px 16px;font-size:1.1rem;flex:none}
+
+@container (max-width:820px){
+  .entrada{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dato{border-bottom:1px solid var(--linea-c)}
+  .dato:nth-child(2n){border-right:0}
+  .talon{grid-column:1/-1;border-left:0;border-top:2px dashed var(--oscuro);margin:-1px 0 0}
+  .talon .boton{width:100%}
+  .dos,.casos,.lleva{grid-template-columns:minmax(0,1fr)}
+}
+@container (min-width:821px){ .barra{display:none} .reglas{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@container (max-width:460px){
+  .fila{grid-template-columns:minmax(0,1fr)}
+  .prog-ac details>p{padding-left:0}
+}
+
+/* ---------- Notas del boceto (fuera de la landing) ---------- */
+.notas{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 64px;max-width:1020px;margin-inline:auto;display:grid;gap:20px;color:var(--gris-o)}
+.notas h2{font-size:1.6rem;color:var(--crema)}
+.notas ul{margin:0;padding-left:1.2em;display:grid;gap:6px;max-width:46em}
+.notas b{color:var(--crema)}
+.og{container-type:inline-size;width:100%;max-width:600px;aspect-ratio:1200/630;background:var(--oscuro);border:1px solid var(--linea-o);border-radius:4px;
+  padding:6cqi;display:grid;align-content:space-between}
+.og .og-marca{font-weight:800;font-size:3.2cqi;color:var(--gris-o);letter-spacing:-.02em}
+.og .og-tit{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;line-height:.9;font-size:8.6cqi;color:var(--crema)}
+.og .og-pro{font-weight:800;font-size:4cqi;color:var(--mostaza);letter-spacing:-.03em;margin-top:2cqi}
+.og .og-tira{font-weight:800;font-size:3.2cqi;color:var(--oscuro);background:var(--crema);padding:1.6cqi 2.4cqi;border-radius:.8cqi;justify-self:start}
+</style>
+
+<header class="mando">
+  <p class="nombre">Bocetos de la landing <span>· clase del 18/11</span></p>
+  <div class="mandos">
+    <div class="grupo" role="group" aria-label="Versión del boceto">
+      <button type="button" data-version="a" aria-pressed="true">A · Fiel al boceto</button>
+      <button type="button" data-version="b" aria-pressed="false">B · Video primero</button>
+    </div>
+    <div class="grupo" role="group" aria-label="Vista">
+      <button type="button" data-vista="celular" aria-pressed="true">Celular</button>
+      <button type="button" data-vista="escritorio" aria-pressed="false">Escritorio</button>
+    </div>
+  </div>
+</header>
+
+<p class="leyenda" id="leyenda" aria-live="polite"><b>Versión A, fiel al boceto.</b> Misma estructura y textos del boceto original, con formulario embebido, lugar para el video y barra fija en el celular.</p>
+
+<main class="mesa" id="mesa" data-vista="celular">
+<div class="lienzo">
+
+<!-- =================== VERSIÓN A · FIEL AL BOCETO =================== -->
+<div class="version" id="version-a" data-version="a">
+
+<section class="banda hero oscuro" id="hero-a"><div>
+  <p class="marca"><b>Manu Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
+  <div>
+    <h1>Cómo destacar con tu marca personal en 2027</h1>
+    <p class="promesa">De que nadie te conozca a que te llamen a vos.</p>
+  </div>
+  <p class="resumen">3 horas para entender cómo cambiaron las reglas de las redes y de la estrategia de marca, y salir con tu plan para 2027.</p>
+  <div class="entrada">
+    <div class="dato"><span>Cuándo</span><strong>Miércoles 18/11</strong></div>
+    <div class="dato"><span>Horario</span><strong>18 a 21 h</strong></div>
+    <div class="dato"><span>Dónde</span><strong>Palermo Soho</strong></div>
+    <div class="dato"><span>Entrada</span><strong>USD 27</strong></div>
+    <div class="talon"><a class="boton" href="#reservar">Reservar mi lugar</a></div>
+  </div>
+  <p class="aviso">Solo 30 lugares. Niceto Vega 4601, CABA. Pagás en pesos por Mercado Pago.</p>
+  <p class="secundario">¿Preferís por Instagram? <a href="https://ig.me/m/casaubon.ar?text=TALLER">Mandame TALLER</a></p>
+</div></section>
+
+<section class="banda oscuro" style="padding-block-start:0" aria-label="Video de presentación"><div>
+  <div class="vsl">
+    <span class="vsl-subt">Mini video · 1:30</span>
+    <p class="escena">¿Te pasó de estar en un evento, escuchar al speaker y pensar: <em>«sabe, pero no sabe tanto como yo»</em>? ¿Por qué lo llaman a él y a mí no?</p>
+    <div class="pie">
+      <button class="play" type="button" aria-label="Reproducir el video (todavía no está grabado)" data-play><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 1.5v17l15-8.5z"/></svg></button>
+      <span class="chip">Video en camino</span>
+      <span class="estado" aria-live="polite"></span>
+    </div>
+  </div>
+</div></section>
+
+<section class="banda crema"><div>
+  <p class="frase">Vas a un evento, escuchás al speaker y pensás: <em>«Sabe, pero no sabe tanto como yo».</em></p>
+  <p class="texto">Entonces, ¿por qué lo llaman a él y a vos no? Porque él está comunicando lo que sabe. En esta clase trabajamos para que tu sector te conozca, en las redes y arriba del escenario, con una comunicación profesional.</p>
+</div></section>
+
+<section class="banda oscuro"><div>
+  <h2>Si hoy te preguntás esto</h2>
+  <ul class="preguntas">
+    <li>¿Qué debería hacer con mi marca?</li>
+    <li>¿Qué tipo de contenido tendría que hacer?</li>
+    <li>¿Qué estrategia tendría que seguir?</li>
+    <li>¿Qué va a funcionar en 2027?</li>
+  </ul>
+  <p class="remate">Esta clase es para vos. Eso es lo que vamos a trabajar.</p>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Las reglas del juego cambiaron</h2>
+  <p class="texto">En las redes y en la estrategia de marca. Estos son los cambios que vamos a trabajar en la clase.</p>
+  <ul class="reglas">
+    <li><b>[Cambio de 2027: lo define Manu]</b><span>Casillero 1 de 3 (D6)</span></li>
+    <li><b>[Cambio de 2027: lo define Manu]</b><span>Casillero 2 de 3 (D6)</span></li>
+    <li><b>[Cambio de 2027: lo define Manu]</b><span>Casillero 3 de 3, opcional (D6)</span></li>
+  </ul>
+</div></section>
+
+<section class="banda crema" style="padding-block-start:0"><div>
+  <h2>Qué te llevás</h2>
+  <div class="lleva">
+    <div><h3>Tu planificación para 2027</h3><p>Una planificación completa para saber exactamente dónde poner el foco en tus redes y en tu marca personal.</p></div>
+    <div><h3>Una auditoría personalizada</h3><p>La auditoría de tu marca, mirada en los 3 niveles de comunicación.</p></div>
+    <div><h3>Cómo diferenciarte</h3><p>Entendés cómo cambiaron las reglas del juego y cómo diferenciar tu marca en 2027.</p></div>
+    <div><h3>Tus preguntas, en persona</h3><p>Me preguntás lo que necesites en vivo, cara a cara.</p></div>
+  </div>
+</div></section>
+
+<section class="banda oscuro"><div>
+  <h2>Qué pasa en las 3 horas</h2>
+  <div class="prog">
+    <div class="fila"><div class="hora">18:00</div><div><div class="nivel">Bienvenida</div><h3>Las reglas cambiaron</h3><p>Qué cambió en las redes sociales y en la estrategia de marca para 2027.</p></div></div>
+    <div class="fila"><div class="hora">18:20</div><div><div class="nivel">Comunicación estratégica</div><h3>Qué decís</h3><p>Trabajás tu mensaje: qué hacés, para quién y por qué te tienen que escuchar a vos.</p></div></div>
+    <div class="fila"><div class="hora">18:50</div><div><div class="nivel">Comunicación creativa</div><h3>Cómo lo mostrás</h3><p>Definís qué tipo de contenido te conviene hacer y cuál es el formato que te sale natural.</p></div></div>
+    <div class="fila"><div class="hora">19:20</div><div><div class="nivel">Pausa</div><h3>Break</h3><p>15 minutos para descansar y conocer a quienes están en la sala.</p></div></div>
+    <div class="fila"><div class="hora">19:35</div><div><div class="nivel">Comunicación de impacto</div><h3>Cómo lo decís</h3><p>Practicamos en vivo. Dos o tres personas pasan al frente y las corrijo ahí mismo, para que todos vean qué cambia.</p></div></div>
+    <div class="fila"><div class="hora">20:05</div><div><div class="nivel">Plan 2027</div><h3>Tu foco y tus preguntas</h3><p>Cerramos tu planificación para 2027 y me hacés tus preguntas en vivo.</p></div></div>
+    <div class="fila"><div class="hora">20:35</div><div><div class="nivel">Cierre</div><h3>Cómo seguir</h3><p>Te cuento cómo es mi programa de 4 meses, para quien quiera seguir trabajando conmigo. A las 21 h terminamos.</p></div></div>
+  </div>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Para quién es</h2>
+  <div class="dos">
+    <div>
+      <h3>Es para vos si</h3>
+      <ul class="lista">
+        <li>Ya tenés una marca personal o la querés empezar.</li>
+        <li>Querés una estrategia clara y saber hacia dónde ir en 2027.</li>
+        <li>Sabés de lo tuyo y querés que tu sector te conozca.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>No es para vos si</h3>
+      <ul class="lista no">
+        <li>Buscás hacerte viral o famoso.</li>
+        <li>Esperás resultados de un día para el otro.</li>
+        <li>Querés una fórmula para repetir sin pensar.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="banda crema" style="padding-block-start:0"><div>
+  <h2>Algunos alumnos</h2>
+  <div class="casos">
+    <div class="caso"><strong>USD 5.000</strong><h3>Joaco Comar</h3><p>Lo cerró en su primera charla propia, con 12 personas en la sala.</p><span class="permiso">Pendiente de permiso escrito</span></div>
+    <div class="caso"><strong>2.000 a 8.700</strong><h3>Fer Di Tomasso</h3><p>Sommelier de más de 45 años. Seguidores en 8 meses, más invitaciones a charlas y capacitaciones.</p><span class="permiso">Pendiente de permiso escrito</span></div>
+    <div class="caso"><strong>30.000 a 48.000</strong><h3>Axel Becker</h3><p>Seguidores en 5 a 6 meses. Hoy es referente de finanzas y cripto.</p><span class="permiso">Pendiente de permiso escrito</span></div>
+  </div>
+  <p class="chico">Son resultados de cada uno, con su trabajo y su contexto. No son una promesa.</p>
+</div></section>
+
+<section class="banda oscuro"><div>
+  <h2>Quién la da</h2>
+  <div class="bio">
+    <p>Soy Manu Casaubon. Trabajo con personas que tienen algo importante para decir, para que aprendan a comunicarlo siendo ellas mismas, sin armar un personaje.</p>
+    <p>Tengo más de 200.000 seguidores en TikTok y más de 100.000 en YouTube. Desde que cambié de tema sumé unos 30.000 seguidores nuevos en Instagram. Doy charlas y capacitaciones en universidades y eventos.</p>
+  </div>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Preguntas</h2>
+  <div class="faq">
+    <details><summary>¿Dónde es?</summary><p>En Niceto Vega 4601, Palermo Soho, CABA.</p></details>
+    <details><summary>¿Cuánto dura?</summary><p>3 horas, de 18 a 21 h. Las puertas abren a las 17:45.</p></details>
+    <details><summary>Recién empiezo con mi marca, ¿me sirve?</summary><p>Sí. Te llevás una estrategia clara para arrancar y saber dónde poner el foco.</p></details>
+    <details><summary>¿Tengo que tener muchos seguidores?</summary><p>No. Lo que importa es que tengas algo para decir.</p></details>
+    <details><summary>Nunca di una charla, ¿me sirve?</summary><p>Sí. Somos 30 personas y pasar al frente es opcional.</p></details>
+    <details><summary>¿Cómo pago?</summary><p>Por Mercado Pago, en pesos. Completás tus datos y pasás a pagar. Si después entrás a mi programa, los USD 27 se descuentan.</p></details>
+    <details><summary>¿Y si ese día no puedo ir?</summary><p><a href="https://ig.me/m/casaubon.ar?text=TALLER">Escribime TALLER igual</a> y te cuento lo que sigue.</p></details>
+  </div>
+</div></section>
+
+<section class="banda final oscuro" id="reservar"><div>
+  <h2>Nos vemos el 18/11</h2>
+  <p class="bajada">Solo 30 lugares, miércoles de 18 a 21 h, en Palermo Soho.</p>
+  <form class="form" novalidate data-form>
+    <div class="campo"><label for="a-nombre">Nombre</label><input id="a-nombre" name="nombre" autocomplete="name" required></div>
+    <div class="campo"><label for="a-mail">Mail</label><input id="a-mail" name="mail" type="email" autocomplete="email" inputmode="email" required></div>
+    <div class="campo"><label for="a-wa">WhatsApp <small>(opcional)</small></label><input id="a-wa" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel"></div>
+    <div class="campo"><label for="a-ig">Instagram o web de tu marca <small>(opcional)</small></label><input id="a-ig" name="perfil" autocomplete="url"><span class="ayuda">Para tu auditoría.</span></div>
+    <label class="consent" for="a-ok"><input id="a-ok" name="consentimiento" type="checkbox"> Quiero recibir mails sobre la clase. Me puedo dar de baja cuando quiera.</label>
+    <button class="boton" type="submit">Reservar mi lugar</button>
+    <p class="estado" aria-live="polite"></p>
+  </form>
+  <p class="secundario">¿Preferís por Instagram? <a href="https://ig.me/m/casaubon.ar?text=TALLER">Mandame TALLER</a></p>
+</div></section>
+
+<div class="barra" data-barra hidden>
+  <p>Miércoles 18/11 · USD 27<span>30 lugares en Palermo Soho</span></p>
+  <a class="boton" href="#reservar">Reservar</a>
+</div>
+</div>
+
+<!-- =================== VERSIÓN B · VIDEO PRIMERO =================== -->
+<div class="version" id="version-b" data-version="b" hidden>
+
+<section class="banda hero oscuro"><div>
+  <p class="marca"><b>Manu Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
+  <div>
+    <h1>Cómo destacar con tu marca personal en 2027</h1>
+    <p class="promesa">De que nadie te conozca a que te llamen a vos.</p>
+  </div>
+  <div class="vsl" aria-label="Video de presentación">
+    <span class="vsl-subt">Mini video · 1:30</span>
+    <p class="escena">¿Te pasó de estar en un evento, escuchar al speaker y pensar: <em>«sabe, pero no sabe tanto como yo»</em>? ¿Por qué lo llaman a él y a mí no?</p>
+    <div class="pie">
+      <button class="play" type="button" aria-label="Reproducir el video (todavía no está grabado)" data-play><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 1.5v17l15-8.5z"/></svg></button>
+      <span class="chip">Video en camino</span>
+      <span class="estado" aria-live="polite"></span>
+    </div>
+  </div>
+  <p class="tira" aria-label="Datos de la clase"><span>Mié 18/11</span><span>18 a 21 h</span><span>Palermo Soho</span><span>USD 27</span></p>
+  <div class="reserva">
+    <p class="contador">Quedan <b>N</b> de 30 lugares</p>
+    <p class="nota-base">Nota del boceto: N sale de la base (cupo real). Nunca baja de 0.</p>
+    <a class="boton" href="#reservar-b">Reservar mi lugar</a>
+    <p class="secundario">¿Preferís por Instagram? <a href="https://ig.me/m/casaubon.ar?text=TALLER">Mandame TALLER</a></p>
+  </div>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Si hoy te preguntás esto</h2>
+  <ul class="preguntas" style="border-top-color:var(--oscuro)">
+    <li style="border-bottom-color:var(--linea-c)">¿Qué debería hacer con mi marca?</li>
+    <li style="border-bottom-color:var(--linea-c)">¿Qué tipo de contenido tendría que hacer?</li>
+    <li style="border-bottom-color:var(--linea-c)">¿Qué estrategia tendría que seguir?</li>
+    <li style="border-bottom-color:var(--linea-c)">¿Qué va a funcionar en 2027?</li>
+  </ul>
+  <p class="remate" style="color:var(--rojo)">Esta clase es para vos. Eso es lo que vamos a trabajar.</p>
+</div></section>
+
+<section class="banda oscuro"><div>
+  <h2>Las reglas del juego cambiaron</h2>
+  <ul class="reglas">
+    <li><b>[Cambio de 2027: lo define Manu]</b><span>Casillero 1 de 3 (D6)</span></li>
+    <li><b>[Cambio de 2027: lo define Manu]</b><span>Casillero 2 de 3 (D6)</span></li>
+    <li><b>[Cambio de 2027: lo define Manu]</b><span>Casillero 3 de 3, opcional (D6)</span></li>
+  </ul>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Qué te llevás</h2>
+  <div class="lleva">
+    <div><h3>Tu planificación para 2027</h3><p>Para saber exactamente dónde poner el foco en tus redes y en tu marca personal.</p></div>
+    <div><h3>Una auditoría personalizada</h3><p>Tu marca, mirada en los 3 niveles de comunicación.</p></div>
+    <div><h3>Cómo diferenciarte</h3><p>Cómo cambiaron las reglas del juego y cómo diferenciar tu marca en 2027.</p></div>
+    <div><h3>Tus preguntas, en persona</h3><p>Me preguntás lo que necesites, cara a cara.</p></div>
+  </div>
+</div></section>
+
+<section class="banda oscuro"><div>
+  <h2>Qué pasa en las 3 horas</h2>
+  <div class="prog-ac">
+    <details><summary><span class="hora">18:00</span><span>Las reglas cambiaron<small>Bienvenida</small></span></summary><p>Qué cambió en las redes sociales y en la estrategia de marca para 2027.</p></details>
+    <details><summary><span class="hora">18:20</span><span>Qué decís<small>Comunicación estratégica</small></span></summary><p>Trabajás tu mensaje: qué hacés, para quién y por qué te tienen que escuchar a vos.</p></details>
+    <details><summary><span class="hora">18:50</span><span>Cómo lo mostrás<small>Comunicación creativa</small></span></summary><p>Definís qué tipo de contenido te conviene hacer y cuál es el formato que te sale natural.</p></details>
+    <details><summary><span class="hora">19:20</span><span>Break<small>Pausa</small></span></summary><p>15 minutos para descansar y conocer a quienes están en la sala.</p></details>
+    <details><summary><span class="hora">19:35</span><span>Cómo lo decís<small>Comunicación de impacto</small></span></summary><p>Practicamos en vivo. Dos o tres personas pasan al frente y las corrijo ahí mismo, para que todos vean qué cambia.</p></details>
+    <details><summary><span class="hora">20:05</span><span>Tu foco y tus preguntas<small>Plan 2027</small></span></summary><p>Cerramos tu planificación para 2027 y me hacés tus preguntas en vivo.</p></details>
+    <details><summary><span class="hora">20:35</span><span>Cómo seguir<small>Cierre</small></span></summary><p>Te cuento cómo es mi programa de 4 meses, para quien quiera seguir trabajando conmigo. A las 21 h terminamos.</p></details>
+  </div>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Para quién es</h2>
+  <div class="dos">
+    <div>
+      <h3>Es para vos si</h3>
+      <ul class="lista">
+        <li>Ya tenés una marca personal o la querés empezar.</li>
+        <li>Querés una estrategia clara para 2027.</li>
+        <li>Sabés de lo tuyo y querés que tu sector te conozca.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>No es para vos si</h3>
+      <ul class="lista no">
+        <li>Buscás hacerte viral o famoso.</li>
+        <li>Esperás resultados de un día para el otro.</li>
+        <li>Querés una fórmula para repetir sin pensar.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="banda oscuro"><div>
+  <h2>Quién la da</h2>
+  <div class="bio">
+    <p>Soy Manu Casaubon. Trabajo con personas que tienen algo importante para decir, para que aprendan a comunicarlo siendo ellas mismas, sin armar un personaje.</p>
+    <p>Tengo más de 200.000 seguidores en TikTok y más de 100.000 en YouTube. Doy charlas y capacitaciones en universidades y eventos.</p>
+  </div>
+</div></section>
+
+<section class="banda crema"><div>
+  <h2>Preguntas</h2>
+  <div class="faq">
+    <details><summary>¿Dónde es?</summary><p>En Niceto Vega 4601, Palermo Soho, CABA. Las puertas abren a las 17:45.</p></details>
+    <details><summary>Recién empiezo con mi marca, ¿me sirve?</summary><p>Sí. Te llevás una estrategia clara para arrancar y saber dónde poner el foco.</p></details>
+    <details><summary>¿Tengo que tener muchos seguidores?</summary><p>No. Lo que importa es que tengas algo para decir.</p></details>
+    <details><summary>Nunca di una charla, ¿me sirve?</summary><p>Sí. Somos 30 personas y pasar al frente es opcional.</p></details>
+    <details><summary>¿Cómo pago?</summary><p>Por Mercado Pago, en pesos. Si después entrás a mi programa, los USD 27 se descuentan.</p></details>
+    <details><summary>¿Y si ese día no puedo ir?</summary><p><a href="https://ig.me/m/casaubon.ar?text=TALLER">Escribime TALLER igual</a> y te cuento lo que sigue.</p></details>
+  </div>
+</div></section>
+
+<section class="banda final oscuro" id="reservar-b"><div>
+  <h2>Nos vemos el 18/11</h2>
+  <p class="contador">Quedan <b>N</b> de 30 lugares</p>
+  <form class="form" novalidate data-form>
+    <div class="campo"><label for="b-nombre">Nombre</label><input id="b-nombre" name="nombre" autocomplete="name" required></div>
+    <div class="campo"><label for="b-mail">Mail</label><input id="b-mail" name="mail" type="email" autocomplete="email" inputmode="email" required></div>
+    <div class="campo"><label for="b-wa">WhatsApp <small>(opcional)</small></label><input id="b-wa" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel"></div>
+    <div class="campo"><label for="b-ig">Instagram o web de tu marca <small>(opcional)</small></label><input id="b-ig" name="perfil" autocomplete="url"><span class="ayuda">Para tu auditoría.</span></div>
+    <label class="consent" for="b-ok"><input id="b-ok" name="consentimiento" type="checkbox"> Quiero recibir mails sobre la clase. Me puedo dar de baja cuando quiera.</label>
+    <button class="boton" type="submit">Reservar mi lugar</button>
+    <p class="estado" aria-live="polite"></p>
+  </form>
+  <p class="secundario">¿Preferís por Instagram? <a href="https://ig.me/m/casaubon.ar?text=TALLER">Mandame TALLER</a></p>
+</div></section>
+</div>
+
+</div>
+</main>
+
+<section class="notas" aria-labelledby="notas-tit">
+  <h2 id="notas-tit">Notas del boceto</h2>
+  <ul>
+    <li><b>El formulario no envía nada.</b> Tiene la forma del formulario A de S2 (un paso). El funcional lo arma S2.</li>
+    <li><b>Video:</b> todavía no está grabado. La página funciona sin él: el póster muestra la escena en texto.</li>
+    <li><b>Casos de alumnos:</b> no salen en producción sin el permiso escrito (D11).</li>
+    <li><b>Reglas de 2027:</b> los casilleros los completa Manu (D6).</li>
+    <li><b>SEO previsto:</b> título, descripción y JSON-LD <code>Event</code> están en un comentario al principio del archivo. Bosquejo de la imagen para compartir (1200×630):</li>
+  </ul>
+  <div class="og" role="img" aria-label="Bosquejo de la imagen para compartir: título de la clase, promesa y fecha">
+    <p class="og-marca">Manu Casaubon · Clase en vivo</p>
+    <div><p class="og-tit">Cómo destacar con tu marca personal en 2027</p><p class="og-pro">De que nadie te conozca a que te llamen a vos.</p></div>
+    <p class="og-tira">Miércoles 18/11 · 18 a 21 h · Palermo Soho</p>
+  </div>
+</section>
+
+<script>
+(function(){
+  var guardar=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
+  var leer=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+  var mesa=document.getElementById('mesa');
+  var leyenda=document.getElementById('leyenda');
+  var textos={
+    a:'<b>Versión A, fiel al boceto.</b> Misma estructura y textos del boceto original, con formulario embebido, lugar para el video y barra fija en el celular.',
+    b:'<b>Versión B, video primero.</b> Título, video y una tira con los datos. Contador de lugares, cuerpo más corto y programa en acordeón.'
+  };
+
+  function ponerVersion(v){
+    document.querySelectorAll('.version').forEach(function(el){el.hidden=el.dataset.version!==v});
+    document.querySelectorAll('[data-version]').forEach(function(b){if(b.tagName==='BUTTON')b.setAttribute('aria-pressed',String(b.dataset.version===v))});
+    leyenda.innerHTML=textos[v];
+    guardar('boceto-pagina-version',v);
+  }
+  function ponerVista(v){
+    mesa.dataset.vista=v;
+    document.querySelectorAll('button[data-vista]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.vista===v))});
+    guardar('boceto-pagina-vista',v);
+  }
+  document.querySelectorAll('button[data-version]').forEach(function(b){b.addEventListener('click',function(){ponerVersion(b.dataset.version)})});
+  document.querySelectorAll('button[data-vista]').forEach(function(b){b.addEventListener('click',function(){ponerVista(b.dataset.vista)})});
+  var v0=leer('boceto-pagina-version'); if(v0==='a'||v0==='b') ponerVersion(v0);
+  var w0=leer('boceto-pagina-vista'); if(w0==='celular'||w0==='escritorio') ponerVista(w0);
+
+  // Play del video: todavía no hay archivo.
+  document.querySelectorAll('[data-play]').forEach(function(b){
+    b.addEventListener('click',function(){
+      b.parentNode.querySelector('.estado').textContent='El video todavía no está grabado. Mientras tanto, la escena queda en texto.';
+    });
+  });
+
+  // Formulario solo visual.
+  document.querySelectorAll('[data-form]').forEach(function(f){
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var mail=f.querySelector('input[type=email]'), nombre=f.querySelector('input[name=nombre]'), estado=f.querySelector('.estado');
+      if(!nombre.value.trim()){estado.textContent='Falta tu nombre.';nombre.focus();return}
+      if(!/^\S+@\S+\.\S+$/.test(mail.value.trim())){estado.textContent='Revisá tu mail: falta algo, por ejemplo la @.';mail.focus();return}
+      estado.textContent='Boceto: acá seguiría el pago con Mercado Pago. Este formulario no envía datos.';
+    });
+  });
+
+  // Barra fija de la versión A: aparece cuando el hero sale de la pantalla y se oculta sobre el formulario.
+  var barra=document.querySelector('[data-barra]');
+  if('IntersectionObserver' in window && barra){
+    var heroFuera=false, formVisible=false;
+    var act=function(){barra.hidden=!(heroFuera&&!formVisible)};
+    new IntersectionObserver(function(es){es.forEach(function(e){heroFuera=!e.isIntersecting&&e.boundingClientRect.top<0});act()}).observe(document.getElementById('hero-a'));
+    new IntersectionObserver(function(es){es.forEach(function(e){formVisible=e.isIntersecting});act()}).observe(document.getElementById('reservar'));
+  }
+})();
+</script>
