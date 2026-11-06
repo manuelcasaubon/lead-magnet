@@ -16,4 +16,8 @@ export const formatoArs = (n: number) => `ARS ${n.toLocaleString("es-AR", { maxi
 /** Fotos reales de Manu (charla, clase, capacitación). Van en /public/fotos/ y se cargan acá cuando Manu las pase.
  *  Sin archivo, el lugar no se muestra. Con FOTOS_BOCETO=1 (solo para el boceto) se ve un recuadro con lo que va. */
 export type Foto = { src: string; alt: string; ancho: number; alto: number } | null;
-export const FOTOS: { charla: Foto; clase: Foto; quien: Foto } = { charla: null, clase: null, quien: null };
+export const FOTOS: { charla: Foto; clase: Foto; quien: Foto } = {
+  charla: { src: "/fotos/manu-tent.jpg", alt: "Manu Casaubon como host en el escenario de tent. Creator Summit, frente al público", ancho: 1600, alto: 1067 },
+  clase: { src: "/fotos/manu-clase.jpg", alt: "Manu Casaubon de espaldas, dando una clase a un grupo sentado alrededor de una mesa", ancho: 1600, alto: 1200 },
+  quien: { src: "/fotos/manu-escenario.jpg", alt: "Manu Casaubon dando una charla en un escenario, con micrófono y presentador en la mano", ancho: 1000, alto: 1500 },
+};

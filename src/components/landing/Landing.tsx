@@ -16,11 +16,11 @@ type Props = { cupo: Cupo | null; precioArs: number; agotado: boolean };
 const LUGARES_PUBLICOS = 30;
 const BOCETO_FOTOS = process.env.FOTOS_BOCETO === "1";
 
-function FotoReal({ foto, que }: { foto: Foto; que: string }) {
+function FotoReal({ foto, que, vertical }: { foto: Foto; que: string; vertical?: boolean }) {
   if (foto) {
     return (
-      <figure className={s.foto}>
-        <Image src={foto.src} alt={foto.alt} width={foto.ancho} height={foto.alto} sizes="(max-width: 980px) 100vw, 980px" />
+      <figure className={`${s.foto} ${vertical ? s.fotoVertical : ""}`}>
+        <Image src={foto.src} alt={foto.alt} width={foto.ancho} height={foto.alto} sizes={vertical ? "(max-width: 820px) 100vw, 380px" : "(max-width: 980px) 100vw, 980px"} />
       </figure>
     );
   }
@@ -150,11 +150,13 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
 
       <section className={s.banda}><div>
         <h2>Quién la da</h2>
+        <div className={s.quien}>
         <div className={s.bio}>
           <p>Soy Manu Casaubon. Trabajo con personas que tienen algo importante para decir, para que aprendan a comunicarlo siendo ellas mismas, sin armar un personaje.</p>
           <p>Tengo más de 200.000 seguidores en TikTok y más de 100.000 en YouTube. Soy speaker y conferencista en universidades y eventos.</p>
         </div>
-        <FotoReal foto={FOTOS.quien} que="en un escenario o retrato" />
+        <FotoReal foto={FOTOS.quien} que="en un escenario o retrato" vertical />
+        </div>
       </div></section>
 
       <section className={`${s.banda} ${s.crema}`}><div>
