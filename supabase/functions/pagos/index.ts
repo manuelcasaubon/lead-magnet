@@ -15,6 +15,7 @@
 // POST { pendientes: true } + header x-cron-secret   (pg_cron cada 10 min)
 //  - Reintenta los mails de las entradas sin avisar (plantillas recién aprobadas, modo test → live, fallas).
 //  - Manda los Purchase que quedaron esperando o fallaron.
+//  - Si se agotaron los lugares, pausa las campanas de Meta (también lo hace al aprobarse cada pago).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { enviarPlantilla, resuelto, saludo } from "../_shared/email.ts";
 import { enviarEventoMeta } from "../_shared/meta.ts";
@@ -132,6 +133,42 @@ async function unirVisita(orderId: string, vid: string) {
   if (o?.person_id) await db.from("people").update({ first_visitor_id: vid }).eq("id", o.person_id).is("first_visitor_id", null);
 }
 
+// Lugares agotados (o ventas cerradas) → pausa las campanas de settings.meta_campaigns_pausar, una sola vez.
+// META_ADS_ACCESS_TOKEN: token del usuario del sistema con ads_management (no es el de la Conversions API).
+async function pausarAnunciosSiAgotado() {
+  const [{ data: cupo }, { data: s }] = await Promise.all([
+    db.rpc("seats_status"),
+    db.from("settings").select("meta_campaigns_pausar, meta_campaigns_pausadas_at").eq("id", 1).single(),
+  ]);
+  const c = cupo?.[0];
+  const campanas: string[] = s?.meta_campaigns_pausar ?? [];
+  if (!c || s?.meta_campaigns_pausadas_at || !campanas.length) return;
+  if (c.left_public > 0 && c.sales_open) return;
+  const token = Deno.env.get("META_ADS_ACCESS_TOKEN");
+  if (!token) { console.error("pausarAnuncios: falta META_ADS_ACCESS_TOKEN"); return; }
+  const resultado: Record<string, unknown> = {};
+  let todas = true;
+  for (const id of campanas) {
+    try {
+      const r = await fetch(`https://graph.facebook.com/v23.0/${id}`, {
+        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/x-www-form-urlencoded" },
+        body: "status=PAUSED", signal: AbortSignal.timeout(10_000),
+      });
+      const j = await r.json().catch(() => ({}));
+      resultado[id] = r.ok ? "pausada" : j;
+      if (!r.ok) todas = false;
+    } catch (e) { resultado[id] = String(e); todas = false; }
+  }
+  // Si alguna falla, se reintenta en el cron (cada 10 min) y queda en los logs; el evento se registra una sola vez.
+  if (!todas) { console.error("pausarAnuncios", JSON.stringify(resultado).slice(0, 500)); return; }
+  const { data: marcada } = await db.from("settings").update({ meta_campaigns_pausadas_at: new Date().toISOString() })
+    .eq("id", 1).is("meta_campaigns_pausadas_at", null).select("id");
+  if (marcada?.length) await db.from("events").insert({
+    name: "ads_paused", visitor_id: crypto.randomUUID(), path: "/evento",
+    props: { motivo: c.left_public > 0 ? "ventas cerradas" : "agotado", vendidas: c.sold, resultado },
+  });
+}
+
 async function pendientes(req: Request) {
   const { data: ok } = await db.rpc("check_cron_secret", { p_secret: req.headers.get("x-cron-secret") ?? "" });
   if (!ok) return json({ ok: false }, 401);
@@ -154,6 +191,7 @@ async function pendientes(req: Request) {
   const enviadas = new Set((yaMeta ?? []).map((m) => m.event_id));
   const faltan = ids.filter((id) => !enviadas.has(id));
   for (const id of faltan) await compraMeta(id);
+  await pausarAnunciosSiAgotado();
   return json({ ok: true, revisadas: lista?.length ?? 0, meta: (meta?.length ?? 0) + faltan.length });
 }
 
@@ -202,6 +240,7 @@ Deno.serve(async (req) => {
       const viejo = !ord?.approved_at || Date.now() - new Date(ord.approved_at).getTime() > ESPERA_META_MIN * 60_000;
       if ((visitante && (orderId || reciente)) || ord?.visitor_id || viejo) await compraMeta(r.order_id, visitante && (orderId || reciente) ? visitante : {});
     }
+    if (r.newly_approved) await pausarAnunciosSiAgotado();
     if (r.newly_approved) await evento("payment_approved", r.order_id, { mp_status: pago.status, overbooked: r.overbooked, via: porLink ? "link" : "checkout" });
     else if (PENDIENTE.includes(pago.status)) await evento("payment_pending", r.order_id, { mp_status: pago.status });
     else if (["rejected", "cancelled"].includes(pago.status)) await evento("payment_rejected", r.order_id, { mp_status: pago.status });
