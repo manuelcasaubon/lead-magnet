@@ -539,6 +539,8 @@ export type Database = {
       settings: {
         Row: {
           site_url: string
+          bunny_library_id: number | null
+          bunny_cdn_hostname: string | null
           email_from: string
           email_reply_to: string | null
           email_mode: string
@@ -563,6 +565,8 @@ export type Database = {
           venue: string
         }
         Insert: {
+          bunny_library_id?: number | null
+          bunny_cdn_hostname?: string | null
           site_url?: string
           email_from?: string
           email_reply_to?: string | null
@@ -588,6 +592,8 @@ export type Database = {
           venue?: string
         }
         Update: {
+          bunny_library_id?: number | null
+          bunny_cdn_hostname?: string | null
           site_url?: string
           email_from?: string
           email_reply_to?: string | null
@@ -659,6 +665,66 @@ export type Database = {
         }
         Relationships: []
       }
+      videos: {
+        Row: {
+          guid: string
+          library_id: number
+          titulo: string
+          uso: string | null
+          estado: string
+          bunny_status: number | null
+          duracion_seg: number | null
+          thumbnail_url: string | null
+          hls_url: string | null
+          subtitulos: Json
+          resoluciones: string[]
+          subido_at: string | null
+          sincronizado_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          guid: string
+          library_id: number
+          titulo?: string
+          uso?: string | null
+          estado?: string
+          bunny_status?: number | null
+          duracion_seg?: number | null
+          thumbnail_url?: string | null
+          hls_url?: string | null
+          subtitulos?: Json
+          resoluciones?: string[]
+          subido_at?: string | null
+          sincronizado_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          guid?: string
+          library_id?: number
+          titulo?: string
+          uso?: string | null
+          estado?: string
+          bunny_status?: number | null
+          duracion_seg?: number | null
+          thumbnail_url?: string | null
+          hls_url?: string | null
+          subtitulos?: Json
+          resoluciones?: string[]
+          subido_at?: string | null
+          sincronizado_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bunny_webhook_events: {
+        Row: { event_id: string; video_guid: string | null; status: number | null; received_at: string }
+        Insert: { event_id: string; video_guid?: string | null; status?: number | null; received_at?: string }
+        Update: { event_id?: string; video_guid?: string | null; status?: number | null; received_at?: string }
+        Relationships: []
+      }
       visitors: {
         Row: {
           device: string | null
@@ -695,6 +761,10 @@ export type Database = {
     }
     Views: { [_ in never]: never }
     Functions: {
+      vsl_metricas: {
+        Args: { p_video?: string; p_desde?: string; p_hasta?: string }
+        Returns: Json
+      }
       adopt_link_payment: {
         Args: { p_payment: Json }
         Returns: { adopted: boolean; newly_approved: boolean; order_id: string | null; order_status: string | null; overbooked: boolean; ticket_code: string | null }[]

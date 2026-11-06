@@ -75,3 +75,14 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 | S3: 6 | **Reservas falsas.** Cada mail nuevo que toca "pagar" reserva un lugar 20 min. Alguien con mala intención podría agotar el cupo un rato con mails inventados. Hay un límite de 5 intentos por minuto por IP | Límite por IP + reserva de 20 min (D9). Si pasa, se baja `hold_minutes` desde el panel | — |
 | S3: 7 | **Dos migraciones para que S0 revise y aplique** (no están aplicadas): `20261105000102` corrige un bug de `upsert_lead`, que falla con "person_id is ambiguous" cada vez que llega con la cookie `vid` (rompe el formulario y el pago); `20261105000101` hace que `aviso_manu` salga una vez por compra y no una sola vez en toda la venta | **Resuelto (6/11, S0):** revisadas, probadas y aplicadas en Supabase. La prueba de la base ahora pasa `p_visitor_id` | — |
 | S3: 8 | **Perfil de auditoría por server action** en `/entrada` en vez de `POST /api/entrada/perfil`, para no salir de las carpetas de S3. Mismo contrato `{ o, perfil }` | Server action | — |
+
+### S9 — Videos con Bunny Stream
+
+| # | Decisión | Por defecto mientras tanto | Bloquea |
+|---|---|---|---|
+| S9:1 | **D7 resuelto: Bunny Stream** (librería 801645), con reproductor propio `VideoBunny`. Ver SPEC §5.9 | Activo | — |
+| S9:2 | **Cargar dos secretos en Supabase** (Edge Functions → Secrets): `BUNNY_STREAM_API_KEY` y `BUNNY_STREAM_READONLY_KEY` (esta última firma el webhook: Bunny sí firma, con la key de solo lectura de la librería). Hasta entonces `bunny-sync` y `bunny-upload` responden "Falta el secreto …" y el webhook responde 500 | Sin videos: la web muestra el póster de texto | Videos |
+| S9:3 | **Configurar el webhook en Bunny** (librería → Webhooks): `https://qzfzswascgitycynwlkk.supabase.co/functions/v1/bunny-webhook` | Sin webhook, `bunny-sync` actualiza el estado cada 30 min | Estado en vivo |
+| S9:4 | **El `uso` de cada video se asigna a mano** (`vsl_evento`, `vsl_inicio`): la sincronización no lo pisa. Si hay varios listos con el mismo uso, la web usa el más nuevo. S5 puede hacerlo desde el panel | SQL a mano | Mostrar el video |
+| S9:5 | **Seguridad del CDN de Bunny.** Los videos se sirven por URL directa del CDN (`vz-….b-cdn.net`), sin firmar, así que quien tenga el link puede verlos. Si el VSL tiene que ser privado, hay que activar Token Authentication en Bunny y firmar las URLs desde el servidor | URLs directas | — |
+| S9:6 | **Archivos de otras sesiones que toqué** (mínimo, a revisar por S0): `src/lib/supabase/database.types.ts` (sumé `videos`, `bunny_webhook_events`, `vsl_metricas` y 2 columnas de `settings` a mano; conviene regenerar los tipos) y `package.json` (dependencia `hls.js`) | — | — |

@@ -50,6 +50,7 @@ Escrito el 5/11/26. Si algo de acá choca con lo que diga Manu, vale lo que diga
 | S6 | Mails con Resend | Opus 5.5 | `claude/mails` | `src/lib/email/` (salvo `enviar.ts`), `src/app/api/resend/`, `src/app/api/cron/`, `src/app/baja/`, `src/app/api/baja/`, plantillas de campaña | Después de S1–S3 |
 | S7 | A/B testing | Opus 5.5 | `claude/ab` | `src/lib/ab/`, cambios mínimos en landing/form/VSL | Al final |
 | S8 | Landing principal (oferta) | Opus 5.5, esfuerzo medio | `claude/landing-principal` | `bocetos/inicio*.html`, después `src/app/page.tsx` y `src/components/inicio/` | Se lanza el 6/11 |
+| S9 | Videos con Bunny Stream | Sonnet 5.5 | `claude/bunny-videos` | `supabase/functions/bunny-*`, `supabase/functions/_shared/bunny.ts`, `src/components/video/`, `src/lib/video/`, `src/app/prueba/video/`, migraciones `*_videos.sql` y `*_cron_bunny.sql` | Lista para revisión de S0 |
 
 **Reglas para todas las sesiones**
 1. Cada sesión trabaja solo en su rama y en sus carpetas. Si necesita tocar algo de otra, lo anota en su resumen final en vez de cambiarlo.
@@ -91,7 +92,7 @@ Visitante ──> Vercel (Next.js 15, App Router, TypeScript)
 - **Stack:** Next.js 15 + React 19 + TypeScript en Vercel; Supabase (base, auth, RLS); Resend; Mercado Pago por REST (`fetch`, sin SDK); jsPDF para el comprobante; `zod` para validar entradas.
 - **Por qué sin SDK de Mercado Pago:** son 2 llamadas (crear preferencia, leer pago) y así controlamos tiempos de espera y errores.
 - **Sin parpadeo en el A/B:** la variante se calcula en el servidor con hash(`vid` + clave del experimento) y pesos; la página ya sale renderizada con su variante.
-- **VSL propio:** `<video>` HTML5 con el archivo en Vercel Blob o Bunny Stream (D7). Así medimos cuartiles, tiempo visto y abandono cada 5 s. YouTube no deja medir eso bien.
+- **VSL propio:** Bunny Stream (D7, resuelto en §5.9) con reproductor propio. Así medimos cuartiles, tiempo visto y abandono cada 5 s. YouTube no deja medir eso bien.
 - **Cron:** Vercel Cron diario a las 10 h (13 UTC), compatible con el plan Hobby. Si el plan es Pro, se puede pasar a cada 15 minutos. Además, el panel tiene el botón "Enviar ahora" para lo aprobado.
 
 ---
@@ -358,6 +359,49 @@ Objetivo: la página de inicio del sitio central. Presenta la oferta principal d
 4. No inventar resultados, testimonios ni reglas de 2027. Casos de alumnos con la marca "pendiente de permiso".
 5. CTA principal: hoy, la clase del 18/11 (`/evento`). Secundario: Instagram (`ig.me/m/casaubon.ar`). Sin formulario propio por ahora.
 6. Publicar el Artifact, commit y push a la rama propia, y dejar las preguntas para Manu en `docs/DECISIONES.md` con el prefijo "S8:". **No construir en `src/` hasta que Manu elija.**
+
+### 5.9 S9 — Videos con Bunny Stream (rama `claude/bunny-videos`)
+
+Los videos (VSL de `/evento`, otros de la landing) se suben directo a **Bunny Stream** (librería **801645**). La web nunca guarda ni sirve el archivo: lee de la tabla `videos` la URL HLS y reproduce con un reproductor propio que mide cada paso (§4). Los secretos viven solo en Supabase; Vercel no tiene claves de Bunny.
+
+**Base (migración `20261106000020_videos.sql`, aditiva, ya aplicada)**
+- `settings.bunny_library_id` (801645) y `settings.bunny_cdn_hostname` (lo completa `bunny-sync` la primera vez, con `BUNNY_API_KEY`).
+- `videos`: `guid` (Bunny), `library_id`, `titulo`, `uso` (`vsl_evento`, `vsl_inicio`...), `estado` (`creado`, `subido`, `procesando`, `codificando`, `listo`, `error`, `borrado`), `bunny_status`, `duracion_seg`, `thumbnail_url`, `hls_url`, `subtitulos` (`[{lang,label,url}]`), `resoluciones`, fechas. RLS activa y forzada: lectura y edición solo admins (`private.is_admin()`), `anon` sin acceso. **El `uso` se asigna a mano** (desde el panel, S5, o con `update videos set uso = 'vsl_evento' where guid = '…'`); la sincronización nunca lo pisa.
+- `bunny_webhook_events`: `EventId` único para no repetir avisos.
+- `vsl_metricas(p_video, p_desde, p_hasta)` → `jsonb` (solo `service_role`): `vieron`, `reprodujeron`, `tasa_play`, `cuartiles {25,50,75,100}` (visitantes únicos), `terminaron`, `tiempo_visto_promedio_seg` (cada `vsl_progress` = 5 s) y `curva` `[{desde_seg, visitantes, retencion}]` (visitantes únicos por tramo de 5 s sobre quienes reprodujeron). `p_video` filtra por `props.video` (el `uso` o el guid); sin filtro suma todos. Pruebas: `supabase/tests/videos_test.sql`.
+- Cron (`20261106000021_cron_bunny.sql`, solo Supabase): `bunny-sync-30min`, cada 30 min, con la clave `cron_secret` de Vault.
+
+**Edge Functions** (código en `supabase/functions/bunny-*`, compartido en `_shared/bunny.ts`)
+
+| Función | JWT | Qué hace |
+|---|---|---|
+| `bunny-sync` | no | `POST` con `x-cron-secret` (`check_cron_secret()`). Lista los videos de la librería (Stream API), resuelve el hostname del CDN (librería → pull zone, con `BUNNY_API_KEY`), hace upsert en `videos` y marca `borrado` los que ya no están |
+| `bunny-webhook` | no | Aviso de Bunny. Verifica la firma (ver abajo), es idempotente por `EventId`, y con el `VideoGuid` vuelve a leer el video en la API (nunca confía en el estado del aviso, así los avisos repetidos o desordenados dejan el estado actual). Un fallo responde 500 y Bunny reintenta |
+| `bunny-upload` | sí + `admins` | Para el panel. `POST { titulo, uso? }` con el `access_token` del admin. Crea el video en la librería y devuelve `{ guid, libraryId, endpoint, expire, signature }`. La firma TUS es `SHA256(library_id + api_key + expire + video_id)` (24 h). El navegador sube con tus-js-client a `https://video.bunnycdn.com/tusupload` con los headers `AuthorizationSignature`, `AuthorizationExpire`, `LibraryId`, `VideoId` y metadata `filetype` y `title`. CORS solo para `settings.site_url` y `localhost:3000` |
+
+**Webhook: sí trae firma** (doc oficial de Bunny Stream). Cada `POST` lleva `X-BunnyStream-Signature-Version: v1`, `X-BunnyStream-Signature-Algorithm: hmac-sha256` y `X-BunnyStream-Signature` = HMAC-SHA256 en hex del cuerpo crudo, con la **API key de solo lectura de la librería** como clave. Por eso el secreto es `BUNNY_STREAM_READONLY_KEY` (esa misma key). El cuerpo trae `VideoLibraryId`, `VideoGuid`, `Status` (3 = terminó el encoding, 5 = falló, 32 = borrado), `EventId` (igual en los reintentos) y `Timestamp`. Reintentos de Bunny: 30 s, 2 min, 10 min, 30 min, 1 h y 2 h ante 5xx/408/429.
+
+**Pasos de Manu**
+1. Supabase → Edge Functions → Secrets: cargar `BUNNY_STREAM_API_KEY` (Bunny → Stream → tu librería → API → *API Key*) y `BUNNY_STREAM_READONLY_KEY` (misma pantalla, *Read-Only API Key*). `BUNNY_API_KEY` ya está.
+2. Bunny → Stream → librería 801645 → *Webhooks* → *Webhook URL*: `https://qzfzswascgitycynwlkk.supabase.co/functions/v1/bunny-webhook`.
+3. Subir el video a Bunny. En 30 min (o por el aviso del webhook) aparece en `videos`. Asignarle el uso: `update public.videos set uso = 'vsl_evento' where guid = '<guid>';`.
+4. Subtítulos: subir el VTT en Bunny → el video → *Captions*. Salen solos en el reproductor.
+5. Si en la librería activaste *Token Authentication* o *Block direct URL file access*, el CDN rechaza la reproducción desde la web: dejá desactivado *Block direct URL access* o pedime URLs firmadas.
+
+**Cómo integrar el reproductor (S1 en `/evento`, S8 en `/`)**
+```tsx
+// server component (la página)
+import VideoBunny from "@/components/video/VideoBunny";
+import { getVideo } from "@/lib/video/getVideo";
+
+const video = await getVideo("vsl_evento");          // null si todavía no hay uno listo
+<VideoBunny video={video} uso="vsl_evento" titulo="Video de la clase"
+            posterTexto={<p>¿Te pasó de estar en un evento…?</p>} />
+```
+- `video={null}` no rompe: muestra `posterTexto` con la etiqueta "Video en camino".
+- Sin autoplay; botón grande "Ver la clase"; HLS nativo en Safari/iOS y `hls.js` cargado de forma dinámica solo donde hace falta; subtítulos VTT.
+- Eventos (§4), todos con `props.video = uso`: `vsl_view` (50 % visible), `vsl_play` y `vsl_pause` (`sec`), `vsl_progress` (cada 5 s solo mientras reproduce, `sec`), `vsl_quartile` (`q` 25/50/75/100; solo por reproducción natural, un salto no suma cuartiles) y `vsl_end`.
+- Página de prueba: `/prueba/video` (noindex).
 
 ---
 
