@@ -1,0 +1,415 @@
+<title>Pago y comprobante 18/11</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Poppins:wght@400;500;600;800;900&display=swap">
+<style>
+/* Layout: tira de versión arriba; a la izquierda el celular clickeable, a la derecha el mapa de pasos y qué medimos. Una sola apariencia: la de la marca. */
+:root{
+  --oscuro:#2d2828; --oscuro-2:#3a3434; --hondo:#211d1d; --crema:#fffdf6; --rojo:#d0443f; --rojo-h:#b93832; --mostaza:#dda51e;
+  --linea-o:#5a5252; --linea-c:#e4dccb; --gris-c:#5e5757; --gris-o:#c9c2b6; --verde:#7fb77e;
+  --sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--oscuro);color:var(--crema);font-family:var(--sans);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+em,i{font-style:normal}
+button,a,input{font:inherit}
+:focus-visible{outline:3px solid var(--mostaza);outline-offset:3px}
+.envoltura{max-width:1080px;margin-inline:auto;display:grid;gap:24px}
+
+/* Encabezado */
+.cabeza{display:grid;gap:6px}
+.eyebrow{margin:0;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mostaza)}
+h1{margin:0;font-weight:900;text-transform:uppercase;letter-spacing:-.045em;line-height:.95;font-size:clamp(2rem,6vw,3.2rem);text-wrap:balance}
+.intro{margin:0;font-family:var(--serif);font-size:1.2rem;line-height:1.35;color:var(--gris-o);max-width:60ch}
+
+/* Selector de versión */
+.selector{display:flex;flex-wrap:wrap;gap:8px}
+.selector button{appearance:none;cursor:pointer;border:2px solid var(--linea-o);background:transparent;color:var(--crema);
+  padding:10px 16px;border-radius:4px;text-align:left;display:grid;gap:0;min-height:48px}
+.selector button b{font-weight:800;letter-spacing:-.02em}
+.selector button span{font-size:.8rem;color:var(--gris-o)}
+.selector button[aria-pressed="true"]{border-color:var(--rojo);background:var(--oscuro-2)}
+
+.grilla{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:860px){.grilla{grid-template-columns:minmax(0,1fr)}}
+
+/* Celular */
+.celu-col{display:grid;gap:10px;justify-items:center}
+.celu{width:100%;max-width:390px;height:760px;border-radius:38px;background:var(--hondo);padding:12px;box-shadow:0 0 0 2px var(--linea-o)}
+.pantalla{height:100%;border-radius:28px;overflow:hidden;background:var(--oscuro);display:flex;flex-direction:column;position:relative}
+.barra{display:flex;justify-content:space-between;align-items:center;padding:10px 18px 6px;font-size:.72rem;color:var(--gris-o);flex:none}
+.url{margin:0 12px 8px;padding:6px 10px;border-radius:8px;background:var(--hondo);font-size:.72rem;color:var(--gris-o);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none}
+.vista{flex:1;overflow-y:auto;padding:16px 18px 24px;display:flex;flex-direction:column;gap:16px}
+.reiniciar{appearance:none;background:none;border:0;color:var(--gris-o);text-decoration:underline;cursor:pointer;padding:6px}
+
+/* Piezas de las pantallas */
+.marca{margin:0;font-weight:800;letter-spacing:-.03em;font-size:.9rem}
+.tit{margin:0;font-weight:900;text-transform:uppercase;letter-spacing:-.045em;line-height:.95;font-size:2rem;text-wrap:balance}
+.baj{margin:0;font-family:var(--serif);font-size:1.15rem;line-height:1.3;color:var(--mostaza)}
+.txt{margin:0;color:var(--gris-o);font-size:.9rem}
+.campo{display:grid;gap:4px}
+.campo label{font-weight:600;font-size:.82rem}
+.campo label small{font-weight:400;color:var(--gris-o)}
+.campo input{min-height:46px;padding:10px 12px;border-radius:4px;border:2px solid var(--gris-o);background:var(--crema);color:var(--oscuro)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--gris-o)}
+.check input{width:22px;height:22px;flex:none;margin:0;accent-color:var(--rojo)}
+.btn{appearance:none;border:0;cursor:pointer;display:block;width:100%;background:var(--rojo);color:var(--crema);font-weight:800;letter-spacing:-.02em;
+  padding:14px 18px;border-radius:4px;text-align:center;min-height:48px}
+.btn:hover{background:var(--rojo-h)}
+.btn.sec{background:transparent;box-shadow:inset 0 0 0 2px var(--gris-o)}
+.btn.sec:hover{background:var(--oscuro-2)}
+.link{color:var(--gris-o);font-size:.82rem;text-align:center;text-decoration:underline;background:none;border:0;cursor:pointer;padding:6px}
+.err{margin:0;color:#ffb4a8;font-size:.82rem;min-height:1.2em}
+.pausa{display:grid;gap:10px;padding:14px;border:1px solid var(--linea-o);border-radius:6px}
+.fila{display:flex;justify-content:space-between;gap:12px;font-size:.88rem}
+.fila b{font-weight:700}
+.quedan{display:inline-block;padding:2px 8px;border-radius:3px;background:var(--mostaza);color:var(--oscuro);font-weight:800;font-size:.8rem}
+.nota-ej{font-size:.7rem;color:var(--gris-o)}
+ul.incluye{margin:0;padding-left:18px;font-size:.88rem;display:grid;gap:2px}
+
+/* Mercado Pago simulado: neutro y claramente "otra web" */
+.mp{background:#f2f2f2;color:#333;margin:-16px -18px -24px;padding:16px 18px 24px;flex:1;display:flex;flex-direction:column;gap:12px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.mp .cab{background:#ffe600;margin:-16px -18px 0;padding:12px 18px;font-weight:700;color:#2d3277}
+.mp .caja{background:#fff;border-radius:6px;padding:14px;display:grid;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.mp .monto{font-size:1.6rem;font-weight:600}
+.mp button{appearance:none;border:0;border-radius:6px;padding:12px;cursor:pointer;font-weight:600;min-height:46px}
+.mp .ok{background:#009ee3;color:#fff}
+.mp .alt{background:#fff;color:#009ee3;box-shadow:inset 0 0 0 1px #009ee3}
+.mp small{color:#555}
+.sim{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:#666}
+
+/* Ticket con impresión */
+.ranura{height:16px;background:#191616;border-radius:6px;box-shadow:inset 0 -3px 0 #000;position:relative;z-index:2}
+.salida{overflow:hidden;margin:-8px 8px 0;padding-top:8px}
+.ticket{background:var(--crema);color:var(--oscuro);padding:16px 16px 20px;
+  background-image:radial-gradient(circle at 8px 100%,var(--oscuro) 6px,transparent 6.5px);background-size:16px 8px;background-repeat:repeat-x;background-position:bottom -1px left}
+.imprime .ticket{animation:imprimir 2.1s steps(26,end) both}
+@keyframes imprimir{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.ticket h3{margin:0;font-weight:900;letter-spacing:-.04em;line-height:1.05;font-size:1.15rem}
+.ticket .sub{margin:2px 0 10px;font-family:var(--serif);color:var(--rojo)}
+.ticket dl{margin:0;display:grid;border-top:2px dashed var(--oscuro)}
+.ticket .d{display:grid;grid-template-columns:6.4em minmax(0,1fr);gap:8px;padding:6px 0;border-bottom:1px solid var(--linea-c);font-size:.82rem}
+.ticket dt{font-size:.64rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris-c);padding-top:2px}
+.ticket dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.ticket .cod dd{font-size:1.1rem;font-weight:900}
+.ticket .nota{margin:10px 0 0;font-size:.7rem;color:var(--gris-c)}
+.mail{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:6px;background:var(--oscuro-2);font-size:.82rem}
+.mail .ic{width:28px;height:28px;border-radius:50%;background:var(--mostaza);color:var(--oscuro);display:grid;place-items:center;font-weight:900;flex:none}
+@media (prefers-reduced-motion:reduce){.imprime .ticket{animation:none}}
+
+/* Mapa de pasos */
+.mapa{display:grid;gap:20px;min-width:0}
+.mapa h2{margin:0;font-weight:800;letter-spacing:-.03em;font-size:1.25rem}
+.pasos{list-style:none;margin:0;padding:0;display:grid;gap:0;counter-reset:p}
+.paso{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;position:relative;padding-bottom:14px}
+.paso::before{counter-increment:p;content:counter(p);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.85rem;
+  border:2px solid var(--linea-o);background:var(--oscuro);position:relative;z-index:1}
+.paso:not(:last-child)::after{content:"";position:absolute;left:15px;top:30px;bottom:0;width:2px;background:var(--linea-o)}
+.paso.ahora::before{border-color:var(--rojo);background:var(--rojo)}
+.paso.hecho::before{border-color:var(--gris-o)}
+.paso button{appearance:none;background:none;border:0;color:inherit;text-align:left;padding:4px 0;cursor:pointer;display:grid;gap:2px}
+.paso b{font-weight:700}
+.paso .ev{font-size:.76rem;color:var(--gris-o);font-variant-numeric:tabular-nums}
+.paso .ev code{font-size:.74rem;background:var(--hondo);padding:1px 5px;border-radius:3px;color:var(--mostaza)}
+.paso .rama{font-size:.8rem;color:var(--gris-o)}
+.bloque{display:grid;gap:8px;padding:16px;border:1px solid var(--linea-o);border-radius:6px}
+.bloque h3{margin:0;font-size:1rem;font-weight:800;letter-spacing:-.02em}
+.bloque p,.bloque li{margin:0;font-size:.88rem;color:var(--gris-o)}
+.bloque ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.bloque strong{color:var(--crema);font-weight:600}
+.dif{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.dif{grid-template-columns:minmax(0,1fr)}}
+.dif .bloque.activa{border-color:var(--rojo)}
+</style>
+
+<div class="envoltura">
+  <header class="cabeza">
+    <p class="eyebrow">Boceto · Clase en vivo del 18/11 · S3</p>
+    <h1>Cómo se conecta el pago</h1>
+    <p class="intro">Del formulario a la entrada impresa, en dos versiones. Tocá los botones del celular para recorrer cada una. Mercado Pago está simulado: acá no se cobra nada.</p>
+  </header>
+
+  <div class="selector" role="group" aria-label="Versión del flujo">
+    <button type="button" id="verA" data-v="A" aria-pressed="true"><b>Versión A · Directo</b><span>Formulario y de ahí a pagar</span></button>
+    <button type="button" id="verB" data-v="B" aria-pressed="false"><b>Versión B · Con pausa</b><span>Primero te anotás, después pagás</span></button>
+  </div>
+
+  <div class="grilla">
+    <div class="celu-col">
+      <div class="celu" aria-label="Prototipo en un celular">
+        <div class="pantalla">
+          <div class="barra" aria-hidden="true"><span>18:42</span><span>●●● 5G</span></div>
+          <div class="url" id="url">clase.comunicatumarca.com</div>
+          <div class="vista" id="vista" aria-live="polite"></div>
+        </div>
+      </div>
+      <button type="button" class="reiniciar" id="reiniciar">Empezar de nuevo</button>
+    </div>
+
+    <section class="mapa" aria-labelledby="t-mapa">
+      <h2 id="t-mapa">Los pasos de esta versión</h2>
+      <ol class="pasos" id="pasos"></ol>
+
+      <div class="dif">
+        <div class="bloque" id="difA">
+          <h3>A · Directo</h3>
+          <ul>
+            <li><strong>Un clic menos</strong> hasta Mercado Pago: menos lugares donde abandonar.</li>
+            <li>Pide los datos completos de entrada (nombre, mail, WhatsApp e Instagram opcionales).</li>
+            <li>Si no dejó el Instagram, se lo pido en la entrada, para la auditoría.</li>
+            <li>Si se va en Mercado Pago, igual queda como lead (con fuente <code>checkout</code>).</li>
+          </ul>
+        </div>
+        <div class="bloque" id="difB">
+          <h3>B · Con pausa</h3>
+          <ul>
+            <li>Pide <strong>solo nombre y mail</strong>: más gente deja el dato.</li>
+            <li>Una pantalla intermedia con precio, qué incluye y lugares que quedan (número real).</li>
+            <li><strong>"Pagar después"</strong>: le mando el link de pago por mail. Necesita una plantilla nueva <code>link_pago</code>, aprobada por vos.</li>
+            <li>Un paso más antes de pagar: puede bajar la conversión de quien venía decidido.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <h3>Lo que es igual en las dos</h3>
+        <ul>
+          <li>Al tocar pagar se <strong>reserva el lugar 20 minutos</strong>. Si se pasa del tope, aviso "agotado" antes de ir a Mercado Pago.</li>
+          <li>El pago se confirma siempre preguntándole a Mercado Pago, aunque la persona no vuelva a la web.</li>
+          <li>La entrada sale impresa en pantalla, con código <code>CTM-XXXXXX</code> y PDF. Dice "Este comprobante no es una factura".</li>
+          <li>Te llega un mail con cada entrada nueva, con el número de vendidas.</li>
+        </ul>
+      </div>
+
+      <div class="bloque">
+        <h3>Cómo se miden las fuentes</h3>
+        <p><strong>Formulario:</strong> cada lead y cada pago guarda de dónde vino (UTM del link de la historia, o la web que lo trajo, o "directo") y la versión que vio.</p>
+        <p><strong>DM "Mandame TALLER":</strong> el botón de Instagram registra <code>instagram_click</code>. Quien paga por DM se carga a mano en el panel con fuente <code>instagram_dm</code>; si ya había dejado el mail en el formulario, se une a la misma persona.</p>
+        <p>Así el panel compara: visitas → formulario → pago, por fuente y por versión.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  const ARS = "ARS [precio: lo definís vos]";
+  const QUEDAN = 18; // ejemplo: en la web real sale de la base
+  const $ = (id) => document.getElementById(id);
+  const vista = $("vista"), url = $("url"), pasosEl = $("pasos");
+  let version = "A";
+  try { const v = localStorage.getItem("conexion-version"); if (v === "A" || v === "B") version = v; } catch (e) {}
+  let datos = { nombre: "", email: "", ig: "" };
+  let pantalla = "form";
+
+  // Pasos de cada versión: id de pantalla, título y eventos que se miden.
+  const PASOS = {
+    A: [
+      ["form", "Formulario completo", "form_start · form_submit · lead_created"],
+      ["mp", "Mercado Pago", "checkout_start (se reserva el lugar 20 min)"],
+      ["entrada", "La entrada se imprime + PDF", "payment_approved · ticket_view · pdf_download", "Si queda pendiente: \"Tu pago está en proceso\". Si se rechaza: reintentar."],
+      ["perfil", "Instagram para la auditoría", "audit_profile_sent", "Solo si no lo dejó en el formulario."],
+    ],
+    B: [
+      ["form", "Nombre y mail", "form_start · form_submit · lead_created"],
+      ["pausa", "Ya estás anotado/a, falta el pago", "click (pagar / pagar_despues)", "Muestra precio, qué incluye y quedan N de 30. \"Pagar después\" manda el link por mail."],
+      ["mp", "Mercado Pago", "checkout_start (se reserva el lugar 20 min)"],
+      ["entrada", "La entrada se imprime + PDF", "payment_approved · ticket_view · pdf_download", "Si queda pendiente: \"Tu pago está en proceso\"."],
+      ["mail", "Te llega la confirmación por mail", "confirmacion_entrada (y tu aviso)"],
+    ],
+  };
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
+
+  function dibujarPasos() {
+    const lista = PASOS[version];
+    const idx = lista.findIndex((p) => p[0] === pantallaPaso());
+    pasosEl.innerHTML = lista.map((p, i) =>
+      `<li class="paso ${i === idx ? "ahora" : i < idx ? "hecho" : ""}"><button type="button" data-ir="${p[0]}" ${i === idx ? 'aria-current="step"' : ""}>
+        <b>${esc(p[1])}</b><span class="ev">Se mide: <code>${esc(p[2])}</code></span>${p[3] ? `<span class="rama">${esc(p[3])}</span>` : ""}</button></li>`).join("");
+    $("difA").classList.toggle("activa", version === "A");
+    $("difB").classList.toggle("activa", version === "B");
+  }
+  function pantallaPaso() {
+    if (["pendiente", "rechazo"].includes(pantalla)) return "entrada";
+    if (pantalla === "despues") return "pausa";
+    if (pantalla === "perfil-ok") return "perfil";
+    if (version === "B" && pantalla === "perfil") return "entrada";
+    return pantalla;
+  }
+
+  const P = {
+    form() {
+      url.textContent = "clase.comunicatumarca.com/#reservar";
+      const largo = version === "A";
+      return `<p class="marca">Manu Casaubon</p>
+        <h2 class="tit">Reservá tu lugar</h2>
+        <p class="baj">Miércoles 18/11, de 18 a 21 h. Palermo Soho.</p>
+        <form id="f" novalidate style="display:grid;gap:12px">
+          <div class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" autocomplete="name" value="${esc(datos.nombre || "Lucía Pérez")}"></div>
+          <div class="campo"><label for="f-mail">Mail</label><input id="f-mail" type="email" inputmode="email" autocomplete="email" value="${esc(datos.email || "lucia@ejemplo.com")}"></div>
+          ${largo ? `<div class="campo"><label for="f-tel">WhatsApp <small>(opcional)</small></label><input id="f-tel" type="tel" inputmode="tel" autocomplete="tel"></div>
+          <div class="campo"><label for="f-ig">Instagram o web de tu marca <small>(opcional, para tu auditoría)</small></label><input id="f-ig" autocapitalize="none" placeholder="@tuusuario" value="${esc(datos.ig)}"></div>` : ""}
+          <label class="check"><input type="checkbox" id="f-ok"> Quiero recibir mails sobre la clase. Me puedo dar de baja cuando quiera.</label>
+          <p class="err" id="f-err" aria-live="polite"></p>
+          <button class="btn" type="submit">${largo ? "Ir a pagar" : "Reservar mi lugar"}</button>
+          <button class="link" type="button" disabled>¿Preferís por Instagram? Mandame TALLER</button>
+        </form>`;
+    },
+    pausa() {
+      url.textContent = "clase.comunicatumarca.com/anotado";
+      return `<p class="marca">Manu Casaubon</p>
+        <h2 class="tit">Ya estás anotado/a, falta el pago</h2>
+        <p class="baj">${esc(primer())}, tu lugar se confirma cuando pagás.</p>
+        <div class="pausa">
+          <div class="fila"><span>Entrada</span><b>${ARS}</b></div>
+          <div class="fila"><span>Lugares</span><span><span class="quedan">Quedan ${QUEDAN} de 30</span></span></div>
+          <span class="nota-ej">El número sale de la base. ${QUEDAN} es un ejemplo.</span>
+          <ul class="incluye"><li>3 horas en vivo, presencial</li><li>Auditoría personalizada de tu marca</li><li>Planificación completa para 2027</li><li>Preguntas en vivo</li></ul>
+        </div>
+        <button class="btn" type="button" data-ir="mp">Pagar con Mercado Pago</button>
+        <button class="btn sec" type="button" data-ir="despues">Pagar después: te mando el link por mail</button>`;
+    },
+    despues() {
+      url.textContent = "clase.comunicatumarca.com/anotado";
+      return `<p class="marca">Manu Casaubon</p>
+        <h2 class="tit">Te mandé el link</h2>
+        <p class="baj">Revisá ${esc(datos.email)}. El lugar se reserva recién cuando tocás pagar.</p>
+        <div class="mail"><span class="ic">@</span><span><b>Tu link para pagar la clase del 18/11</b><br>Hola, ${esc(primer())}, ¿cómo estás? Acá tenés el link…</span></div>
+        <button class="btn" type="button" data-ir="mp">Abrir el link del mail</button>`;
+    },
+    mp() {
+      url.textContent = "mercadopago.com.ar/checkout";
+      return `<div class="mp">
+        <div class="cab">Mercado Pago</div>
+        <span class="sim">Pantalla simulada</span>
+        <div class="caja"><small>Pagás a MANU CASAUBON</small><div class="monto">${ARS}</div><small>Cómo destacar con tu marca personal en 2027 · 1 entrada</small></div>
+        <div class="caja"><small>Pagar con</small><b>Tarjeta terminada en 4242</b></div>
+        <button class="ok" type="button" data-ir="entrada">Pagar (sale aprobado)</button>
+        <button class="alt" type="button" data-ir="pendiente">Probar: pago en proceso</button>
+        <button class="alt" type="button" data-ir="rechazo">Probar: pago rechazado</button>
+      </div>`;
+    },
+    entrada() {
+      url.textContent = "clase.comunicatumarca.com/entrada?o=…";
+      const pedirPerfil = version === "A" && !datos.ig;
+      return `<p class="marca">Manu Casaubon</p>
+        <h2 class="tit">Tu lugar está reservado</h2>
+        <p class="baj">Te espero el 18/11. Guardá tu comprobante.</p>
+        <div class="imprime"><div class="ranura"></div><div class="salida"><section class="ticket" aria-label="Comprobante de entrada">
+          <h3>Cómo destacar con tu marca personal en 2027</h3><p class="sub">Comprobante de entrada</p>
+          <dl>
+            <div class="d cod"><dt>Entrada</dt><dd>CTM-7K2Q9F</dd></div>
+            <div class="d"><dt>Nombre</dt><dd>${esc(datos.nombre)}</dd></div>
+            <div class="d"><dt>Mail</dt><dd>${esc(datos.email)}</dd></div>
+            <div class="d"><dt>Cuándo</dt><dd>Miércoles 18/11/26, de 18 a 21 h</dd></div>
+            <div class="d"><dt>Puertas</dt><dd>17:45 h</dd></div>
+            <div class="d"><dt>Dónde</dt><dd>Niceto Vega 4601, Palermo Soho, CABA</dd></div>
+            <div class="d"><dt>Pagaste</dt><dd>${ARS}</dd></div>
+          </dl>
+          <p class="nota">Este comprobante no es una factura. Mostralo el día del evento.</p>
+        </section></div></div>
+        <button class="btn" type="button" id="pdf">Descargar comprobante en PDF</button>
+        <p class="txt" id="pdf-nota" aria-live="polite"></p>
+        ${version === "B" ? `<div class="mail"><span class="ic">@</span><span><b>Te llega la confirmación por mail</b><br>Con tu código y el link a esta entrada.</span></div>
+          <button class="btn sec" type="button" data-ir="mail">Ver el mail</button>` : ""}
+        ${pedirPerfil ? perfilForm() : version === "A" ? `<div class="pausa"><b>¡Gracias!</b><span class="txt">Anoté ${esc(datos.ig)} para tu auditoría. La llevo impresa el 18/11.</span></div>` : ""}`;
+    },
+    perfil() { return P.entrada(); },
+    "perfil-ok"() {
+      return `<p class="marca">Manu Casaubon</p><h2 class="tit">¡Gracias!</h2>
+        <p class="baj">Anoté ${esc(datos.ig)} para tu auditoría.</p>
+        <p class="txt">La miro antes de la clase y te la doy impresa el 18/11.</p>
+        <button class="btn sec" type="button" data-ir="entrada">Volver a mi entrada</button>`;
+    },
+    mail() {
+      url.textContent = "Mail · manu@info.comunicatumarca.com";
+      return `<p class="txt">De: Manu Casaubon</p>
+        <h2 style="margin:0;font-weight:800;font-size:1.1rem">Tu lugar para el 18/11 está reservado</h2>
+        <div style="display:grid;gap:10px;font-size:.9rem">
+          <p style="margin:0">Hola, ${esc(primer())}, ¿cómo estás?</p>
+          <p style="margin:0">Ya tenés tu lugar para la clase en vivo "Cómo destacar con tu marca personal en 2027".</p>
+          <p style="margin:0">Cuándo: miércoles 18/11, de 18 a 21 h. Las puertas abren a las 17:45.<br>Dónde: Niceto Vega 4601, Palermo Soho, CABA.<br>Tu entrada: CTM-7K2Q9F</p>
+          <p style="margin:0"><u style="color:var(--rojo)">ver mi entrada</u></p>
+          <p style="margin:0">Te espero el 18.<br>Manu</p>
+        </div>
+        <span class="nota-ej">Texto de la plantilla <code>confirmacion_entrada</code>, en borrador hasta que la apruebes.</span>`;
+    },
+    pendiente() {
+      url.textContent = "clase.comunicatumarca.com/entrada?o=…";
+      return `<p class="marca">Manu Casaubon</p>
+        <h2 class="tit">Tu pago está en proceso</h2>
+        <p class="baj">Cuando Mercado Pago lo apruebe, te confirmo el lugar por mail.</p>
+        <p class="txt">Puede tardar unos minutos (o hasta 2 días hábiles si pagaste en efectivo). No hace falta que pagues de nuevo.</p>
+        <button class="btn sec" type="button" data-ir="entrada">Actualizar (simula que se aprobó)</button>`;
+    },
+    rechazo() {
+      url.textContent = "clase.comunicatumarca.com/entrada?o=…";
+      return `<p class="marca">Manu Casaubon</p>
+        <h2 class="tit">No se pudo cobrar</h2>
+        <p class="baj">Mercado Pago no aprobó el pago. No se te cobró nada.</p>
+        <p class="txt">Podés probar con otra tarjeta o con dinero en cuenta.</p>
+        <button class="btn" type="button" data-ir="mp">Reintentar el pago</button>`;
+    },
+  };
+
+  function perfilForm() {
+    return `<form id="fp" class="pausa" novalidate>
+      <b>Pasame tu Instagram (o web) para tu auditoría</b>
+      <span class="txt">La miro antes de la clase y te la doy impresa ese día.</span>
+      <div class="campo"><label for="fp-ig">Tu Instagram o tu web</label><input id="fp-ig" autocapitalize="none" placeholder="@tuusuario o tuweb.com"></div>
+      <p class="err" id="fp-err" aria-live="polite"></p>
+      <button class="btn" type="submit">Mandar mi perfil</button>
+    </form>`;
+  }
+  function primer() { return (datos.nombre || "Lucía").split(/\s+/)[0]; }
+
+  function ir(p) {
+    pantalla = p;
+    vista.innerHTML = P[p]();
+    vista.scrollTop = 0;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) vista.querySelectorAll(".imprime").forEach((e) => e.classList.remove("imprime"));
+    dibujarPasos();
+  }
+
+  vista.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ir]");
+    if (b) { ir(b.dataset.ir); return; }
+    if (e.target.id === "pdf") $("pdf-nota").textContent = "En la web real baja un PDF con tus datos. En el boceto no se descarga.";
+  });
+  vista.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (e.target.id === "f") {
+      const nombre = $("f-nombre").value.trim(), email = $("f-mail").value.trim();
+      if (!nombre) { $("f-err").textContent = "Escribí tu nombre."; $("f-nombre").focus(); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $("f-err").textContent = "Revisá el mail: falta algo."; $("f-mail").focus(); return; }
+      datos = { nombre, email, ig: $("f-ig") ? $("f-ig").value.trim() : "" };
+      ir(version === "A" ? "mp" : "pausa");
+    } else if (e.target.id === "fp") {
+      const v = $("fp-ig").value.trim();
+      if (v.length < 2) { $("fp-err").textContent = "Escribí tu usuario o tu web."; return; }
+      datos.ig = v.startsWith("@") || v.includes("/") || /\.(com|ar|net|org|io|me)$/i.test(v) ? v : "@" + v;
+      ir("perfil-ok");
+    }
+  });
+  pasosEl.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ir]");
+    if (!b) return;
+    if (!datos.email) datos = { nombre: "Lucía Pérez", email: "lucia@ejemplo.com", ig: "" };
+    ir(b.dataset.ir === "perfil" ? "entrada" : b.dataset.ir);
+  });
+  document.querySelectorAll(".selector button").forEach((b) => b.addEventListener("click", () => {
+    version = b.dataset.v;
+    try { localStorage.setItem("conexion-version", version); } catch (e) {}
+    document.querySelectorAll(".selector button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    datos = { nombre: "", email: "", ig: "" };
+    ir("form");
+  }));
+  $("reiniciar").addEventListener("click", () => { datos = { nombre: "", email: "", ig: "" }; ir("form"); });
+
+  document.querySelectorAll(".selector button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.v === version)));
+  ir("form");
+})();
+</script>
