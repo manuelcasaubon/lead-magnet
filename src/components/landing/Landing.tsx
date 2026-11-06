@@ -4,7 +4,7 @@ import BarraCta from "./BarraCta";
 import LinkInstagram from "./LinkInstagram";
 import Reserva from "./Reserva";
 import Vsl from "./Vsl";
-import { Marcas, Paso, Subrayado } from "./Detalles";
+import { Marcas, Paso } from "./Detalles";
 import { FOTOS, MOSTRAR_CASOS, MOSTRAR_REGLAS_2027, REGLAS_2027, formatoArs, type Foto } from "./contenido";
 import s from "./landing.module.css";
 
@@ -47,9 +47,9 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <p className={s.marca}><b>Manuel Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
         <div className={s.centro}>
           <h1>Cómo destacar con tu marca personal en 2027</h1>
-          <p className={s.promesa}>De que nadie te conozca a que te llamen <Subrayado>a vos</Subrayado>.</p>
+          <p className={s.promesa}>De que nadie te conozca a que te llamen <span className={s.acento}>a vos</span>.</p>
         </div>
-        <p className={`${s.resumen} ${s.centro}`}>3 horas para entender cómo cambiaron las reglas de las redes y de la estrategia de marca, y salir con tu plan de acción para 2027: tu plan de marca y tu plan de contenido.</p>
+        <p className={`${s.resumen} ${s.centro}`}>3 horas para entender cómo <strong className={s.resalta}>cambiaron las reglas</strong> de las redes y de la estrategia de marca, y salir con tu plan de acción para 2027: tu plan de marca y tu plan de contenido.</p>
         <div className={s.conPaso}>
           <Paso n={1}>Mirá el video</Paso>
           <Vsl />
@@ -70,8 +70,9 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
             ? <>Quedan solo <s className={s.tachado}>{LUGARES_PUBLICOS}</s> <span className={s.restan}>{quedan}</span> lugares.</>
             : <>Quedan solo {LUGARES_PUBLICOS} lugares.</>}
         </p>
-        <Marcas />
       </div></section>
+
+      <Marcas />
 
       <section className={`${s.banda} ${s.crema}`}><div>
         <p className={s.frase}>Tenés mucho conocimiento y experiencia, <em>pero pocas personas saben lo que sabés.</em></p>

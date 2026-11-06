@@ -165,7 +165,7 @@
   .vsl { aspect-ratio: 4 / 5; }
 }
 
-/* ===== Toques de comunicatumarca.com/v2: letra a mano, subrayado de trazo, luces cálidas y marcas ===== */
+/* ===== Toques de comunicatumarca.com/v2: letra a mano, luces cálidas y marcas ===== */
 .hero { background:
   radial-gradient(60% 40% at 12% 8%, rgba(221, 165, 30, .10), transparent 70%),
   radial-gradient(50% 35% at 92% 30%, rgba(208, 68, 63, .12), transparent 70%), var(--oscuro); }
@@ -180,23 +180,22 @@
   border-radius: 50%; display: inline-grid; place-items: center; flex: none; transform: rotate(-6deg); }
 .final .paso { justify-content: flex-start; }
 
-.subrayado { position: relative; display: inline-block; white-space: nowrap; color: var(--rojo); }
-.subrayado svg { position: absolute; left: -2%; right: -2%; bottom: -.32em; width: 104%; height: .42em; color: var(--mostaza); overflow: visible; }
-@media (prefers-reduced-motion: no-preference) {
-  .subrayado path { stroke-dasharray: 260; stroke-dashoffset: 260; animation: trazo .9s .4s ease-out forwards; }
-}
-@keyframes trazo { to { stroke-dashoffset: 0; } }
+.acento { color: var(--rojo); }
+/* "cambiaron las reglas" resaltado en el resumen. */
+.resalta { color: var(--mostaza); font-weight: 500; }
 
-.marcas { display: grid; gap: 14px; margin-top: 8px; }
-.marcasTitulo { text-align: center; font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--gris-o); }
+/* Franja de marcas: fondo crema y texto oscuro de la paleta (pedido de Manu, 6/11). */
+.franjaMarcas { background: var(--crema); color: var(--oscuro); padding-block: 22px 26px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.marcas { display: grid; gap: 14px; max-width: 980px; margin-inline: auto; }
+.marcasTitulo { text-align: center; font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--oscuro); }
 .cinta { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
 .cintaIn { display: flex; gap: clamp(32px, 6vw, 56px); width: max-content; align-items: center; animation: cinta 34s linear infinite; }
 .cinta:hover .cintaIn { animation-play-state: paused; }
 @keyframes cinta { to { transform: translateX(calc(-50% - clamp(16px, 3vw, 28px))); } }
 @media (prefers-reduced-motion: reduce) { .cintaIn { animation: none; flex-wrap: wrap; width: auto; justify-content: center; } }
 .logo { display: inline-flex; align-items: center; height: 40px; flex: none; }
-.logo img { height: 100%; width: auto; max-width: 140px; object-fit: contain; filter: grayscale(1) brightness(1.6); opacity: .75; }
-.logoFalta { display: inline-grid; place-items: center; height: 36px; padding: 0 18px; border: 1.5px dashed var(--linea-o); border-radius: 4px; color: var(--gris-o); font-size: .8rem; font-weight: 600; white-space: nowrap; }
+.logo img { height: 100%; width: auto; max-width: 140px; object-fit: contain; filter: grayscale(1) brightness(.35); opacity: .8; }
+.logoFalta { display: inline-grid; place-items: center; height: 36px; padding: 0 18px; border: 1.5px dashed var(--gris-c); border-radius: 4px; color: var(--gris-c); font-size: .8rem; font-weight: 600; white-space: nowrap; }
 
 /* Botón extra de reserva en el medio de la página (lleva al formulario y de ahí a Mercado Pago). */
 .ctaMedio { display: flex; justify-content: center; margin-top: clamp(24px, 4vw, 36px); }
