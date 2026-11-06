@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   try {
     const r = await procesarPago(dataId);
     const result = r.ok
-      ? `mp=${r.mpStatus} orden=${r.orderId ?? "-"} estado=${r.estado ?? "-"}${r.nuevo ? " nuevo" : ""}${r.codigo ? ` ${r.codigo}` : ""}`
+      ? `mp=${r.mpStatus} orden=${r.orderId ?? "-"} estado=${r.estado ?? "-"}${r.nuevo ? " nuevo" : ""}`
       : `mp=${r.mpStatus} ${r.motivo}`;
     await cerrar(result.slice(0, 500));
     return NextResponse.json({ ok: true });

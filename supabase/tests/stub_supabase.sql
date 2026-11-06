@@ -13,3 +13,7 @@ grant all on all tables in schema public to service_role;
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 grant execute on function auth.uid() to anon, authenticated, service_role;
+-- Vault mínimo (en Supabase lo da la extensión supabase_vault).
+create schema if not exists vault;
+create table if not exists vault.secrets (name text primary key, secret text);
+create or replace view vault.decrypted_secrets as select name, secret as decrypted_secret from vault.secrets;

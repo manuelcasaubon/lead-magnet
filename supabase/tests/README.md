@@ -9,6 +9,6 @@ su postgres -c "$B/initdb -D $D -A trust -U postgres && $B/pg_ctl -D $D -o '-p 5
 P="psql -h /var/tmp -p 55432 -U postgres -q -v ON_ERROR_STOP=1"
 $P -c 'drop database if exists t' -c 'create database t'
 $P -d t -f supabase/tests/stub_supabase.sql
-for f in supabase/migrations/*.sql; do $P -d t -f "$f"; done
+for f in supabase/migrations/*.sql; do case "$f" in *_cron_*) continue;; esac; $P -d t -f "$f"; done   # las *_cron_* son solo de Supabase
 $P -d t -f supabase/tests/funciones_test.sql   # termina en "OK"
 ```

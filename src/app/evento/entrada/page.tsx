@@ -42,7 +42,7 @@ export default async function Entrada({ searchParams }: Props) {
       const r = await procesarPago(paymentId);
       const reciente = r.ok && r.aprobadoEn && Date.now() - new Date(r.aprobadoEn).getTime() < VENTANA_LINK_MIN * 60_000;
       if (r.ok && r.orderId && reciente) destino = `${RUTAS.entrada}?o=${r.orderId}`;
-      else if (r.ok && r.orderId) destino = `${RUTAS.entrada}?listo=1`;
+      else if (r.ok && r.confirmado) destino = `${RUTAS.entrada}?listo=1`;
       else if (r.ok && ["pending", "in_process", "authorized"].includes(r.mpStatus)) destino = `${RUTAS.entrada}?en_proceso=1`;
     } catch (e) {
       console.error("/evento/entrada pago por link", e);
