@@ -18,17 +18,60 @@ export const renderTexto = (tpl: string, vars: Vars) =>
 const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-export function renderHtml(body: string, preheader?: string | null): string {
-  const parrafos = body.trim().split(/\n{2,}/).map((p) => {
-    const html = esc(p).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (_, t, u) =>
-      `<a href="${u}" style="color:#d0443f;font-weight:600">${t}</a>`).replace(/\n/g, "<br>");
-    return `<p style="margin:0 0 16px">${html}</p>`;
-  }).join("");
-  const pre = preheader ? `<div style="display:none;max-height:0;overflow:hidden">${esc(preheader)}</div>` : "";
-  return `<!doctype html><html lang="es"><body style="margin:0;background:#fffdf6">${pre}
-<div style="max-width:560px;margin:0 auto;padding:28px 20px;font:16px/1.55 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#2d2828">
-${parrafos}</div></body></html>`;
+// Estilo de la marca (mismo lenguaje que comunicatumarca.com): crema, oscuro, rojo y Poppins negrita.
+const C = { oscuro: "#2d2828", crema: "#fffdf6", rojo: "#d0443f", mostaza: "#dda51e", gris: "#5e5757", borde: "#ece6da", blanco: "#ffffff" };
+const SANS = "'Poppins','Helvetica Neue',Helvetica,Arial,sans-serif";
+
+// Marcas simples en el cuerpo de la plantilla (así el texto se edita como texto plano desde el panel):
+//   "# Título con **palabra**"   → título grande; lo que va entre ** sale en rojo.
+//   "[Texto](https://…)" solo     → botón rojo.
+//   Líneas "Clave: valor" (2 o más) → tarjeta de datos.
+//   **texto** en un párrafo        → negrita en rojo.  [texto](url) en un párrafo → link.
+const enLinea = (t: string) =>
+  t.replace(/\*\*(.+?)\*\*/g, `<strong style="color:${C.rojo};font-weight:800">$1</strong>`)
+   .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, `<a href="$2" style="color:${C.rojo};font-weight:700;text-decoration:underline">$1</a>`)
+   .replace(/\n/g, "<br>");
+
+function bloque(p: string): string {
+  const e = esc(p.trim());
+  if (e.startsWith("# ")) {
+    const t = e.slice(2).replace(/\*\*(.+?)\*\*/g, `<span style="color:${C.rojo};white-space:nowrap">$1</span>`);
+    return `<h1 style="margin:0 0 20px;font-family:${SANS};font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-0.03em;color:${C.oscuro}">${t}</h1>`;
+  }
+  const boton = e.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+  if (boton) {
+    return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px"><tr><td style="border-radius:999px;background:${C.rojo}">
+<a href="${boton[2]}" style="display:inline-block;padding:14px 28px;font-family:${SANS};font-size:16px;font-weight:700;color:${C.blanco};text-decoration:none;border-radius:999px">${boton[1]}</a></td></tr></table>`;
+  }
+  const lineas = e.split("\n");
+  const filas = lineas.map((l) => l.match(/^([^:]{1,24}):\s+(.+)$/));
+  if (lineas.length >= 2 && filas.every(Boolean)) {
+    const trs = filas.map((m, i) => `<tr><td style="padding:12px 18px;${i ? `border-top:1px solid ${C.borde};` : ""}font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${C.gris};width:34%;vertical-align:top">${m![1]}</td>
+<td style="padding:12px 18px;${i ? `border-top:1px solid ${C.borde};` : ""}font-family:${SANS};font-size:15px;font-weight:600;color:${C.oscuro}">${enLinea(m![2])}</td></tr>`).join("");
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;background:${C.blanco};border:1px solid ${C.borde};border-radius:14px;border-collapse:separate">${trs}</table>`;
+  }
+  return `<p style="margin:0 0 16px;font-family:${SANS};font-size:16px;line-height:1.6;color:${C.oscuro}">${enLinea(e)}</p>`;
 }
+
+export function renderHtml(body: string, preheader?: string | null): string {
+  const contenido = body.trim().split(/\n{2,}/).map(bloque).join("\n");
+  const pre = preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${esc(preheader)}</div>` : "";
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet"></head>
+<body style="margin:0;padding:0;background:${C.crema}">${pre}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.crema}"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">
+<tr><td style="background:${C.oscuro};padding:16px 24px;font-family:${SANS};font-size:15px;font-weight:800;color:${C.crema};letter-spacing:-0.02em">CTM<span style="color:${C.rojo}">.</span>
+<span style="float:right;font-size:12px;font-weight:600;color:${C.mostaza};letter-spacing:0">Manu Casaubon</span></td></tr>
+<tr><td style="padding:32px 24px 16px">${contenido}</td></tr>
+<tr><td style="background:${C.oscuro};padding:20px 24px;font-family:${SANS};font-size:12px;line-height:1.5;color:#c9c2b6">
+Comunica Tu Marca · Manu Casaubon<br>¿Dudas? Respondé este mail y te contesto yo.</td></tr>
+</table></td></tr></table></body></html>`;
+}
+
+// Versión de texto plano: sin las marcas de formato.
+export const textoPlano = (body: string) =>
+  body.replace(/^# /gm, "").replace(/\*\*(.+?)\*\*/g, "$1").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, "$1: $2");
 
 // "Hola, Ana, ¿cómo estás?" o "Hola, ¿cómo estás?" si no hay nombre.
 export const saludo = (nombre?: string | null) => (nombre && nombre.trim() ? `Hola, ${nombre.trim()}, ¿cómo estás?` : "Hola, ¿cómo estás?");
@@ -96,7 +139,7 @@ export async function enviarPlantilla(db: SupabaseClient, o: {
     body: JSON.stringify({
       from: s?.email_from ?? "Manu Casaubon <manu@info.comunicatumarca.com>", to: [to],
       reply_to: s?.email_reply_to ?? undefined, subject,
-      html: renderHtml(body, tpl.preheader ? renderTexto(tpl.preheader, vars) : null), text: body, headers,
+      html: renderHtml(body, tpl.preheader ? renderTexto(tpl.preheader, vars) : null), text: textoPlano(body), headers,
       tags: [{ name: "template", value: tpl.key.replace(/[^a-zA-Z0-9_-]/g, "_") }],
     }),
   });
