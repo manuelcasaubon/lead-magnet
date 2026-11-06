@@ -3,9 +3,9 @@
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 
-// Pixel de Meta ("Comunica tu marca Web") en las páginas públicas: PageView en cada vista.
-// El Lead lo dispara el formulario con el mismo eventID que manda el servidor por la Conversions API
-// (deduplicación). Purchase y Schedule van solo por la Conversions API (el comprobante lleva la orden en la URL
+// Pixel de Meta ("Comunica Tu Marca | Offer Nov 2026") en las páginas públicas: PageView en cada vista.
+// El Lead lo dispara el formulario y el Schedule la agenda del inicio, con el mismo eventID que manda el servidor
+// por la Conversions API (deduplicación). Purchase va solo por la Conversions API (el comprobante lleva la orden en la URL
 // y no se le pasa a terceros). Mismas exclusiones que Clarity.
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1821219275793871";
 const EXCLUIDAS = /^\/(evento\/entrada|entrada|panel|baja|prueba)(\/|$)/;
@@ -13,6 +13,10 @@ const EXCLUIDAS = /^\/(evento\/entrada|entrada|panel|baja|prueba)(\/|$)/;
 type Fbq = (...args: unknown[]) => void;
 export function metaLead(eventId: string) {
   try { (window as unknown as { fbq?: Fbq }).fbq?.("track", "Lead", {}, { eventID: eventId }); } catch { /* nunca rompe */ }
+}
+// Reserva de la sesión en Cal.com: mismo eventID (uid de la reserva) que manda cal-webhook por la Conversions API.
+export function metaSchedule(eventId: string) {
+  try { (window as unknown as { fbq?: Fbq }).fbq?.("track", "Schedule", {}, { eventID: eventId }); } catch { /* nunca rompe */ }
 }
 
 export default function MetaPixel() {

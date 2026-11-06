@@ -29,6 +29,7 @@ export const EVENTOS = {
   exp_exposure: "Vio una variante (props.exp, props.variant)",
   agenda_view: "Agenda de Cal.com visible en la página",
   agenda_step: "Respondió una pregunta del formulario previo a la agenda (props.step, props.field)",
+  agenda_booked: "Terminó la reserva en el calendario embebido (navegador)",
   booking_created: "Reservó una sesión en Cal.com (servidor, webhook)",
   booking_rescheduled: "Reprogramó la sesión (servidor, webhook)",
   booking_cancelled: "Canceló la sesión (servidor, webhook)",
