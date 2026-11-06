@@ -25,7 +25,7 @@
 >
 > **Conversions API de Meta (6/11/26):** `supabase/functions/_shared/meta.ts` es el único punto de envío. Secretos de Supabase: `META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN` y, opcional, `META_TEST_EVENT_CODE`.
 > - `Lead`: `/api/lead` (paso final) llama a la Edge Function `meta-capi`, autorizada solo con la clave de servidor. Manda IP y navegador solo en ese envío, sin guardarlos, y devuelve `metaEventId` para que el pixel del navegador use el mismo `eventID`.
-> - `Purchase`: `pagos` lo manda al aprobarse la orden (event_id = id de la orden, valor en ARS). Si falla o todavía no hay token, el cron de cada 10 min lo reintenta.
+> - `Purchase` (evento de conversión de los anuncios a `/evento`): `pagos` lo manda al aprobarse la orden (event_id = id de la orden, valor en ARS, content_name "Clase en vivo 18/11", event_source_url `/evento`). La página de retorno `/evento/entrada` le pasa a `pagos` la visita (cookie `vid`), la IP y el navegador: la orden del link de MP queda unida a la visita del anuncio (`_fbp`/`_fbc`) y el Purchase sale con esos datos. Si el aviso de MP llega antes que el retorno y la orden todavía no tiene visita, el Purchase espera; a los 10 min lo manda el cron igual. Si falla o falta el token, el cron lo reintenta.
 > - `Schedule`: `cal-webhook` en `BOOKING_CREATED` (event_id = uid de la reserva).
 > - Se guardan `_fbp` y `_fbc` en `visitors`. El middleware arma `_fbc` desde `fbclid`. Cada envío queda registrado en `meta_capi_events` y se manda una sola vez por evento.
 > - El pixel del navegador (PageView + Lead deduplicado) ya está en `/` y `/evento`.

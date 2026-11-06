@@ -8,8 +8,13 @@
 //  - Idempotente. Responde lo mínimo: { ok, orderId, confirmado, pendiente }. orderId (que habilita ver el
 //    comprobante) solo si vino con su orden o si el pago se aprobó hace menos de 60 min.
 //
+//  - visitante { vid, ip, ua }: solo lo manda la página de retorno (navegador de quien pagó). Une la orden con la
+//    visita (fbp/fbc) y va con IP y navegador en el Purchase de Meta. Si el aviso de MP llega antes y la orden no
+//    tiene visita, el Purchase espera: lo manda el retorno o, a los 10 min, el cron.
+//
 // POST { pendientes: true } + header x-cron-secret   (pg_cron cada 10 min)
 //  - Reintenta los mails de las entradas sin avisar (plantillas recién aprobadas, modo test → live, fallas).
+//  - Manda los Purchase que quedaron esperando o fallaron.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { enviarPlantilla, resuelto, saludo } from "../_shared/email.ts";
 import { enviarEventoMeta } from "../_shared/meta.ts";
@@ -99,7 +104,10 @@ async function avisarEntrada(orderId: string) {
 }
 
 // Purchase a la Conversions API de Meta (event_id = id de la orden). Idempotente: se manda una sola vez.
-async function compraMeta(orderId: string) {
+type Visitante = { vid?: string | null; ip?: string | null; ua?: string | null };
+const ESPERA_META_MIN = 10;
+
+async function compraMeta(orderId: string, v: Visitante = {}) {
   const { data: o } = await db.from("orders").select("person_id, visitor_id, amount_ars, mp_payment_id, approved_at, status").eq("id", orderId).maybeSingle();
   if (!o || o.status !== "approved") return;
   const [{ data: p }, { data: pago }, { data: s }] = await Promise.all([
@@ -113,7 +121,15 @@ async function compraMeta(orderId: string) {
     cuando: o.approved_at ? new Date(o.approved_at) : undefined,
     valor: { monto: Number(pago?.transaction_amount ?? o.amount_ars), moneda: "ARS", contenido: "Clase en vivo 18/11" },
     visitorId: o.visitor_id ?? p?.first_visitor_id ?? null,
+    ip: v.ip ?? null, userAgent: v.ua ?? null,
   });
+}
+
+// La orden del link de MP nace sin visita: se completa con la del navegador que volvió del pago (solo si está vacía).
+async function unirVisita(orderId: string, vid: string) {
+  const { data: o } = await db.from("orders").update({ visitor_id: vid }).eq("id", orderId).is("visitor_id", null)
+    .select("person_id").maybeSingle();
+  if (o?.person_id) await db.from("people").update({ first_visitor_id: vid }).eq("id", o.person_id).is("first_visitor_id", null);
 }
 
 async function pendientes(req: Request) {
@@ -126,17 +142,35 @@ async function pendientes(req: Request) {
   const { data: meta } = await db.from("meta_capi_events").select("event_id")
     .eq("event_name", "Purchase").in("status", ["skipped", "failed"]).order("created_at").limit(50);
   for (const m of meta ?? []) await compraMeta(m.event_id);
-  return json({ ok: true, revisadas: lista?.length ?? 0, meta: meta?.length ?? 0 });
+  // Compras aprobadas que esperaban la visita y nunca llegó el retorno (cerró la pestaña, pago por el link sin volver).
+  const desde = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const hasta = new Date(Date.now() - ESPERA_META_MIN * 60_000).toISOString();
+  const { data: aprobadas } = await db.from("orders").select("id").eq("status", "approved")
+    .gte("approved_at", desde).lte("approved_at", hasta).order("approved_at").limit(200);
+  const ids = (aprobadas ?? []).map((o) => o.id);
+  const { data: yaMeta } = ids.length
+    ? await db.from("meta_capi_events").select("event_id").eq("event_name", "Purchase").in("event_id", ids)
+    : { data: [] };
+  const enviadas = new Set((yaMeta ?? []).map((m) => m.event_id));
+  const faltan = ids.filter((id) => !enviadas.has(id));
+  for (const id of faltan) await compraMeta(id);
+  return json({ ok: true, revisadas: lista?.length ?? 0, meta: (meta?.length ?? 0) + faltan.length });
 }
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
-  const body = await req.json().catch(() => ({})) as { payment_id?: string | number; order_id?: string; pendientes?: boolean };
+  const body = await req.json().catch(() => ({})) as { payment_id?: string | number; order_id?: string; pendientes?: boolean; visitante?: Visitante };
   if (body.pendientes) return pendientes(req);
 
   const paymentId = String(body.payment_id ?? "").trim();
   const orderId = body.order_id ? String(body.order_id) : null;
   if (!/^\d{1,20}$/.test(paymentId) || (orderId && !UUID.test(orderId))) return json({ ok: false, error: "invalid" }, 400);
+  const bv = body.visitante ?? null;
+  const visitante: Visitante | null = bv ? {
+    vid: typeof bv.vid === "string" && UUID.test(bv.vid) ? bv.vid : null,
+    ip: typeof bv.ip === "string" ? bv.ip.slice(0, 64) : null,
+    ua: typeof bv.ua === "string" ? bv.ua.slice(0, 512) : null,
+  } : null;
 
   try {
     const pago = await obtenerPago(paymentId);
@@ -159,13 +193,19 @@ Deno.serve(async (req) => {
     }
 
     if (r.order_status === "approved") await avisarEntrada(r.order_id);
-    if (r.order_status === "approved") await compraMeta(r.order_id);
+    // Solo el navegador que acaba de pagar (orden propia o pago aprobado hace menos de 60 min) se une a la orden.
+    const aprobadoEn: string | null = pago.date_approved ?? null;
+    const reciente = !!aprobadoEn && Date.now() - new Date(aprobadoEn).getTime() < VENTANA_MIN * 60_000;
+    if (visitante?.vid && (orderId || reciente)) await unirVisita(r.order_id, visitante.vid);
+    if (r.order_status === "approved") {
+      const { data: ord } = await db.from("orders").select("visitor_id, approved_at").eq("id", r.order_id).maybeSingle();
+      const viejo = !ord?.approved_at || Date.now() - new Date(ord.approved_at).getTime() > ESPERA_META_MIN * 60_000;
+      if ((visitante && (orderId || reciente)) || ord?.visitor_id || viejo) await compraMeta(r.order_id, visitante && (orderId || reciente) ? visitante : {});
+    }
     if (r.newly_approved) await evento("payment_approved", r.order_id, { mp_status: pago.status, overbooked: r.overbooked, via: porLink ? "link" : "checkout" });
     else if (PENDIENTE.includes(pago.status)) await evento("payment_pending", r.order_id, { mp_status: pago.status });
     else if (["rejected", "cancelled"].includes(pago.status)) await evento("payment_rejected", r.order_id, { mp_status: pago.status });
 
-    const aprobadoEn: string | null = pago.date_approved ?? null;
-    const reciente = !!aprobadoEn && Date.now() - new Date(aprobadoEn).getTime() < VENTANA_MIN * 60_000;
     return json({
       ok: true,
       orderId: orderId || reciente ? r.order_id : null,

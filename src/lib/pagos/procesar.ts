@@ -9,11 +9,15 @@ import { env } from "@/lib/env";
 // orderId: solo si el pago vino con su orden o se aprobó hace menos de 60 min (habilita ver el comprobante).
 export type ResultadoProceso = { ok: true; orderId: string | null; confirmado: boolean; pendiente: boolean } | { ok: false; motivo: string };
 
-export async function procesarPago(paymentId: string | number, opts: { ordenEsperada?: string } = {}): Promise<ResultadoProceso> {
+// visitante: solo desde la página de retorno (el navegador de quien pagó). Une la compra con su visita y le da
+// a la Conversions API de Meta las cookies _fbp/_fbc, la IP y el navegador para atribuir la compra al anuncio.
+export type Visitante = { vid?: string | null; ip?: string | null; ua?: string | null };
+
+export async function procesarPago(paymentId: string | number, opts: { ordenEsperada?: string; visitante?: Visitante } = {}): Promise<ResultadoProceso> {
   const r = await fetch(`${env.supabaseUrl()}/functions/v1/pagos`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ payment_id: String(paymentId), order_id: opts.ordenEsperada }),
+    body: JSON.stringify({ payment_id: String(paymentId), order_id: opts.ordenEsperada, visitante: opts.visitante }),
     cache: "no-store",
     signal: AbortSignal.timeout(25_000),
   });

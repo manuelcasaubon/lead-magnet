@@ -33,11 +33,15 @@ export default async function Entrada({ searchParams }: Props) {
   const q = await searchParams;
   const o = uno(q.o);
   const paymentId = uno(q.payment_id) ?? uno(q.collection_id);
+  const h = await headers();
+  const visitante = {
+    vid: h.get("x-vid"), ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null, ua: h.get("user-agent"),
+  };
 
   if (!o && paymentId && /^\d{1,20}$/.test(paymentId)) {
     let destino: string | null = null;
     try {
-      const r = await procesarPago(paymentId);
+      const r = await procesarPago(paymentId, { visitante });
       if (r.ok && r.orderId) destino = `${RUTAS.entrada}?o=${r.orderId}`;
       else if (r.ok && r.confirmado) destino = `${RUTAS.entrada}?listo=1`;
       else if (r.ok && r.pendiente) destino = `${RUTAS.entrada}?en_proceso=1`;
@@ -66,7 +70,7 @@ export default async function Entrada({ searchParams }: Props) {
   let vista = await leerOrden(o);
   if (vista.tipo !== "no_existe" && vista.tipo !== "aprobada" && vista.tipo !== "cancelada" && paymentId && /^\d{1,20}$/.test(paymentId)) {
     try {
-      const r = await procesarPago(paymentId, { ordenEsperada: o });
+      const r = await procesarPago(paymentId, { ordenEsperada: o, visitante });
       if (r.ok) vista = await leerOrden(o);
     } catch (e) {
       console.error("/evento/entrada procesarPago", e);
@@ -74,8 +78,7 @@ export default async function Entrada({ searchParams }: Props) {
   }
 
   if (vista.tipo === "aprobada") {
-    const vid = (await headers()).get("x-vid");
-    await registrarEvento({ name: "ticket_view", visitorId: vid ?? vista.visitorId, personId: vista.personId, path: "/evento/entrada" });
+    await registrarEvento({ name: "ticket_view", visitorId: visitante.vid ?? vista.visitorId, personId: vista.personId, path: "/evento/entrada" });
   }
 
   return (
