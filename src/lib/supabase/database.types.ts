@@ -539,6 +539,7 @@ export type Database = {
       settings: {
         Row: {
           absorb_fee: boolean
+          mp_link_match: string | null
           capacity_max: number
           capacity_public: number
           doors_label: string
@@ -556,6 +557,7 @@ export type Database = {
         }
         Insert: {
           absorb_fee?: boolean
+          mp_link_match?: string | null
           capacity_max?: number
           capacity_public?: number
           doors_label?: string
@@ -573,6 +575,7 @@ export type Database = {
         }
         Update: {
           absorb_fee?: boolean
+          mp_link_match?: string | null
           capacity_max?: number
           capacity_public?: number
           doors_label?: string
@@ -671,6 +674,10 @@ export type Database = {
     }
     Views: { [_ in never]: never }
     Functions: {
+      adopt_link_payment: {
+        Args: { p_payment: Json }
+        Returns: { adopted: boolean; newly_approved: boolean; order_id: string | null; order_status: string | null; overbooked: boolean; ticket_code: string | null }[]
+      }
       apply_payment: {
         Args: { p_payment: Json }
         Returns: { newly_approved: boolean; order_id: string; order_status: string; overbooked: boolean; ticket_code: string }[]

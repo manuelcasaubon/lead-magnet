@@ -5,14 +5,14 @@ import { obtenerPago, type PagoMp } from "@/lib/mercadopago/cliente";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
 import { urlEntrada } from "@/lib/rutas";
-import { registrarEvento } from "./eventos";
+import { esUuid, registrarEvento } from "./eventos";
 import { formatoArs } from "./formato";
 
 // Un pago se confirma SIEMPRE contra GET /v1/payments/{id} y se aplica con apply_payment(), que es
 // idempotente (docs/SPEC.md §5.3.5). Lo usan el webhook y /evento/entrada.
 
 export type ResultadoProceso =
-  | { ok: true; orderId: string | null; estado: string | null; nuevo: boolean; codigo: string | null; mpStatus: string }
+  | { ok: true; orderId: string | null; estado: string | null; nuevo: boolean; codigo: string | null; mpStatus: string; porLink: boolean; aprobadoEn: string | null }
   | { ok: false; motivo: "otra_orden"; mpStatus: string };
 
 export async function procesarPago(paymentId: string | number, opts: { ordenEsperada?: string } = {}): Promise<ResultadoProceso> {
@@ -24,10 +24,16 @@ export async function procesarPago(paymentId: string | number, opts: { ordenEspe
   }
 
   const db = supabaseAdmin();
-  const { data, error } = await db.rpc("apply_payment", { p_payment: pago as unknown as Json });
-  if (error) throw new Error(`apply_payment: ${error.message}`);
+  // Sin orden nuestra en external_reference = pago hecho con el link fijo de MP (mpago.la).
+  // adopt_link_payment lo valida (aprobado, ARS, monto >= precio, producto) y crea persona, orden y entrada.
+  const porLink = !esUuid(pago.external_reference ?? null);
+  const { data, error } = porLink
+    ? await db.rpc("adopt_link_payment", { p_payment: pago as unknown as Json })
+    : await db.rpc("apply_payment", { p_payment: pago as unknown as Json });
+  if (error) throw new Error(`${porLink ? "adopt_link_payment" : "apply_payment"}: ${error.message}`);
   const r = data?.[0];
-  if (!r?.order_id) return { ok: true, orderId: null, estado: null, nuevo: false, codigo: null, mpStatus: pago.status };
+  const aprobadoEn = pago.date_approved ?? null;
+  if (!r?.order_id) return { ok: true, orderId: null, estado: null, nuevo: false, codigo: null, mpStatus: pago.status, porLink, aprobadoEn };
 
   if (r.order_status === "approved") {
     // Se avisa mientras la entrada no tenga manu_notified_at: si un intento anterior se cortó a la mitad,
@@ -43,7 +49,7 @@ export async function procesarPago(paymentId: string | number, opts: { ordenEspe
     await evento("payment_rejected", r.order_id, { mp_status: pago.status, detail: pago.status_detail ?? null });
   }
 
-  return { ok: true, orderId: r.order_id, estado: r.order_status, nuevo: r.newly_approved, codigo: r.ticket_code, mpStatus: pago.status };
+  return { ok: true, orderId: r.order_id, estado: r.order_status, nuevo: r.newly_approved, codigo: r.ticket_code, mpStatus: pago.status, porLink, aprobadoEn };
 }
 
 async function evento(name: "payment_approved" | "payment_pending" | "payment_rejected", orderId: string, props: Record<string, unknown>) {
@@ -70,10 +76,13 @@ async function avisarEntrada(orderId: string, pago: PagoMp) {
   const c = cupo?.[0];
   const nombre = primerNombre(p.name);
 
-  const conf = await enviarPlantilla({
-    templateKey: "confirmacion_entrada", to: p.email, personId: p.id,
-    vars: { nombre, codigo: t.code, link_entrada: urlEntrada(env.siteUrl(), orderId) },
-  });
+  // Pago por link sin mail del pagador: mail marcador @sin-mail.invalid; no se le escribe (Manu igual recibe el aviso).
+  const conf = p.email.endsWith(".invalid")
+    ? { status: "skipped" as const }
+    : await enviarPlantilla({
+        templateKey: "confirmacion_entrada", to: p.email, personId: p.id,
+        vars: { nombre, codigo: t.code, link_entrada: urlEntrada(env.siteUrl(), orderId) },
+      });
 
   const manu = env.manuNotifyEmail();
   // personId = quien compró: así el aviso a Manu es único por compra y no uno solo en toda la venta
