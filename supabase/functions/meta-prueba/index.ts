@@ -1,6 +1,6 @@
 // Edge Function "meta-prueba": diagnóstico de la Conversions API. Solo con header x-cron-secret (Vault).
-// POST { pixels?: string[] } → para cada pixel: lee su nombre con el token y manda un Lead de prueba
-// (siempre con META_TEST_EVENT_CODE; sin código no manda nada). Nunca devuelve el token.
+// POST { pixels?: string[], test_event_code?: "TEST123" } → para cada pixel: lee su nombre con el token y manda un Lead de prueba
+// (siempre con código de prueba: el del body o META_TEST_EVENT_CODE; sin código no manda nada). Nunca devuelve el token.
 const VERSION = Deno.env.get("META_GRAPH_VERSION") ?? "v23.0";
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b, null, 1), { status, headers: { "Content-Type": "application/json" } });
 const sha = async (v: string) => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(v))), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -11,10 +11,10 @@ Deno.serve(async (req) => {
   const { data: ok } = await db.rpc("check_cron_secret", { p_secret: req.headers.get("x-cron-secret") ?? "" });
   if (!ok) return json({ ok: false }, 401);
 
-  const token = Deno.env.get("META_CAPI_ACCESS_TOKEN") ?? Deno.env.get("ETA_CAPI_ACCESS_TOKEN"); // 2º: nombre mal tipeado (6/11), solo para diagnóstico
-  const test = Deno.env.get("META_TEST_EVENT_CODE");
+  const token = Deno.env.get("META_CAPI_ACCESS_TOKEN");
   const configurado = Deno.env.get("META_PIXEL_ID") ?? null;
-  const body = await req.json().catch(() => ({})) as { pixels?: string[] };
+  const body = await req.json().catch(() => ({})) as { pixels?: string[]; test_event_code?: string };
+  const test = /^TEST\d+$/.test(body.test_event_code ?? "") ? body.test_event_code : Deno.env.get("META_TEST_EVENT_CODE");
   const pixels = [...new Set([configurado, ...(body.pixels ?? [])].filter((p): p is string => !!p && /^\d{10,20}$/.test(p)))];
   const nombres = Object.keys(Deno.env.toObject()).filter((k) => /META|CAPI|FACEBOOK|FB_|PIXEL/i.test(k)).sort();
   const out: Record<string, unknown> = { secretos_meta: nombres, META_PIXEL_ID: configurado, hay_token: !!token, test_event_code: test ?? null, pixels: {} };
