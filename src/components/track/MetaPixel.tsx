@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 // El Lead lo dispara el formulario con el mismo eventID que manda el servidor por la Conversions API
 // (deduplicación). Purchase y Schedule van solo por la Conversions API (el comprobante lleva la orden en la URL
 // y no se le pasa a terceros). Mismas exclusiones que Clarity.
-export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1541348264386482";
+export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1821219275793871";
 const EXCLUIDAS = /^\/(evento\/entrada|entrada|panel|baja|prueba)(\/|$)/;
 
 type Fbq = (...args: unknown[]) => void;
