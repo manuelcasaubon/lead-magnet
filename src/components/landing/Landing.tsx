@@ -118,13 +118,18 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <h2>Qué pasa en las 3 horas</h2>
         <div className={s.prog}>
           {PROGRAMA.map(([hora, nivel, titulo, texto, lleva]) => (
-            <div className={s.fila} key={hora}>
-              <div className={s.hora}>{hora}</div>
-              <div>
-                <div className={s.nivel}>{nivel}</div><h3>{titulo}</h3><p>{texto}</p>
+            // Desplegable: cerrado se ve la hora, el bloque y el título; al abrir, qué pasa y qué te llevás.
+            <details className={s.fila} key={hora}>
+              <summary>
+                <span className={s.hora}>{hora}</span>
+                <div><span className={s.nivel}>{nivel}</span><h3>{titulo}</h3></div>
+                <span className={s.flecha} aria-hidden="true">+</span>
+              </summary>
+              <div className={s.filaCuerpo}>
+                <p>{texto}</p>
                 {lleva && <p className={s.tellevas}><b>Te llevás:</b> {lleva}</p>}
               </div>
-            </div>
+            </details>
           ))}
         </div>
         <FotoReal foto={FOTOS.clase} que="dando una clase o una capacitación para un cliente" />
@@ -147,7 +152,7 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
             <ul className={`${s.lista} ${s.no}`}>
               <li>Buscás hacerte viral o famoso.</li>
               <li>Esperás resultados de un día para el otro.</li>
-              <li>Querés aprender a crear contenido solo para ganar más dinero.</li>
+              <li>Querés desarrollar tu marca personal solo para ganar más dinero y nada más.</li>
             </ul>
           </div>
         </div>
@@ -169,8 +174,8 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <h2>Quién la da</h2>
         <div className={s.quien}>
         <div className={s.bio}>
-          <p>Soy Manu Casaubon. Acompaño a personas que tienen algo importante para decir a aprender a comunicarlo al mundo, logrando alcanzar nuevas oportunidades (ventas, charlas, medios, etc.).</p>
-          <p>Tengo más de 89.000 seguidores en Instagram, 200.000 en TikTok y 130.000 en YouTube. Soy speaker, conferencista y capacitador en universidades, empresas y eventos.</p>
+          <p>Soy Manu Casaubon. Acompaño a personas cracks en lo que hacen a aprender a comunicarlo al mundo, logrando alcanzar nuevas oportunidades (ventas, charlas, medios, etc.).</p>
+          <p>Con más de 89.000 seguidores en Instagram, 200.000 en TikTok y 130.000 en YouTube, soy speaker, conferencista y capacitador en universidades, empresas y eventos.</p>
         </div>
         <FotoReal foto={FOTOS.quien} que="en un escenario o retrato" vertical />
         </div>
