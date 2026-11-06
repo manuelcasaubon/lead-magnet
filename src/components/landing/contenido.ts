@@ -21,3 +21,8 @@ export const FOTOS: { charla: Foto; clase: Foto; quien: Foto } = {
   clase: { src: "/fotos/manu-clase.jpg", alt: "Manu Casaubon de espaldas, dando una clase a un grupo sentado alrededor de una mesa", ancho: 1600, alto: 1200 },
   quien: { src: "/fotos/manu-escenario.jpg", alt: "Manu Casaubon dando una charla en un escenario, con micrófono y presentador en la mano", ancho: 1000, alto: 1500 },
 };
+
+/** Logos de marcas con las que trabajó Manu (tira que pasa debajo de los datos). Archivos en /public/marcas/,
+ *  en blanco o gris claro sobre transparente (SVG o PNG). Vacío = la tira no se muestra. */
+export type Marca = { nombre: string; src: string; ancho: number; alto: number };
+export const MARCAS: Marca[] = [];

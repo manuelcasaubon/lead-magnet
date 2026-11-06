@@ -4,6 +4,7 @@ import BarraCta from "./BarraCta";
 import LinkInstagram from "./LinkInstagram";
 import Reserva from "./Reserva";
 import Vsl from "./Vsl";
+import { Marcas, Paso, Subrayado } from "./Detalles";
 import { FOTOS, MOSTRAR_CASOS, MOSTRAR_REGLAS_2027, REGLAS_2027, formatoArs, type Foto } from "./contenido";
 import s from "./landing.module.css";
 
@@ -44,10 +45,13 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <p className={s.marca}><b>Manu Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
         <div className={s.centro}>
           <h1>Cómo destacar con tu marca personal en 2027</h1>
-          <p className={s.promesa}>De que nadie te conozca a que te llamen a vos.</p>
+          <p className={s.promesa}>De que nadie te conozca a que te llamen <Subrayado>a vos</Subrayado>.</p>
         </div>
         <p className={`${s.resumen} ${s.centro}`}>3 horas para entender cómo cambiaron las reglas de las redes y de la estrategia de marca, y salir con tu plan de acción para 2027: tu plan de marca y tu plan de contenido.</p>
-        <Vsl />
+        <div className={s.conPaso}>
+          <Paso n={1}>Mirá el video</Paso>
+          <Vsl />
+        </div>
         <div className={s.entrada}>
           <div className={s.dato}><span>Cuándo</span><strong>Miércoles 18/11</strong></div>
           <div className={s.dato}><span>Horario</span><strong>18 a 21 h</strong></div>
@@ -60,6 +64,7 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
           </div>
         </div>
         <p className={s.lugares}>{lugares}</p>
+        <Marcas />
       </div></section>
 
       <section className={`${s.banda} ${s.crema}`}><div>
@@ -175,6 +180,7 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
       <section className={`${s.banda} ${s.final}`} id="reservar"><div>
         <h2>Nos vemos el 18/11</h2>
         <p className={s.bajada}>{agotado ? "Se agotaron los lugares." : `${lugares.replace(/\.$/, "")}, miércoles de 18 a 21 h, en Palermo Soho.`}</p>
+        {!agotado && <Paso n={2}>Reservá tu lugar</Paso>}
         {!agotado && <p className={s.aviso}>Niceto Vega 4601, CABA. Pagás {precio} por Mercado Pago.</p>}
         {agotado ? (
           <div className={s.cerrado} role="status">

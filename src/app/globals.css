@@ -5,6 +5,7 @@
   --rojo-hover: #b93832;
   --sans: var(--font-poppins), "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
   --serif: var(--font-garamond), "EB Garamond", Georgia, "Times New Roman", serif;
+  --mano: var(--font-caveat), "Caveat", "Segoe Print", "Bradley Hand", cursive;
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: border-box; }
