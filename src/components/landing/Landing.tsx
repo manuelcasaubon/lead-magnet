@@ -31,7 +31,9 @@ function FotoReal({ foto, que, vertical }: { foto: Foto; que: string; vertical?:
 
 export default function Landing({ cupo, precioArs, agotado }: Props) {
   // Siempre el número real (reglas de comunicación). Sin dato de la base, se dice el total.
-  const quedan = cupo ? Math.max(0, cupo.left_public) : null;
+  // CUPO_BOCETO: solo para la vista previa local (simula lugares vendidos); en producción no está definida.
+  const simulado = process.env.CUPO_BOCETO ? Number(process.env.CUPO_BOCETO) : null;
+  const quedan = cupo ? Math.max(0, cupo.left_public) : simulado;
   const lugares = agotado
     ? "Se agotaron los lugares."
     : quedan !== null && quedan < LUGARES_PUBLICOS
@@ -42,7 +44,7 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
   return (
     <main className={s.raiz}>
       <section className={`${s.banda} ${s.hero}`} id="inicio-evento"><div>
-        <p className={s.marca}><b>Manu Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
+        <p className={s.marca}><b>Manuel Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
         <div className={s.centro}>
           <h1>Cómo destacar con tu marca personal en 2027</h1>
           <p className={s.promesa}>De que nadie te conozca a que te llamen <Subrayado>a vos</Subrayado>.</p>
@@ -63,14 +65,23 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
             </a>
           </div>
         </div>
-        <p className={s.lugares}>{lugares}</p>
+        <p className={s.lugares}>
+          {agotado ? "Se agotaron los lugares." : quedan !== null && quedan < LUGARES_PUBLICOS
+            ? <>Quedan solo <s className={s.tachado}>{LUGARES_PUBLICOS}</s> <span className={s.restan}>{quedan}</span> lugares.</>
+            : <>Quedan solo {LUGARES_PUBLICOS} lugares.</>}
+        </p>
         <Marcas />
       </div></section>
 
       <section className={`${s.banda} ${s.crema}`}><div>
         <p className={s.frase}>Tenés mucho conocimiento y experiencia, <em>pero pocas personas saben lo que sabés.</em></p>
-        <p className={s.texto}>Lo que te falta es comunicar tu marca de manera genuina y auténtica: con claridad y un plan de comunicación, sabiendo qué lenguaje y qué formatos te quedan mejor en tu caso, y mejorando tu comunicación de impacto.</p>
+        <p className={s.texto}>Lo que te falta es comunicar tu marca de manera genuina y auténtica: con claridad y un plan de comunicación, sabiendo qué tipo de contenido, formato y mejorando tu forma de comunicar (oratoria y storytelling).</p>
         <FotoReal foto={FOTOS.charla} que="dando una charla o una conferencia" />
+        {!agotado && (
+          <div className={s.ctaMedio}>
+            <a className={s.boton} href="#reservar" data-track="medio_reservar">Reservar mi lugar</a>
+          </div>
+        )}
       </div></section>
 
       <section className={s.banda}><div>
@@ -157,8 +168,8 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <h2>Quién la da</h2>
         <div className={s.quien}>
         <div className={s.bio}>
-          <p>Soy Manu Casaubon. Trabajo con personas que tienen algo importante para decir, para que aprendan a comunicarlo siendo ellas mismas, sin armar un personaje.</p>
-          <p>Tengo más de 200.000 seguidores en TikTok y más de 100.000 en YouTube. Soy speaker y conferencista en universidades y eventos.</p>
+          <p>Soy Manu Casaubon. Acompaño a personas que tienen algo importante para decir a aprender a comunicarlo al mundo, logrando alcanzar nuevas oportunidades (ventas, charlas, medios, etc.).</p>
+          <p>Tengo más de 89.000 seguidores en Instagram, 200.000 en TikTok y 130.000 en YouTube. Soy speaker, conferencista y capacitador en universidades, empresas y eventos.</p>
         </div>
         <FotoReal foto={FOTOS.quien} que="en un escenario o retrato" vertical />
         </div>

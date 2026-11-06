@@ -30,6 +30,9 @@ const Lead = z.object({
   website: z.string().optional(),
 }).superRefine((d, ctx) => {
   if (d.paso === "final" && !d.nombre) ctx.addIssue({ code: "custom", path: ["nombre"], message: "required" });
+  // WhatsApp e Instagram (o web) obligatorios en el envío final (pedido de Manu, 6/11).
+  if (d.paso === "final" && !d.telefono) ctx.addIssue({ code: "custom", path: ["telefono"], message: "required" });
+  if (d.paso === "final" && !d.marca) ctx.addIssue({ code: "custom", path: ["marca"], message: "required" });
 });
 
 // Límite simple: 5 envíos por minuto por vid (en memoria de la instancia; alcanza contra el abuso casual).

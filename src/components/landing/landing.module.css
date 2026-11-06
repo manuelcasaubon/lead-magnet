@@ -25,13 +25,15 @@
 .crema a:focus-visible, .crema button:focus-visible, .crema summary:focus-visible { outline-color: var(--oscuro); }
 
 .bajada { font-family: var(--serif); font-size: clamp(1.3rem, 3.4vw, 1.7rem); line-height: 1.3; color: var(--mostaza); }
-.marca { font-weight: 800; letter-spacing: -.03em; font-size: 1rem; display: flex; justify-content: space-between; gap: 4px 16px; flex-wrap: wrap; color: var(--gris-o); }
-.marca b { color: var(--crema); font-weight: 800; }
+/* Encabezado: nombre y formato centrados, en EB Garamond (pedido de Manu, 6/11). */
+.marca { font-family: var(--serif); font-weight: 400; font-size: clamp(1.05rem, 3vw, 1.2rem); line-height: 1.25; display: grid; justify-items: center; text-align: center; gap: 2px; color: var(--gris-o); }
+.marca b { color: var(--crema); font-weight: 500; font-size: clamp(1.35rem, 4vw, 1.6rem); letter-spacing: .01em; }
 
 .hero { padding-block-start: clamp(28px, 5vw, 48px); }
 .hero > div { display: grid; gap: clamp(24px, 5vw, 44px); }
-.promesa { font-weight: 800; letter-spacing: -.04em; line-height: 1.1; font-size: clamp(1.4rem, 4.4vw, 2.3rem); color: var(--mostaza); max-width: 22em; text-wrap: balance; margin-top: clamp(14px, 3vw, 24px) !important; }
-.resumen { max-width: 38em; color: var(--gris-o); }
+/* Bajada en EB Garamond blanca, con «a vos» en rojo (pedido de Manu, 6/11). */
+.promesa { font-family: var(--serif); font-weight: 500; letter-spacing: -.01em; line-height: 1.15; font-size: clamp(1.6rem, 5.2vw, 2.6rem); color: var(--crema); max-width: 22em; text-wrap: balance; margin-top: clamp(14px, 3vw, 24px) !important; }
+.resumen { max-width: 34em; color: var(--gris-o); font-family: var(--serif); font-size: clamp(1.15rem, 3.4vw, 1.35rem); line-height: 1.4; }
 /* Título, bajada y resumen centrados (feedback de Manu, 6/11). */
 .centro { text-align: center; justify-self: center; margin-inline: auto; }
 .centro .promesa { margin-inline: auto; }
@@ -105,9 +107,10 @@
 
 .dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 5vw, 56px); margin-top: clamp(24px, 4vw, 36px); }
 .lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
-.lista li { padding-left: 1.1em; position: relative; }
-.lista li::before { content: ""; position: absolute; left: 0; top: .62em; width: .45em; height: .45em; background: var(--rojo); }
-.no li::before { background: var(--linea-c); outline: 1px solid var(--gris-c); }
+/* Checks en "Es para vos" y puntos rojos en "No es para vos" (pedido de Manu, 6/11). */
+.lista li { padding-left: 1.7em; position: relative; }
+.lista li::before { content: "✓"; position: absolute; left: 0; top: 0; font-weight: 900; color: var(--rojo); font-size: 1.1em; line-height: 1.4; }
+.no li::before { content: ""; top: .6em; left: .3em; width: .5em; height: .5em; border-radius: 50%; background: var(--rojo); }
 
 .casos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 4vw, 36px); margin-top: clamp(24px, 4vw, 36px); }
 .caso { min-width: 0; border-top: 2px solid var(--oscuro); padding-top: 14px; }
@@ -177,8 +180,8 @@
   border-radius: 50%; display: inline-grid; place-items: center; flex: none; transform: rotate(-6deg); }
 .final .paso { justify-content: flex-start; }
 
-.subrayado { position: relative; display: inline-block; white-space: nowrap; color: var(--crema); }
-.subrayado svg { position: absolute; left: -2%; right: -2%; bottom: -.32em; width: 104%; height: .42em; color: var(--rojo); overflow: visible; }
+.subrayado { position: relative; display: inline-block; white-space: nowrap; color: var(--rojo); }
+.subrayado svg { position: absolute; left: -2%; right: -2%; bottom: -.32em; width: 104%; height: .42em; color: var(--mostaza); overflow: visible; }
 @media (prefers-reduced-motion: no-preference) {
   .subrayado path { stroke-dasharray: 260; stroke-dashoffset: 260; animation: trazo .9s .4s ease-out forwards; }
 }
@@ -194,3 +197,11 @@
 .logo { display: inline-flex; align-items: center; height: 40px; flex: none; }
 .logo img { height: 100%; width: auto; max-width: 140px; object-fit: contain; filter: grayscale(1) brightness(1.6); opacity: .75; }
 .logoFalta { display: inline-grid; place-items: center; height: 36px; padding: 0 18px; border: 1.5px dashed var(--linea-o); border-radius: 4px; color: var(--gris-o); font-size: .8rem; font-weight: 600; white-space: nowrap; }
+
+/* Botón extra de reserva en el medio de la página (lleva al formulario y de ahí a Mercado Pago). */
+.ctaMedio { display: flex; justify-content: center; margin-top: clamp(24px, 4vw, 36px); }
+.ctaMedio .boton { min-width: min(100%, 320px); }
+
+/* "Quedan solo 30 lugares": con ventas, el 30 tachado y al lado los que quedan (número real de la base). */
+.tachado { text-decoration: line-through; text-decoration-thickness: .12em; color: var(--gris-o); }
+.restan { color: var(--crema); background: var(--rojo); padding: 0 .3em; border-radius: 3px; }

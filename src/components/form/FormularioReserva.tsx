@@ -28,8 +28,9 @@ const VACIO: Valores = { email: "", nombre: "", telefono: "", marca: "", objetiv
 
 // Campos de cada pantalla, en orden. Los obligatorios llevan true.
 const PANTALLAS: Record<Variante, [Campo, boolean][][]> = {
-  "un-paso": [[["nombre", true], ["email", true], ["telefono", false], ["marca", false]]],
-  "dos-pasos": [[["email", true]], [["nombre", true], ["marca", false], ["objetivo", false]]],
+  // WhatsApp e Instagram son obligatorios (pedido de Manu, 6/11).
+  "un-paso": [[["nombre", true], ["email", true], ["telefono", true], ["marca", true]]],
+  "dos-pasos": [[["email", true]], [["nombre", true], ["telefono", true], ["marca", true], ["objetivo", false]]],
 };
 
 const SERVIDOR: Record<string, string> = {
