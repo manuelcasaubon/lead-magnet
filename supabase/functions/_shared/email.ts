@@ -1,11 +1,16 @@
-// Envío de mails desde Edge Functions (misma lógica que src/lib/email/enviar.ts):
+// Envío de mails (único punto de salida del proyecto desde el 6/11/26):
 //  1. Solo plantillas 'approved'.  2. email_mode='test' → solo email_test_recipients.
-//  3. Nadie recibe dos veces la misma plantilla (índice único).  4. Campaña: solo con consentimiento.
+//  3. Nadie recibe dos veces la misma plantilla (índice único); si falló, se reintenta.  4. Campaña: solo con consentimiento.
 // Config no secreta en public.settings; RESEND_API_KEY en los secretos de Supabase.
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 export type Vars = Record<string, string | number | null | undefined>;
-export type Resultado = { status: "sent" | "skipped" | "failed" | "duplicate"; error?: string };
+// sent: salió ahora. duplicate: ya había salido antes. skipped: no corresponde mandarlo nunca (sin consentimiento,
+// sin mail). pending: todavía no se puede (plantilla sin aprobar, modo test, falta config): se reintenta.
+// failed: error al mandar: se reintenta.
+export type Resultado = { status: "sent" | "duplicate" | "skipped" | "pending" | "failed"; error?: string };
+export const resuelto = (r: Resultado) => r.status === "sent" || r.status === "duplicate" || r.status === "skipped";
+const YA_SALIO = ["sent", "delivered", "opened", "clicked", "bounced", "complained"];
 
 export const renderTexto = (tpl: string, vars: Vars) =>
   tpl.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => (vars[k] ?? "").toString());
@@ -35,7 +40,7 @@ export async function enviarPlantilla(db: SupabaseClient, o: {
   const { data: s } = await db.from("settings").select("email_mode,email_test_recipients,email_from,email_reply_to").eq("id", 1).single();
   const { data: tpl } = await db.from("email_templates").select("*").eq("key", o.templateKey).maybeSingle();
   if (!tpl) return { status: "failed", error: `no existe la plantilla ${o.templateKey}` };
-  if (tpl.status !== "approved") return { status: "skipped", error: "plantilla sin aprobar" };
+  if (tpl.status !== "approved") return { status: "pending", error: "plantilla sin aprobar" };
 
   if (tpl.kind === "campaign") {
     if (!o.unsubscribeUrl) return { status: "failed", error: "campaña sin link de baja" };
@@ -45,23 +50,34 @@ export async function enviarPlantilla(db: SupabaseClient, o: {
     }
   }
 
-  const { data: send, error: insErr } = await db.from("email_sends")
-    .insert({ template_id: tpl.id, template_version: tpl.version, person_id: o.personId ?? null, to_email: to })
-    .select("id").single();
-  if (insErr) return insErr.code === "23505" ? { status: "duplicate" } : { status: "failed", error: insErr.message };
-
+  // Modo test: no se registra nada, así cuando pase a "live" el mail sale.
   const prueba = (s?.email_mode ?? "test") !== "live";
   const permitidos: string[] = (s?.email_test_recipients ?? []).map((x: string) => x.toLowerCase());
-  if (prueba && !permitidos.includes(to)) {
-    await db.from("email_sends").update({ status: "skipped", error: "email_mode=test" }).eq("id", send.id);
-    return { status: "skipped", error: "email_mode=test" };
-  }
+  if (prueba && !permitidos.includes(to)) return { status: "pending", error: "email_mode=test" };
 
   const key = Deno.env.get("RESEND_API_KEY");
-  if (!key) {
-    await db.from("email_sends").update({ status: "failed", error: "falta RESEND_API_KEY" }).eq("id", send.id);
-    return { status: "failed", error: "falta RESEND_API_KEY" };
+  if (!key) return { status: "pending", error: "falta RESEND_API_KEY" };
+
+  // Un registro por (plantilla, mail, persona). Si ya existe y no salió (falló antes), se reintenta sobre ese registro.
+  let sendId: string;
+  let reintento = false;
+  const ins = await db.from("email_sends")
+    .insert({ template_id: tpl.id, template_version: tpl.version, person_id: o.personId ?? null, to_email: to })
+    .select("id").single();
+  if (ins.error) {
+    if (ins.error.code !== "23505") return { status: "failed", error: ins.error.message };
+    let q = db.from("email_sends").select("id,status").eq("template_id", tpl.id).eq("to_email", to);
+    q = o.personId ? q.eq("person_id", o.personId) : q.is("person_id", null);
+    const { data: previo } = await q.maybeSingle();
+    if (!previo) return { status: "failed", error: "registro de envío no encontrado" };
+    if (YA_SALIO.includes(previo.status)) return { status: "duplicate" };
+    sendId = previo.id;
+    reintento = true;
+    await db.from("email_sends").update({ status: "queued", error: null, template_version: tpl.version }).eq("id", sendId);
+  } else {
+    sendId = ins.data.id;
   }
+
   const vars = { ...o.vars, link_baja: o.unsubscribeUrl ?? "" };
   const subject = renderTexto(tpl.subject, vars);
   const body = renderTexto(tpl.body, vars);
@@ -72,7 +88,11 @@ export async function enviarPlantilla(db: SupabaseClient, o: {
   }
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": send.id },
+    headers: {
+      Authorization: `Bearer ${key}`, "Content-Type": "application/json",
+      // En un reintento la clave cambia: Resend devolvería la misma respuesta fallida si se repite.
+      "Idempotency-Key": reintento ? `${sendId}-${Date.now()}` : sendId,
+    },
     body: JSON.stringify({
       from: s?.email_from ?? "Manu Casaubon <manu@info.comunicatumarca.com>", to: [to],
       reply_to: s?.email_reply_to ?? undefined, subject,
@@ -82,9 +102,9 @@ export async function enviarPlantilla(db: SupabaseClient, o: {
   });
   const json = await r.json().catch(() => ({})) as { id?: string; message?: string };
   if (!r.ok || !json.id) {
-    await db.from("email_sends").update({ status: "failed", error: json.message ?? `HTTP ${r.status}` }).eq("id", send.id);
+    await db.from("email_sends").update({ status: "failed", error: json.message ?? `HTTP ${r.status}` }).eq("id", sendId);
     return { status: "failed", error: json.message ?? `HTTP ${r.status}` };
   }
-  await db.from("email_sends").update({ status: "sent", resend_id: json.id, sent_at: new Date().toISOString() }).eq("id", send.id);
+  await db.from("email_sends").update({ status: "sent", resend_id: json.id, sent_at: new Date().toISOString(), error: null }).eq("id", sendId);
   return { status: "sent" };
 }

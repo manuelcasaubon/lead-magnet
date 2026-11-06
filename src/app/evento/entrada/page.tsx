@@ -15,11 +15,9 @@ import { leerOrden } from "./datos";
 // Nunca se confía en status ni en external_reference de la URL: si viene payment_id y la orden todavía
 // no está aprobada, se consulta ese pago a la API y se aplica solo si pertenece a esta orden.
 //
-// Link fijo de MP (mpago.la): vuelve SIN ?o= y con payment_id. Se verifica el pago contra la API, se adopta
-// (adopt_link_payment) y se redirige a ?o=<orden>. El comprobante con datos solo se muestra si el pago se
-// aprobó hace menos de VENTANA_LINK_MIN: así nadie puede ver entradas ajenas probando números de pago viejos.
-// Fuera de esa ventana, la persona tiene su link en el mail de confirmación.
-const VENTANA_LINK_MIN = 60;
+// Link fijo de MP (mpago.la): vuelve SIN ?o= y con payment_id. La Edge Function "pagos" verifica y adopta el
+// pago, y devuelve el id de orden solo si el pago se aprobó hace menos de 60 min (así nadie ve entradas ajenas
+// probando números de pago viejos). Fuera de esa ventana, la persona tiene su link en el mail de confirmación.
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -40,10 +38,9 @@ export default async function Entrada({ searchParams }: Props) {
     let destino: string | null = null;
     try {
       const r = await procesarPago(paymentId);
-      const reciente = r.ok && r.aprobadoEn && Date.now() - new Date(r.aprobadoEn).getTime() < VENTANA_LINK_MIN * 60_000;
-      if (r.ok && r.orderId && reciente) destino = `${RUTAS.entrada}?o=${r.orderId}`;
+      if (r.ok && r.orderId) destino = `${RUTAS.entrada}?o=${r.orderId}`;
       else if (r.ok && r.confirmado) destino = `${RUTAS.entrada}?listo=1`;
-      else if (r.ok && ["pending", "in_process", "authorized"].includes(r.mpStatus)) destino = `${RUTAS.entrada}?en_proceso=1`;
+      else if (r.ok && r.pendiente) destino = `${RUTAS.entrada}?en_proceso=1`;
     } catch (e) {
       console.error("/evento/entrada pago por link", e);
     }
@@ -99,13 +96,13 @@ export default async function Entrada({ searchParams }: Props) {
       {vista.tipo === "sin_pago" && (
         <Mensaje titulo="Todavía no vemos tu pago" bajada="Si recién pagaste, esperá un momento y actualizá.">
           <a className={`${s.boton} ${s.sec}`} href={`/evento/entrada?o=${o}`}>Actualizar</a>
-          <Reintentar o={o!} texto="Ir a pagar con Mercado Pago" />
+          <Reintentar texto="Ir a pagar con Mercado Pago" />
         </Mensaje>
       )}
       {vista.tipo === "rechazada" && (
         <Mensaje titulo="No se pudo cobrar" bajada="Mercado Pago no aprobó el pago. No se te cobró nada.">
           <p className={s.aviso}>Podés probar con otra tarjeta o con dinero en cuenta.</p>
-          <Reintentar o={o!} texto="Reintentar el pago" />
+          <Reintentar texto="Reintentar el pago" />
         </Mensaje>
       )}
       {vista.tipo === "cancelada" && (

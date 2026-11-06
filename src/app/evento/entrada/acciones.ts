@@ -1,8 +1,7 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { z } from "zod";
-import { iniciarCheckout, leerJsonCookie } from "@/lib/pagos/checkout";
 import { esUuid, registrarEvento } from "@/lib/pagos/eventos";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
@@ -48,24 +47,6 @@ export async function registrarDescarga(o: string): Promise<void> {
   const { data: orden } = await supabaseAdmin().from("orders").select("person_id, visitor_id, status").eq("id", o).maybeSingle();
   if (!orden || orden.status !== "approved") return;
   await registrarEvento({ name: "pdf_download", visitorId: await vid(orden.visitor_id), personId: orden.person_id, path: "/evento/entrada" });
-}
-
-export type EstadoReintento = { url?: string; code?: string };
-
-// "Reintentar": arma una preferencia nueva para la misma persona sin exponer su mail en la página.
-export async function reintentarPago(o: string): Promise<EstadoReintento> {
-  if (!esUuid(o)) return { code: "invalid" };
-  const db = supabaseAdmin();
-  const { data: orden } = await db.from("orders").select("person_id").eq("id", o).maybeSingle();
-  if (!orden) return { code: "invalid" };
-  const { data: p } = await db.from("people").select("email, name").eq("id", orden.person_id).single();
-  if (!p) return { code: "invalid" };
-  const c = await cookies();
-  const r = await iniciarCheckout({ email: p.email, name: p.name ?? undefined }, {
-    visitorId: c.get("vid")?.value, utm: leerJsonCookie(c.get("utm")?.value), experiments: leerJsonCookie(c.get("exp")?.value),
-    referrer: (await headers()).get("referer"), path: "/evento/entrada",
-  });
-  return r.ok ? { url: r.url } : { code: r.code };
 }
 
 async function vid(deLaOrden: string | null): Promise<string | null> {

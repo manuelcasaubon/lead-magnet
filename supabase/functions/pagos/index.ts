@@ -1,17 +1,21 @@
 // Edge Function "pagos": verifica un pago de Mercado Pago contra la API y emite la entrada.
-// POST { payment_id: "123", order_id?: "<uuid>" }
+//
+// POST { payment_id: "123", order_id?: "<uuid>" }   (pública: la llama /evento/entrada desde Vercel)
 //  - Nunca confía en lo que trae la URL: consulta GET /v1/payments/{id} con MP_ACCESS_TOKEN (secreto de Supabase).
 //  - Con order_id (checkout propio): solo aplica el pago si external_reference coincide.
-//  - Sin orden nuestra (link fijo mpago.la): adopt_link_payment() valida monto/moneda/producto y crea persona, orden y entrada.
-//  - Idempotente: se puede llamar N veces (página de retorno, reintentos, webhook).
-//  - Al aprobarse manda confirmacion_entrada y aviso_manu (si están aprobadas) y registra eventos del embudo.
-// Pública a propósito (verify_jwt=false): no devuelve datos personales, solo el id de orden si el pago es
-// reciente (60 min) o vino con su order_id correcto. Lo llama el servidor de Vercel desde /evento/entrada.
+//  - Sin orden nuestra (link fijo mpago.la): adopt_link_payment() valida precio exacto, moneda, fecha y producto,
+//    y crea persona, orden y entrada.
+//  - Idempotente. Responde lo mínimo: { ok, orderId, confirmado, pendiente }. orderId (que habilita ver el
+//    comprobante) solo si vino con su orden o si el pago se aprobó hace menos de 60 min.
+//
+// POST { pendientes: true } + header x-cron-secret   (pg_cron cada 10 min)
+//  - Reintenta los mails de las entradas sin avisar (plantillas recién aprobadas, modo test → live, fallas).
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { enviarPlantilla, saludo } from "../_shared/email.ts";
+import { enviarPlantilla, resuelto, saludo } from "../_shared/email.ts";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VENTANA_MIN = 60;
+const PENDIENTE = ["pending", "in_process", "authorized"];
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 const ars = (n: number | string) => `ARS ${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(Number(n))}`;
 
@@ -44,51 +48,74 @@ async function evento(name: string, orderId: string, props: Record<string, unkno
   });
 }
 
-async function avisarEntrada(orderId: string, pago: Record<string, any>) {
+// Confirmación a quien compró + aviso a Manu. Marca manu_notified_at solo cuando los dos quedaron resueltos
+// (enviados, ya enviados antes, o que no corresponde mandar). Si alguno está pendiente o falló, se reintenta.
+async function avisarEntrada(orderId: string) {
   const { data: t } = await db.from("tickets").select("id, code, status, manu_notified_at, overbooked, person_id").eq("order_id", orderId).maybeSingle();
   if (!t || t.manu_notified_at || t.status === "cancelled") return;
   const [{ data: p }, { data: o }, { data: cupo }, { data: s }] = await Promise.all([
     db.from("people").select("id, email, name").eq("id", t.person_id).single(),
-    db.from("orders").select("amount_ars, source").eq("id", orderId).single(),
+    db.from("orders").select("amount_ars, source, mp_payment_id").eq("id", orderId).single(),
     db.rpc("seats_status"),
     db.from("settings").select("site_url, manu_notify_email").eq("id", 1).single(),
   ]);
-  if (!p) return;
+  if (!p || !o) return;
+  const { data: pago } = o.mp_payment_id
+    ? await db.from("payments").select("transaction_amount").eq("mp_payment_id", o.mp_payment_id).maybeSingle()
+    : { data: null };
   const c = cupo?.[0];
   const nombre = (p.name ?? "").trim().split(/\s+/)[0] ?? "";
   const link = `${(s?.site_url ?? "https://comunicatumarca.com").replace(/\/$/, "")}/evento/entrada?o=${orderId}`;
 
-  const conf = p.email.endsWith(".invalid") ? { status: "skipped" as const } : await enviarPlantilla(db, {
-    templateKey: "confirmacion_entrada", to: p.email, personId: p.id,
-    vars: { nombre, saludo: saludo(nombre), codigo: t.code, link_entrada: link },
-  });
-  const aviso = s?.manu_notify_email ? await enviarPlantilla(db, {
-    templateKey: "aviso_manu", to: s.manu_notify_email, personId: p.id,
-    vars: {
-      nombre: p.name ?? p.email, email: p.email, codigo: t.code + (t.overbooked ? " (pasado del tope)" : ""),
-      monto: ars(pago.transaction_amount ?? o?.amount_ars ?? 0), origen: o?.source ?? "directo",
-      vendidas: c?.sold ?? "?", cupo: c?.capacity_public ?? 30, tope: c?.capacity_max ?? 40,
-    },
-  }) : { status: "skipped" as const };
-  if (conf.status !== "failed" && aviso.status !== "failed") {
+  const conf = p.email.endsWith(".invalid")
+    ? { status: "skipped" as const, error: "sin mail" }
+    : await enviarPlantilla(db, {
+        templateKey: "confirmacion_entrada", to: p.email, personId: p.id,
+        vars: { nombre, saludo: saludo(nombre), codigo: t.code, link_entrada: link },
+      });
+  const aviso = s?.manu_notify_email
+    ? await enviarPlantilla(db, {
+        templateKey: "aviso_manu", to: s.manu_notify_email, personId: p.id,
+        vars: {
+          nombre: p.name ?? p.email, email: p.email, codigo: t.code + (t.overbooked ? " (pasado del tope)" : ""),
+          monto: ars(pago?.transaction_amount ?? o.amount_ars), origen: o.source ?? "directo",
+          vendidas: c?.sold ?? "?", cupo: c?.capacity_public ?? 30, tope: c?.capacity_max ?? 40,
+        },
+      })
+    : { status: "pending" as const, error: "falta settings.manu_notify_email" };
+
+  if (resuelto(conf) && resuelto(aviso)) {
     await db.from("tickets").update({ manu_notified_at: new Date().toISOString() }).eq("id", t.id).is("manu_notified_at", null);
-  } else {
+  } else if (conf.status === "failed" || aviso.status === "failed") {
     console.error("avisarEntrada", orderId, conf, aviso);
   }
 }
 
+async function pendientes(req: Request) {
+  const { data: ok } = await db.rpc("check_cron_secret", { p_secret: req.headers.get("x-cron-secret") ?? "" });
+  if (!ok) return json({ ok: false }, 401);
+  const { data: lista } = await db.from("tickets").select("order_id")
+    .is("manu_notified_at", null).in("status", ["valid", "used"]).order("created_at").limit(50);
+  for (const t of lista ?? []) await avisarEntrada(t.order_id);
+  return json({ ok: true, revisadas: lista?.length ?? 0 });
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
-  const body = await req.json().catch(() => ({})) as { payment_id?: string | number; order_id?: string };
+  const body = await req.json().catch(() => ({})) as { payment_id?: string | number; order_id?: string; pendientes?: boolean };
+  if (body.pendientes) return pendientes(req);
+
   const paymentId = String(body.payment_id ?? "").trim();
   const orderId = body.order_id ? String(body.order_id) : null;
   if (!/^\d{1,20}$/.test(paymentId) || (orderId && !UUID.test(orderId))) return json({ ok: false, error: "invalid" }, 400);
 
   try {
     const pago = await obtenerPago(paymentId);
-    if (!pago) return json({ ok: false, motivo: "no_existe" }, 404);
+    // Respuesta mínima para pagos que no son de la entrada: no se revela si existen ni su estado.
+    const nada = { ok: true, orderId: null, confirmado: false, pendiente: false };
+    if (!pago) return json(nada);
     const extRef = typeof pago.external_reference === "string" ? pago.external_reference : null;
-    if (orderId && extRef !== orderId) return json({ ok: false, motivo: "otra_orden", mpStatus: pago.status });
+    if (orderId && extRef !== orderId) return json(nada);
 
     const porLink = !(extRef && UUID.test(extRef));
     const { data, error } = porLink
@@ -96,19 +123,25 @@ Deno.serve(async (req) => {
       : await db.rpc("apply_payment", { p_payment: pago });
     if (error) throw new Error(error.message);
     const r = data?.[0];
-    const aprobadoEn: string | null = pago.date_approved ?? null;
-    if (!r?.order_id) return json({ ok: true, orderId: null, estado: null, mpStatus: pago.status, porLink, aprobadoEn });
+    if (!r?.order_id) {
+      // Un pago del link pendiente todavía no se adopta (se adopta cuando se aprueba).
+      const pareceDelLink = porLink && PENDIENTE.includes(pago.status);
+      return json({ ...nada, pendiente: pareceDelLink });
+    }
 
-    if (r.order_status === "approved") await avisarEntrada(r.order_id, pago);
+    if (r.order_status === "approved") await avisarEntrada(r.order_id);
     if (r.newly_approved) await evento("payment_approved", r.order_id, { mp_status: pago.status, overbooked: r.overbooked, via: porLink ? "link" : "checkout" });
-    else if (["pending", "in_process", "authorized"].includes(pago.status)) await evento("payment_pending", r.order_id, { mp_status: pago.status });
+    else if (PENDIENTE.includes(pago.status)) await evento("payment_pending", r.order_id, { mp_status: pago.status });
     else if (["rejected", "cancelled"].includes(pago.status)) await evento("payment_rejected", r.order_id, { mp_status: pago.status });
 
-    // El id de orden habilita ver el comprobante: solo se devuelve si vino con su orden o si el pago es reciente.
+    const aprobadoEn: string | null = pago.date_approved ?? null;
     const reciente = !!aprobadoEn && Date.now() - new Date(aprobadoEn).getTime() < VENTANA_MIN * 60_000;
-    const mostrar = !!orderId || reciente;
-    return json({ ok: true, orderId: mostrar ? r.order_id : null, confirmado: r.order_status === "approved",
-      estado: r.order_status, nuevo: r.newly_approved, mpStatus: pago.status, porLink, aprobadoEn });
+    return json({
+      ok: true,
+      orderId: orderId || reciente ? r.order_id : null,
+      confirmado: r.order_status === "approved",
+      pendiente: r.order_status === "pending" || r.order_status === "in_process",
+    });
   } catch (e) {
     console.error("pagos", paymentId, e instanceof Error ? e.message : e);
     return json({ ok: false, error: "server" }, 500);

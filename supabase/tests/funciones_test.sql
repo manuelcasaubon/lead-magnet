@@ -22,6 +22,14 @@ do $$ begin
 end $$;
 select count(*) as toques from lead_touches;
 
+-- Visitante: alta y actualización sin pisar la primera atribución
+select touch_visitor('33333333-3333-4333-8333-333333333333', 'instagram.com', '/evento', '{"utm_source":"ig"}', 'mobile');
+select touch_visitor('33333333-3333-4333-8333-333333333333', 'google.com', '/', '{}', 'desktop');
+do $$ begin
+  if (select first_referrer from visitors where id='33333333-3333-4333-8333-333333333333') <> 'instagram.com' then raise exception 'primera atribución'; end if;
+  if (select device from visitors where id='33333333-3333-4333-8333-333333333333') <> 'desktop' then raise exception 'device'; end if;
+end $$;
+
 -- Reserva: reutiliza la orden pendiente de la misma persona
 select id as o1 from reserve_order((select id from people limit 1)) \gset
 select id as o1b from reserve_order((select id from people limit 1)) \gset

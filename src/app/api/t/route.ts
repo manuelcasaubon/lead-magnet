@@ -72,17 +72,15 @@ export async function POST(req: NextRequest) {
 
   try {
     const db = supabaseAdmin();
-    const ahora = new Date().toISOString();
-    // Primera vez: guarda la atribución inicial. Después solo se actualiza last_seen_at y device.
-    await db.from("visitors").upsert({
-      id: ctx.vid,
-      first_referrer: ctx.referrer,
-      first_path: filas[0].path,
-      first_utm: Object.keys(ctx.utm).length ? ctx.utm : null,
-      device: ctx.device,
-    }, { onConflict: "id", ignoreDuplicates: true });
-    await db.from("visitors").update({ last_seen_at: ahora, device: ctx.device }).eq("id", ctx.vid);
-    const { error } = await db.from("events").insert(filas);
+    // Visitante (alta o last_seen_at, sin pisar la primera atribución) y eventos, en paralelo.
+    const [v, { error }] = await Promise.all([
+      db.rpc("touch_visitor", {
+        p_id: ctx.vid!, p_referrer: ctx.referrer ?? "", p_path: filas[0].path ?? "",
+        p_utm: ctx.utm as Json, p_device: ctx.device,
+      }),
+      db.from("events").insert(filas),
+    ]);
+    if (v.error) console.error(`[api/t] touch_visitor: ${v.error.message}`);
     if (error) console.error(`[api/t] ${error.message}`);
   } catch (err) {
     // Sin claves en local o base caída: el tracking nunca rompe la página.

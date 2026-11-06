@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 // Identidad anónima del visitante, sin datos personales:
 //  - vid: id de visitante (1 año). Es la llave del A/B (variante fija por visitante) y del tracking.
 //  - sid: id de sesión (30 min de inactividad).
-//  - utm: primera atribución con UTM y referrer (30 días), para guardar el origen del lead.
+//  - utm: PRIMERA atribución (UTM o referrer externo), 30 días. No se pisa con visitas posteriores:
+//    el origen de cada visita igual queda en events.source; el del lead, en lead_touches.
 // Se pasan también como headers de la request para que el server component los lea en la misma visita.
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
 
@@ -16,12 +17,12 @@ export function middleware(req: NextRequest) {
 
   const url = req.nextUrl;
   let utmCookie = req.cookies.get("utm")?.value;
-  const utm: Record<string, string> = {};
-  for (const k of UTM_KEYS) {
-    const v = url.searchParams.get(k);
-    if (v) utm[k] = v.slice(0, 120);
-  }
-  if (Object.keys(utm).length > 0 || !utmCookie) {
+  if (!utmCookie) {
+    const utm: Record<string, string> = {};
+    for (const k of UTM_KEYS) {
+      const v = url.searchParams.get(k);
+      if (v) utm[k] = v.slice(0, 120);
+    }
     const ref = req.headers.get("referer");
     const refHost = ref ? safeHost(ref) : null;
     if (refHost && refHost !== url.host) utm.referrer = refHost;

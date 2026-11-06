@@ -1,11 +1,8 @@
 import "server-only";
 import { z } from "zod";
-import { env } from "@/lib/env";
-import { enviarPlantilla } from "@/lib/email/enviar";
 import { crearPreferencia } from "@/lib/mercadopago/cliente";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
-import { urlEntrada } from "@/lib/rutas";
 import { CONSENT_TEXT } from "@/components/form/reglas";
 import { esUuid, registrarEvento } from "./eventos";
 
@@ -64,7 +61,6 @@ export async function iniciarCheckout(entrada: Pick<EntradaCheckout, "email"> & 
   });
   if (e2 || !order) {
     const code = CODIGOS_DB.find((c) => e2?.message?.includes(c));
-    if (code === "already_has_ticket") await reenviarEntrada(personId);
     if (!code) console.error("reserve_order", e2?.message);
     await registrarEvento({ name: "checkout_error", visitorId: vid, personId, path: ctx.path, props: { code: code ?? "error" }, source, utm: utm as Json, experiments: exps as Json });
     return { ok: false, code: code ?? "error" };
@@ -91,21 +87,6 @@ export async function iniciarCheckout(entrada: Pick<EntradaCheckout, "email"> & 
   // 5.
   await registrarEvento({ name: "checkout_start", visitorId: vid, personId, path: ctx.path, props: { order_id: order.id }, source, utm: utm as Json, experiments: exps as Json });
   return { ok: true, url, orderId: order.id };
-}
-
-// "Ya tenés tu entrada, te la reenvío". Solo sale si la plantilla está aprobada y no se mandó antes
-// (enviarPlantilla no repite una plantilla a la misma persona; ver pregunta S3 en DECISIONES.md).
-async function reenviarEntrada(personId: string) {
-  const db = supabaseAdmin();
-  const { data: t } = await db.from("tickets").select("code, order_id, person_id").eq("person_id", personId)
-    .in("status", ["valid", "used"]).limit(1).maybeSingle();
-  if (!t) return;
-  const { data: p } = await db.from("people").select("email, name").eq("id", personId).single();
-  if (!p) return;
-  await enviarPlantilla({
-    templateKey: "confirmacion_entrada", to: p.email, personId,
-    vars: { nombre: (p.name ?? "").split(/\s+/)[0], codigo: t.code, link_entrada: urlEntrada(env.siteUrl(), t.order_id) },
-  }).catch((e) => console.error("reenviarEntrada", e));
 }
 
 // Cookies del middleware: utm va como JSON con encodeURIComponent. exp (la agrega S7) se acepta como JSON {exp: variante}.

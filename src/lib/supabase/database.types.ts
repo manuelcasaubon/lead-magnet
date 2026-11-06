@@ -538,6 +538,13 @@ export type Database = {
       }
       settings: {
         Row: {
+          site_url: string
+          email_from: string
+          email_reply_to: string | null
+          email_mode: string
+          email_test_recipients: string[]
+          manu_notify_email: string | null
+          link_valid_from: string
           absorb_fee: boolean
           mp_link_match: string | null
           capacity_max: number
@@ -556,6 +563,13 @@ export type Database = {
           venue: string
         }
         Insert: {
+          site_url?: string
+          email_from?: string
+          email_reply_to?: string | null
+          email_mode?: string
+          email_test_recipients?: string[]
+          manu_notify_email?: string | null
+          link_valid_from?: string
           absorb_fee?: boolean
           mp_link_match?: string | null
           capacity_max?: number
@@ -574,6 +588,13 @@ export type Database = {
           venue?: string
         }
         Update: {
+          site_url?: string
+          email_from?: string
+          email_reply_to?: string | null
+          email_mode?: string
+          email_test_recipients?: string[]
+          manu_notify_email?: string | null
+          link_valid_from?: string
           absorb_fee?: boolean
           mp_link_match?: string | null
           capacity_max?: number
@@ -692,6 +713,10 @@ export type Database = {
         Returns: { capacity_max: number; capacity_public: number; holds: number; left_max: number; left_public: number; price_ars: number | null; sales_open: boolean; sold: number }[]
       }
       set_order_preference: { Args: { p_order_id: string; p_preference_id: string }; Returns: undefined }
+      touch_visitor: {
+        Args: { p_id: string; p_referrer: string; p_path: string; p_utm: Json; p_device: string }
+        Returns: undefined
+      }
       unsubscribe: { Args: { p_token: string }; Returns: boolean }
       upsert_lead: {
         Args: {
