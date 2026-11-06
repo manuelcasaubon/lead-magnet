@@ -28,7 +28,8 @@
 > - `Purchase`: `pagos` lo manda al aprobarse la orden (event_id = id de la orden, valor en ARS). Si falla o todavía no hay token, el cron de cada 10 min lo reintenta.
 > - `Schedule`: `cal-webhook` en `BOOKING_CREATED` (event_id = uid de la reserva).
 > - Se guardan `_fbp` y `_fbc` en `visitors`. El middleware arma `_fbc` desde `fbclid`. Cada envío queda registrado en `meta_capi_events` y se manda una sola vez por evento.
-> - El pixel del navegador (PageView + Lead deduplicado) se suma cuando Manu pase el ID del pixel.
+> - El pixel del navegador (PageView + Lead deduplicado) ya está en `/` y `/evento`.
+> - Cuentas de Meta (D29): portafolio comercial `330388412037713`, cuenta publicitaria "Ads ManuelCasaubon" `1929675617525189` (`act_1929675617525189`), pixel "Comunica tu marca Web" `1541348264386482`. Son identificadores públicos, no secretos; el token de CAPI va solo en los secretos de Supabase.
 >
 > **Link fijo de Mercado Pago (6/11/26):** además de Checkout Pro desde la web, existe `https://mpago.la/1cKaMGj` (ARS 42.000) para Instagram. Al volver a `/evento/entrada?payment_id=…` sin `?o=`, o por webhook, `procesarPago` detecta que no hay orden nuestra en `external_reference` y llama a `adopt_link_payment()`. Esa función valida que el pago esté aprobado, en ARS, por el **precio exacto** (±1 peso), aprobado desde `settings.link_valid_from` (5/11/26) y, si está configurado, con el producto correcto (`settings.mp_link_match`). Después crea persona (fuente `mp_link`), orden y entrada. El comprobante con datos se muestra solo si el pago se aprobó hace menos de 60 min; si no, la persona tiene su link por mail. Pruebas: `supabase/tests/pago_por_link_test.sql`.
 
