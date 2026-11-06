@@ -6,6 +6,10 @@
 > - `/evento/entrada` es el retorno de Mercado Pago y el comprobante. `/entrada` redirige ahí.
 > - Las rutas viven en `src/lib/rutas.ts`; los links nunca se escriben a mano.
 >
+> **Dominio (6/11/26):** `comunicatumarca.com`. `NEXT_PUBLIC_SITE_URL=https://comunicatumarca.com`. Webhook de MP: `https://comunicatumarca.com/api/mp/webhook`. Redirección del link fijo: `https://comunicatumarca.com/evento/entrada`.
+>
+> **Microsoft Clarity (6/11/26):** `src/components/track/Clarity.tsx`, cargado desde el layout raíz con `NEXT_PUBLIC_CLARITY_PROJECT_ID` (por defecto `z96epwr8ri`, es público). Excluye `/evento/entrada`, `/entrada`, `/panel`, `/baja` y `/prueba`. Complementa el tracking propio (§4), no lo reemplaza: los embudos y conversiones salen de Supabase.
+>
 > **Link fijo de Mercado Pago (6/11/26):** además de Checkout Pro desde la web, existe `https://mpago.la/1cKaMGj` (ARS 42.000) para Instagram. Al volver a `/evento/entrada?payment_id=…` sin `?o=`, o por webhook, `procesarPago` detecta que no hay orden nuestra en `external_reference` y llama a `adopt_link_payment()`. Esa función valida que el pago esté aprobado, en ARS, por el precio vigente y, si está configurado, con el producto correcto (`settings.mp_link_match`). Después crea persona (fuente `mp_link`), orden y entrada. El comprobante con datos se muestra solo si el pago se aprobó hace menos de 60 min; si no, la persona tiene su link por mail. Pruebas: `supabase/tests/pago_por_link_test.sql`.
 
 Producto: landing + leads + pago con Mercado Pago + comprobante + tracking + VSL + A/B + panel + mails, para la clase **"Cómo destacar con tu marca personal en 2027. De que nadie te conozca a que te llamen a vos."** (miércoles 18/11/26, 18 a 21 h, puertas 17:45, Niceto Vega 4601, Palermo Soho, CABA. USD 27 en pesos. Se comunican 30 lugares; la sala admite hasta 40).
