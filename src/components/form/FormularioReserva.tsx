@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent, type ReactNode } from "react";
 import { track } from "@/lib/track/cliente";
+import { metaLead } from "@/components/track/MetaPixel";
 import { CONSENT_TEXT, LIMITES, MENSAJES, validar, type Campo, type CodigoError } from "./reglas";
 import s from "./FormularioReserva.module.css";
 
@@ -127,7 +128,7 @@ export default function FormularioReserva({ variante, instagramUrl, onLead, luga
           marca: v.marca, objetivo: v.objetivo, consentimiento: v.consentimiento, website: v.website,
         }),
       });
-      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; code?: string; field?: Campo };
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; code?: string; field?: Campo; metaEventId?: string };
       if (!json.ok) {
         if (json.field && json.code) {
           setErrores({ [json.field]: json.code as CodigoError });
@@ -147,6 +148,8 @@ export default function FormularioReserva({ variante, instagramUrl, onLead, luga
         setTimeout(() => document.getElementById(id(pantallas[paso + 1][0][0]))?.focus(), 0);
         return;
       }
+      // Lead al pixel con el mismo eventID que el servidor mandó por la Conversions API (Meta lo cuenta una vez).
+      if (json.metaEventId) metaLead(json.metaEventId);
       if (onLead) await onLead({ email: v.email.trim().toLowerCase() });
       setEstado("listo");
     } catch (err) {

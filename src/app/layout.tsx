@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Poppins, EB_Garamond } from "next/font/google";
 import "./globals.css";
 import Clarity from "@/components/track/Clarity";
+import MetaPixel from "@/components/track/MetaPixel";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600", "800", "900"], variable: "--font-poppins", display: "swap" });
 const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"], style: ["normal"], variable: "--font-garamond", display: "swap" });
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <Clarity />
+        <MetaPixel />
       </body>
     </html>
   );
