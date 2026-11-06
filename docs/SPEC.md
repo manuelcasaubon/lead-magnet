@@ -1,4 +1,10 @@
-# SPEC — Clase en vivo del 18/11/26
+# SPEC — Sitio central de Manu Casaubon y clase en vivo del 18/11/26
+
+> **Cambio del 6/11/26 (Manu):** el proyecto de Vercel `lead-magnet` es el **sitio central**.
+> - `/` es la landing de la oferta principal: ayudar a personas expertas en un tema a comunicar lo que saben y tener su marca personal online (redes) y offline (eventos). Sesión S8, §5.8.
+> - `/evento` es la landing de la clase del 18/11.
+> - `/evento/entrada` es el retorno de Mercado Pago y el comprobante. `/entrada` redirige ahí.
+> - Las rutas viven en `src/lib/rutas.ts`; los links nunca se escriben a mano.
 
 Producto: landing + leads + pago con Mercado Pago + comprobante + tracking + VSL + A/B + panel + mails, para la clase **"Cómo destacar con tu marca personal en 2027. De que nadie te conozca a que te llamen a vos."** (miércoles 18/11/26, 18 a 21 h, puertas 17:45, Niceto Vega 4601, Palermo Soho, CABA. USD 27 en pesos. Se comunican 30 lugares; la sala admite hasta 40).
 
@@ -24,6 +30,7 @@ Escrito el 5/11/26. Si algo de acá choca con lo que diga Manu, vale lo que diga
 | S5 | Panel privado | Opus 5.5 | `claude/panel` | `src/app/panel/`, `src/app/api/panel/` | Después de S1–S3 |
 | S6 | Mails con Resend | Opus 5.5 | `claude/mails` | `src/lib/email/` (salvo `enviar.ts`), `src/app/api/resend/`, `src/app/api/cron/`, `src/app/baja/`, `src/app/api/baja/`, plantillas de campaña | Después de S1–S3 |
 | S7 | A/B testing | Opus 5.5 | `claude/ab` | `src/lib/ab/`, cambios mínimos en landing/form/VSL | Al final |
+| S8 | Landing principal (oferta) | Opus 5.5, esfuerzo medio | `claude/landing-principal` | `bocetos/inicio*.html`, después `src/app/page.tsx` y `src/components/inicio/` | Se lanza el 6/11 |
 
 **Reglas para todas las sesiones**
 1. Cada sesión trabaja solo en su rama y en sus carpetas. Si necesita tocar algo de otra, lo anota en su resumen final en vez de cambiarlo.
@@ -163,7 +170,7 @@ Pruebas: `supabase/tests/funciones_test.sql` (ver `supabase/tests/README.md`). C
 Objetivo: 2 versiones navegables de la landing para que Manu elija y pula **antes** de construir la definitiva.
 
 1. Leer el contexto obligatorio y `src/app/globals.css`.
-2. Crear `bocetos/pagina.html`: un archivo autocontenido con un selector fijo arriba "Versión A / Versión B" (accesible, recuerda la elección en `localStorage` dentro de try/catch) y un selector "Celular / Escritorio" que encierra la vista en un marco de 390 px.
+2. La landing final va en **`/evento`** (`src/app/evento/page.tsx`), no en `/`. Crear `bocetos/pagina.html`: un archivo autocontenido con un selector fijo arriba "Versión A / Versión B" (accesible, recuerda la elección en `localStorage` dentro de try/catch) y un selector "Celular / Escritorio" que encierra la vista en un marco de 390 px.
 3. **Versión A, "Fiel al boceto":**
    - misma estructura y textos que `landing-boceto.html`;
    - el CTA del talón baja al formulario embebido `#reservar` (con la forma del formulario de la versión A de S2, solo visual) en lugar de abrir Instagram;
@@ -179,7 +186,7 @@ Objetivo: 2 versiones navegables de la landing para que Manu elija y pula **ante
 7. SEO previsto: título, descripción, OG image (bosquejo de 1200×630 con el título en la marca) y JSON-LD `Event` en un comentario, para la versión final.
 8. Publicar como Artifact (privado) con la herramienta Artifact y devolver la URL.
 9. Commit y push. Resumen: qué cambia entre A y B y preguntas de diseño para Manu.
-10. **Cuando Manu elija** (otra vuelta de esta misma sesión): construir `src/app/page.tsx` y `src/components/landing/*` como server components con el cupo real (`getCupo()`), metadata, JSON-LD `Event`, OG image (`opengraph-image.tsx`), `sitemap.ts`, `robots.ts` y el VSL (S4). Lighthouse en celular ≥ 90 en rendimiento y accesibilidad.
+10. **Cuando Manu elija** (otra vuelta de esta misma sesión): construir `src/app/evento/page.tsx` y `src/components/landing/*` como server components con el cupo real (`getCupo()`), metadata, JSON-LD `Event`, OG image (`opengraph-image.tsx`), `sitemap.ts`, `robots.ts` y el VSL (S4). Lighthouse en celular ≥ 90 en rendimiento y accesibilidad.
 
 ### 5.2 S2 — Formulario (rama `claude/formulario`)
 
@@ -319,6 +326,19 @@ Objetivo: cobrar en pesos con Checkout Pro creado desde el servidor, confirmar s
 1. `src/lib/ab/asignar.ts`: experimento `running` (cache de 60 s) y variante = hash(`vid` + key) % 100 según los pesos. Guarda en `experiment_assignments` (con `after()`), expone la cookie `exp` y registra `exp_exposure`.
 2. Superficies: landing (titular, orden de secciones), VSL (con o sin, posición) y formulario (`un-paso` / `dos-pasos`).
 3. Resultados: n por variante, tasa de la métrica principal e intervalo de confianza del 95 % (Wilson). "Sin datos suficientes" mientras alguna variante esté por debajo de `min_sample_per_variant`. Un experimento por vez (la base lo impide).
+
+### 5.8 S8 — Landing principal de la oferta (rama `claude/landing-principal`)
+
+Objetivo: la página de inicio del sitio central. Presenta la oferta principal de Manu: ayudar a personas que saben mucho de un tema (emprendedores, profesionales, especialistas) a **comunicar lo que saben** y tener su marca personal **online** (redes, contenido) y **offline** (eventos, charlas, escenario), con su método de los 3 niveles.
+
+1. Leer `docs/contexto/reglas-y-metodo.md` (tono, marca y método completo), `docs/contexto/evento-18-11.md` (programa, precios y **qué se comunica en cada etapa**) y `docs/referencia/landing-boceto.html` (lenguaje visual).
+2. **Bocetos `bocetos/inicio.html`** (Artifact privado, selector A/B y marco de celular):
+   - **A, "Método primero":** promesa → el problema (sabés, pero tu sector no lo sabe) → los 3 niveles (estratégica, creativa, de impacto) con sus etapas → online y offline → cómo trabajo (programa) → quién soy → próxima clase en vivo → contacto;
+   - **B, "Escenario primero":** abre con la escena del speaker ("sabe, pero no sabe tanto como yo") → qué cambia cuando comunicás → online + offline lado a lado → método en una línea por nivel → resultados (casos pendientes de permiso) → próxima clase → contacto.
+3. **Regla de etapas (D17):** hasta el 25/11 el inicio **no presenta ni vende el programa** de 4 meses; solo lleva a la clase del 18/11. Los bocetos muestran el bloque del programa con una marca visible "se publica desde el 25/11". No se mencionan precios del programa ni la clase online del 24/11.
+4. No inventar resultados, testimonios ni reglas de 2027. Casos de alumnos con la marca "pendiente de permiso".
+5. CTA principal: hoy, la clase del 18/11 (`/evento`). Secundario: Instagram (`ig.me/m/casaubon.ar`). Sin formulario propio por ahora.
+6. Publicar el Artifact, commit y push a la rama propia, y dejar las preguntas para Manu en `docs/DECISIONES.md` con el prefijo "S8:". **No construir en `src/` hasta que Manu elija.**
 
 ---
 

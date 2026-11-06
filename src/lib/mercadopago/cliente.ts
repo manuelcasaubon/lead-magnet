@@ -1,6 +1,7 @@
 import "server-only";
 import { env } from "@/lib/env";
 import { EVENTO } from "@/lib/evento";
+import { urlEntrada } from "@/lib/rutas";
 
 // Mercado Pago por REST, sin SDK (docs/SPEC.md §1 y §5.3.3). Solo dos llamadas:
 // crear la preferencia de Checkout Pro y leer un pago. 10 s de espera y un reintento en 5xx o error de red.
@@ -47,7 +48,7 @@ export async function crearPreferencia(
   person: { email: string; name: string | null },
 ): Promise<Preferencia> {
   const site = env.siteUrl();
-  const vuelta = `${site}/entrada?o=${order.id}`;
+  const vuelta = urlEntrada(site, order.id);
   const vence = new Date(new Date(order.hold_expires_at ?? Date.now() + 20 * 60_000).getTime() + 10 * 60_000);
   return llamar<Preferencia>("/checkout/preferences", {
     method: "POST",

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { registrarDescarga } from "@/app/entrada/acciones";
-import type { DatosComprobante } from "@/app/entrada/datos";
+import { registrarDescarga } from "@/app/evento/entrada/acciones";
+import type { DatosComprobante } from "@/app/evento/entrada/datos";
 import s from "./comprobante.module.css";
 
 // Comprobante de entrada con la animación de impresión y el PDF (portado de docs/referencia/comprobante-demo.html).

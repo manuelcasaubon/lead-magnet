@@ -7,8 +7,8 @@ const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"], style
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  title: "Cómo destacar con tu marca personal en 2027 · Manu Casaubon",
-  description: "Clase en vivo presencial de 3 horas. Miércoles 18/11, de 18 a 21 h, en Palermo Soho. De que nadie te conozca a que te llamen a vos.",
+  title: { default: "Manu Casaubon · Comunica Tu Marca", template: "%s · Manu Casaubon" },
+  description: "Ayudo a personas que saben mucho de un tema a comunicarlo, en redes y arriba del escenario, siendo ellas mismas.",
 };
 
 export const viewport: Viewport = { themeColor: "#2d2828", width: "device-width", initialScale: 1, viewportFit: "cover" };

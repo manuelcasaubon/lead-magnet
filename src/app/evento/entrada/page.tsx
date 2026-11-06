@@ -9,7 +9,7 @@ import Reintentar from "@/components/comprobante/Reintentar";
 import s from "@/components/comprobante/comprobante.module.css";
 import { leerOrden } from "./datos";
 
-// Retorno de Mercado Pago: /entrada?o=<order_id>&payment_id=…&status=…  (docs/SPEC.md §2.8 y §5.3.8)
+// Retorno de Mercado Pago: /evento/entrada?o=<order_id>&payment_id=…&status=…  (docs/SPEC.md §2.8 y §5.3.8)
 // Nunca se confía en status ni en external_reference de la URL: si viene payment_id y la orden todavía
 // no está aprobada, se consulta ese pago a la API y se aplica solo si pertenece a esta orden.
 
@@ -34,13 +34,13 @@ export default async function Entrada({ searchParams }: Props) {
       const r = await procesarPago(paymentId, { ordenEsperada: o });
       if (r.ok) vista = await leerOrden(o);
     } catch (e) {
-      console.error("/entrada procesarPago", e);
+      console.error("/evento/entrada procesarPago", e);
     }
   }
 
   if (vista.tipo === "aprobada") {
     const vid = (await headers()).get("x-vid");
-    await registrarEvento({ name: "ticket_view", visitorId: vid ?? vista.visitorId, personId: vista.personId, path: "/entrada" });
+    await registrarEvento({ name: "ticket_view", visitorId: vid ?? vista.visitorId, personId: vista.personId, path: "/evento/entrada" });
   }
 
   return (
@@ -55,12 +55,12 @@ export default async function Entrada({ searchParams }: Props) {
       {vista.tipo === "pendiente" && (
         <Mensaje titulo="Tu pago está en proceso" bajada="Cuando Mercado Pago lo apruebe, te confirmo el lugar por mail.">
           <p className={s.aviso}>Puede tardar unos minutos (o hasta 2 días hábiles si pagaste en efectivo). No hace falta que pagues de nuevo.</p>
-          <a className={`${s.boton} ${s.sec}`} href={`/entrada?o=${o}`}>Actualizar</a>
+          <a className={`${s.boton} ${s.sec}`} href={`/evento/entrada?o=${o}`}>Actualizar</a>
         </Mensaje>
       )}
       {vista.tipo === "sin_pago" && (
         <Mensaje titulo="Todavía no vemos tu pago" bajada="Si recién pagaste, esperá un momento y actualizá.">
-          <a className={`${s.boton} ${s.sec}`} href={`/entrada?o=${o}`}>Actualizar</a>
+          <a className={`${s.boton} ${s.sec}`} href={`/evento/entrada?o=${o}`}>Actualizar</a>
           <Reintentar o={o!} texto="Ir a pagar con Mercado Pago" />
         </Mensaje>
       )}
@@ -75,7 +75,7 @@ export default async function Entrada({ searchParams }: Props) {
       )}
       {vista.tipo === "no_existe" && (
         <Mensaje titulo="No encontramos esta entrada" bajada="Revisá que el link esté completo. Si pagaste, te llega la confirmación por mail.">
-          <Link className={`${s.boton} ${s.sec}`} href="/">Ir a la página de la clase</Link>
+          <Link className={`${s.boton} ${s.sec}`} href="/evento">Ir a la página de la clase</Link>
         </Mensaje>
       )}
     </main>

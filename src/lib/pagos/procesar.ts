@@ -4,11 +4,12 @@ import { enviarPlantilla } from "@/lib/email/enviar";
 import { obtenerPago, type PagoMp } from "@/lib/mercadopago/cliente";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
+import { urlEntrada } from "@/lib/rutas";
 import { registrarEvento } from "./eventos";
 import { formatoArs } from "./formato";
 
 // Un pago se confirma SIEMPRE contra GET /v1/payments/{id} y se aplica con apply_payment(), que es
-// idempotente (docs/SPEC.md §5.3.5). Lo usan el webhook y /entrada.
+// idempotente (docs/SPEC.md §5.3.5). Lo usan el webhook y /evento/entrada.
 
 export type ResultadoProceso =
   | { ok: true; orderId: string | null; estado: string | null; nuevo: boolean; codigo: string | null; mpStatus: string }
@@ -17,7 +18,7 @@ export type ResultadoProceso =
 export async function procesarPago(paymentId: string | number, opts: { ordenEsperada?: string } = {}): Promise<ResultadoProceso> {
   const pago = await obtenerPago(paymentId);
 
-  // En /entrada solo se aplica un pago que pertenezca a la orden de la URL.
+  // En /evento/entrada solo se aplica un pago que pertenezca a la orden de la URL.
   if (opts.ordenEsperada && pago.external_reference !== opts.ordenEsperada) {
     return { ok: false, motivo: "otra_orden", mpStatus: pago.status };
   }
@@ -71,7 +72,7 @@ async function avisarEntrada(orderId: string, pago: PagoMp) {
 
   const conf = await enviarPlantilla({
     templateKey: "confirmacion_entrada", to: p.email, personId: p.id,
-    vars: { nombre, codigo: t.code, link_entrada: `${env.siteUrl()}/entrada?o=${orderId}` },
+    vars: { nombre, codigo: t.code, link_entrada: urlEntrada(env.siteUrl(), orderId) },
   });
 
   const manu = env.manuNotifyEmail();

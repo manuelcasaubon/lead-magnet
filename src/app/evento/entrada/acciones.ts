@@ -30,7 +30,7 @@ export async function guardarPerfil(_prev: EstadoPerfil, form: FormData): Promis
     .eq("order_id", orden.id).neq("status", "cancelled").select("id").maybeSingle();
   if (error || !t) return { ok: false, error: "No se pudo guardar. Probá de nuevo en un rato." };
 
-  await registrarEvento({ name: "audit_profile_sent", visitorId: await vid(orden.visitor_id), personId: orden.person_id, path: "/entrada" });
+  await registrarEvento({ name: "audit_profile_sent", visitorId: await vid(orden.visitor_id), personId: orden.person_id, path: "/evento/entrada" });
   return { ok: true, perfil };
 }
 
@@ -47,7 +47,7 @@ export async function registrarDescarga(o: string): Promise<void> {
   if (!esUuid(o)) return;
   const { data: orden } = await supabaseAdmin().from("orders").select("person_id, visitor_id, status").eq("id", o).maybeSingle();
   if (!orden || orden.status !== "approved") return;
-  await registrarEvento({ name: "pdf_download", visitorId: await vid(orden.visitor_id), personId: orden.person_id, path: "/entrada" });
+  await registrarEvento({ name: "pdf_download", visitorId: await vid(orden.visitor_id), personId: orden.person_id, path: "/evento/entrada" });
 }
 
 export type EstadoReintento = { url?: string; code?: string };
@@ -63,7 +63,7 @@ export async function reintentarPago(o: string): Promise<EstadoReintento> {
   const c = await cookies();
   const r = await iniciarCheckout({ email: p.email, name: p.name ?? undefined }, {
     visitorId: c.get("vid")?.value, utm: leerJsonCookie(c.get("utm")?.value), experiments: leerJsonCookie(c.get("exp")?.value),
-    referrer: (await headers()).get("referer"), path: "/entrada",
+    referrer: (await headers()).get("referer"), path: "/evento/entrada",
   });
   return r.ok ? { url: r.url } : { code: r.code };
 }

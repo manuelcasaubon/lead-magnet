@@ -5,6 +5,7 @@ import { enviarPlantilla } from "@/lib/email/enviar";
 import { crearPreferencia } from "@/lib/mercadopago/cliente";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
+import { urlEntrada } from "@/lib/rutas";
 import { CONSENT_TEXT } from "@/components/form/reglas";
 import { esUuid, registrarEvento } from "./eventos";
 
@@ -103,7 +104,7 @@ async function reenviarEntrada(personId: string) {
   if (!p) return;
   await enviarPlantilla({
     templateKey: "confirmacion_entrada", to: p.email, personId,
-    vars: { nombre: (p.name ?? "").split(/\s+/)[0], codigo: t.code, link_entrada: `${env.siteUrl()}/entrada?o=${t.order_id}` },
+    vars: { nombre: (p.name ?? "").split(/\s+/)[0], codigo: t.code, link_entrada: urlEntrada(env.siteUrl(), t.order_id) },
   }).catch((e) => console.error("reenviarEntrada", e));
 }
 

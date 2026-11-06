@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { guardarPerfil, type EstadoPerfil } from "@/app/entrada/acciones";
+import { guardarPerfil, type EstadoPerfil } from "@/app/evento/entrada/acciones";
 import s from "./comprobante.module.css";
 
 // Pedido del perfil para la auditoría personalizada (DECISIONES.md D5): se pide al pagar y se entrega impresa en la sala.

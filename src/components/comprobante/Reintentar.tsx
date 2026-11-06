@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { reintentarPago } from "@/app/entrada/acciones";
+import { reintentarPago } from "@/app/evento/entrada/acciones";
 import s from "./comprobante.module.css";
 
 const MENSAJES: Record<string, string> = {
