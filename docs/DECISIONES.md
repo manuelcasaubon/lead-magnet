@@ -52,3 +52,19 @@ _S1 (página) sigue en su rama `claude/bocetos-pagina` hasta que elijas versión
 | S3: 6 | **Reservas falsas.** Cada mail nuevo que toca "pagar" reserva un lugar 20 min. Alguien con mala intención podría agotar el cupo un rato con mails inventados. Hay un límite de 5 intentos por minuto por IP | Límite por IP + reserva de 20 min (D9). Si pasa, se baja `hold_minutes` desde el panel | — |
 | S3: 7 | **Dos migraciones para que S0 revise y aplique** (no están aplicadas): `20261105000102` corrige un bug de `upsert_lead`, que falla con "person_id is ambiguous" cada vez que llega con la cookie `vid` (rompe el formulario y el pago); `20261105000101` hace que `aviso_manu` salga una vez por compra y no una sola vez en toda la venta | **Resuelto (6/11, S0):** revisadas, probadas y aplicadas en Supabase. La prueba de la base ahora pasa `p_visitor_id` | — |
 | S3: 8 | **Perfil de auditoría por server action** en `/entrada` en vez de `POST /api/entrada/perfil`, para no salir de las carpetas de S3. Mismo contrato `{ o, perfil }` | Server action | — |
+
+### S8 — Inicio, landing principal ([boceto A/B](https://claude.ai/artifact/FQzFNHhik9rcULfYqcD2Mr))
+
+A, "Método primero": promesa, problema, los 3 niveles con sus etapas, online y offline, programa, quién soy, clase y contacto. B, "Escenario primero": abre con la escena del speaker, sigue con identidad → imagen → reputación, online y offline lado a lado, método en una línea por nivel, casos, programa, clase y contacto.
+
+| # | Pregunta | Por defecto mientras tanto |
+|---|---|---|
+| S8:1 | **¿A o B?** ¿O una mezcla, por ejemplo el hero de B con los 3 niveles de A? | Ninguna: no se construye en `src/` hasta que elijas |
+| S8:2 | **Titular.** A dice "Que tu sector sepa lo que sabés"; B abre con «Sabe, pero no sabe tanto como yo», que también es la escena de la clase. ¿Te sirve repetirla en el inicio o preferís dejarla solo para `/evento`? | Cada versión con el suyo |
+| S8:3 | **Etapas de la comunicación estratégica.** Tus notas dicen 0 → 1 → 3, sin etapa 2. ¿Falta la 2 o es así a propósito? | Se muestran 0, 1 y 3, como en las notas |
+| S8:4 | **Programa (desde el 25/11).** El bloque está marcado "se publica desde el 25/11" y dice "programa de 4 meses" con diagnóstico, los 3 niveles y plan a 6 meses (sacados de tu método). ¿Qué incluye de verdad, cómo es el formato (grupal, individual, encuentros por semana) y cómo se llama? Sin precios hasta que lo digas | Bloque oculto hasta el 25/11, con la marca "Formato, duración y modalidad: los define Manu" |
+| S8:5 | **Casos de Joaco, Fer y Axel** (solo en B). Siguen con la marca "pendiente de permiso" (D11). Si no llegan los permisos, ¿B se queda sin la sección o la reemplazamos por algo tuyo (cifras de tu canal, una charla)? | Sin permiso, la sección no sale |
+| S8:6 | **Cifras de quién soy** (+200.000 TikTok, +100.000 YouTube, +30.000 nuevos en Instagram). Vienen del boceto de la clase. ¿Siguen vigentes al 6/11? | Se usan así |
+| S8:7 | **Franja de arriba** "Próxima clase en vivo: miércoles 18/11 en Palermo". ¿La querés en todas las páginas hasta el 18/11? ¿Qué muestra del 19 al 24/11, si la clase online del 24/11 todavía no se anuncia antes del 19/11? | Hasta el 18/11 lleva a `/evento`; después se saca hasta que decidas |
+| S8:8 | **Contacto.** El CTA secundario es Instagram (`ig.me/m/casaubon.ar`) y el pie suma YouTube. ¿Agregamos TikTok, LinkedIn o un mail? | Instagram y YouTube |
+| S8:9 | **Nombre en el pie.** Dice "Manu Casaubon · Comunica Tu Marca". ¿Es el nombre que querés para la marca del sitio? | Así |
