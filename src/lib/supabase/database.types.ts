@@ -727,6 +727,8 @@ export type Database = {
       }
       visitors: {
         Row: {
+          fbc: string | null
+          fbp: string | null
           device: string | null
           first_path: string | null
           first_referrer: string | null
@@ -737,6 +739,8 @@ export type Database = {
           person_id: string | null
         }
         Insert: {
+          fbc?: string | null
+          fbp?: string | null
           device?: string | null
           first_path?: string | null
           first_referrer?: string | null
@@ -747,6 +751,8 @@ export type Database = {
           person_id?: string | null
         }
         Update: {
+          fbc?: string | null
+          fbp?: string | null
           device?: string | null
           first_path?: string | null
           first_referrer?: string | null

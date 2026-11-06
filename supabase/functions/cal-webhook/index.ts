@@ -10,6 +10,7 @@
 //    guarda o actualiza la reserva, crea o actualiza el lead (fuente "cal") y registra el evento del embudo.
 //  - El embed de la web manda metadata[vid] y metadata[utm_*] para unir la reserva con la visita.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { enviarEventoMeta } from "../_shared/meta.ts";
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -101,6 +102,14 @@ async function procesar(trigger: string, p: Record<string, any>) {
       name: nombreEvento, visitor_id: vid ?? crypto.randomUUID(), person_id: personId, path: "/",
       props: { uid, event_type: p.type ?? null, start: p.startTime ?? null }, source: (utm.utm_source as string) ?? "cal",
       utm: Object.keys(utm).length ? utm : null,
+    });
+  }
+  // Schedule a la Conversions API de Meta (event_id = uid de la reserva). Se manda una sola vez.
+  if (trigger === "BOOKING_CREATED" && personId) {
+    const { data: s } = await db.from("settings").select("site_url").eq("id", 1).single();
+    await enviarEventoMeta(db, {
+      nombre: "Schedule", eventId: uid, personId, visitorId: vid,
+      url: `${(s?.site_url ?? "https://comunicatumarca.com").replace(/\/$/, "")}/`,
     });
   }
   return `${trigger} ${uid}${personId ? "" : " sin mail"}`;

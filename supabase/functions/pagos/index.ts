@@ -12,6 +12,7 @@
 //  - Reintenta los mails de las entradas sin avisar (plantillas recién aprobadas, modo test → live, fallas).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { enviarPlantilla, resuelto, saludo } from "../_shared/email.ts";
+import { enviarEventoMeta } from "../_shared/meta.ts";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VENTANA_MIN = 60;
@@ -97,13 +98,35 @@ async function avisarEntrada(orderId: string) {
   }
 }
 
+// Purchase a la Conversions API de Meta (event_id = id de la orden). Idempotente: se manda una sola vez.
+async function compraMeta(orderId: string) {
+  const { data: o } = await db.from("orders").select("person_id, visitor_id, amount_ars, mp_payment_id, approved_at, status").eq("id", orderId).maybeSingle();
+  if (!o || o.status !== "approved") return;
+  const [{ data: p }, { data: pago }, { data: s }] = await Promise.all([
+    db.from("people").select("first_visitor_id").eq("id", o.person_id).maybeSingle(),
+    o.mp_payment_id ? db.from("payments").select("transaction_amount").eq("mp_payment_id", o.mp_payment_id).maybeSingle() : Promise.resolve({ data: null }),
+    db.from("settings").select("site_url").eq("id", 1).single(),
+  ]);
+  await enviarEventoMeta(db, {
+    nombre: "Purchase", eventId: orderId, personId: o.person_id,
+    url: `${(s?.site_url ?? "https://comunicatumarca.com").replace(/\/$/, "")}/evento`,
+    cuando: o.approved_at ? new Date(o.approved_at) : undefined,
+    valor: { monto: Number(pago?.transaction_amount ?? o.amount_ars), moneda: "ARS", contenido: "Clase en vivo 18/11" },
+    visitorId: o.visitor_id ?? p?.first_visitor_id ?? null,
+  });
+}
+
 async function pendientes(req: Request) {
   const { data: ok } = await db.rpc("check_cron_secret", { p_secret: req.headers.get("x-cron-secret") ?? "" });
   if (!ok) return json({ ok: false }, 401);
   const { data: lista } = await db.from("tickets").select("order_id")
     .is("manu_notified_at", null).in("status", ["valid", "used"]).order("created_at").limit(50);
   for (const t of lista ?? []) await avisarEntrada(t.order_id);
-  return json({ ok: true, revisadas: lista?.length ?? 0 });
+  // Compras que no llegaron a Meta (sin token todavía o error): se reintentan.
+  const { data: meta } = await db.from("meta_capi_events").select("event_id")
+    .eq("event_name", "Purchase").in("status", ["skipped", "failed"]).order("created_at").limit(50);
+  for (const m of meta ?? []) await compraMeta(m.event_id);
+  return json({ ok: true, revisadas: lista?.length ?? 0, meta: meta?.length ?? 0 });
 }
 
 Deno.serve(async (req) => {
@@ -136,6 +159,7 @@ Deno.serve(async (req) => {
     }
 
     if (r.order_status === "approved") await avisarEntrada(r.order_id);
+    if (r.order_status === "approved") await compraMeta(r.order_id);
     if (r.newly_approved) await evento("payment_approved", r.order_id, { mp_status: pago.status, overbooked: r.overbooked, via: porLink ? "link" : "checkout" });
     else if (PENDIENTE.includes(pago.status)) await evento("payment_pending", r.order_id, { mp_status: pago.status });
     else if (["rejected", "cancelled"].includes(pago.status)) await evento("payment_rejected", r.order_id, { mp_status: pago.status });

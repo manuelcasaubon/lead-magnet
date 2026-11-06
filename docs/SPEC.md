@@ -23,6 +23,13 @@
 > - Webhook: `https://qzfzswascgitycynwlkk.supabase.co/functions/v1/cal-webhook` (Edge Function `cal-webhook`). Verifica `X-Cal-Signature-256` con el secreto `CAL_WEBHOOK_SECRET` de Supabase. Guarda en `bookings` y `cal_webhook_events`, crea el lead con fuente `cal` y registra `booking_created`, `booking_rescheduled` y `booking_cancelled`.
 > - El inicio va con A/B (S8): A = estructura base; B = animación al hacer scroll que muestra la transformación.
 >
+> **Conversions API de Meta (6/11/26):** `supabase/functions/_shared/meta.ts` es el único punto de envío. Secretos de Supabase: `META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN` y, opcional, `META_TEST_EVENT_CODE`.
+> - `Lead`: `/api/lead` (paso final) llama a la Edge Function `meta-capi`, autorizada solo con la clave de servidor. Manda IP y navegador solo en ese envío, sin guardarlos, y devuelve `metaEventId` para que el pixel del navegador use el mismo `eventID`.
+> - `Purchase`: `pagos` lo manda al aprobarse la orden (event_id = id de la orden, valor en ARS). Si falla o todavía no hay token, el cron de cada 10 min lo reintenta.
+> - `Schedule`: `cal-webhook` en `BOOKING_CREATED` (event_id = uid de la reserva).
+> - Se guardan `_fbp` y `_fbc` en `visitors`. El middleware arma `_fbc` desde `fbclid`. Cada envío queda registrado en `meta_capi_events` y se manda una sola vez por evento.
+> - El pixel del navegador (PageView + Lead deduplicado) se suma cuando Manu pase el ID del pixel.
+>
 > **Link fijo de Mercado Pago (6/11/26):** además de Checkout Pro desde la web, existe `https://mpago.la/1cKaMGj` (ARS 42.000) para Instagram. Al volver a `/evento/entrada?payment_id=…` sin `?o=`, o por webhook, `procesarPago` detecta que no hay orden nuestra en `external_reference` y llama a `adopt_link_payment()`. Esa función valida que el pago esté aprobado, en ARS, por el **precio exacto** (±1 peso), aprobado desde `settings.link_valid_from` (5/11/26) y, si está configurado, con el producto correcto (`settings.mp_link_match`). Después crea persona (fuente `mp_link`), orden y entrada. El comprobante con datos se muestra solo si el pago se aprobó hace menos de 60 min; si no, la persona tiene su link por mail. Pruebas: `supabase/tests/pago_por_link_test.sql`.
 
 Producto: landing + leads + pago con Mercado Pago + comprobante + tracking + VSL + A/B + panel + mails, para la clase **"Cómo destacar con tu marca personal en 2027. De que nadie te conozca a que te llamen a vos."** (miércoles 18/11/26, 18 a 21 h, puertas 17:45, Niceto Vega 4601, Palermo Soho, CABA. USD 27 en pesos. Se comunican 30 lugares; la sala admite hasta 40).

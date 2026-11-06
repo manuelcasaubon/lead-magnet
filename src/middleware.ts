@@ -32,6 +32,12 @@ export function middleware(req: NextRequest) {
 
   const res = NextResponse.next({ request: { headers } });
   const secure = url.protocol === "https:";
+  // Clic de un anuncio de Meta: si llega fbclid y no hay _fbc, se arma como lo hace el pixel (fb.1.<ms>.<fbclid>),
+  // para atribuir la conversión aunque el pixel todavía no haya cargado. 90 días, como el pixel.
+  const fbclid = url.searchParams.get("fbclid");
+  if (fbclid && /^[\w-]{1,250}$/.test(fbclid) && !req.cookies.get("_fbc")) {
+    res.cookies.set("_fbc", `fb.1.${Date.now()}.${fbclid}`, { maxAge: 60 * 60 * 24 * 90, sameSite: "lax", secure, path: "/" });
+  }
   res.cookies.set("vid", vid, { maxAge: 60 * 60 * 24 * 365, sameSite: "lax", secure, path: "/" });
   res.cookies.set("sid", sid, { maxAge: 60 * 30, sameSite: "lax", secure, path: "/" });
   if (utmCookie) res.cookies.set("utm", utmCookie, { maxAge: 60 * 60 * 24 * 30, sameSite: "lax", secure, path: "/" });

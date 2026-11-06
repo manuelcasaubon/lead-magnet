@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { env } from "@/lib/env";
 import { contexto, eventoServidor, hostDe } from "@/app/api/t/contexto";
 import {
   CONSENT_TEXT, LIMITES, RE_EMAIL, RE_INSTAGRAM, RE_TELEFONO, RE_URL, separarMarca, type Campo,
@@ -90,14 +91,50 @@ export async function POST(req: NextRequest) {
       return falla(500, "server_error");
     }
     const { person_id, is_new } = data[0];
+    // Meta: cookies del visitante para atribuir (se guardan) y Lead por la Conversions API (IP y navegador
+    // viajan solo en este envío, no se guardan). El event_id vuelve al navegador para que el pixel no lo duplique.
+    const fbp = cookieMeta(req.cookies.get("_fbp")?.value);
+    const fbc = cookieMeta(req.cookies.get("_fbc")?.value);
+    if (ctx.vid && (fbp || fbc)) {
+      await supabaseAdmin().from("visitors").upsert({ id: ctx.vid, ...(fbp ? { fbp } : {}), ...(fbc ? { fbc } : {}) }, { onConflict: "id" });
+    }
+    const metaEventId = d.paso === "final" ? `lead_${crypto.randomUUID()}` : null;
+    if (metaEventId) {
+      await leadAMeta({
+        nombre: "Lead", event_id: metaEventId, person_id, visitor_id: ctx.vid ?? undefined,
+        url: req.headers.get("referer") ?? `${env.siteUrl()}/evento`,
+        ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(), user_agent: req.headers.get("user-agent") ?? undefined,
+        fbp: fbp ?? undefined, fbc: fbc ?? undefined,
+      });
+    }
     await eventoServidor("lead_created", ctx, {
       personId: person_id,
       path,
       props: { source: "form", step: d.paso, variant: d.variante ?? "sin_variante", is_new, consent: d.consentimiento },
     });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json(metaEventId ? { ok: true, metaEventId } : { ok: true });
   } catch (err) {
     console.error(`[api/lead] ${(err as Error).message}`);
     return falla(500, "server_error");
+  }
+}
+
+// Cookies de Meta: _fbp = fb.1.<ts>.<n>, _fbc = fb.1.<ts>.<fbclid>. Cualquier otra cosa se descarta.
+function cookieMeta(v: string | undefined): string | null {
+  return v && /^fb\.\d\.\d{10,13}\.[\w-]{1,250}$/.test(v) ? v : null;
+}
+
+// Manda el Lead a la Edge Function meta-capi (la que tiene el token de Meta). Nunca rompe el guardado del lead.
+async function leadAMeta(cuerpo: Record<string, string | undefined>) {
+  try {
+    const r = await fetch(`${env.supabaseUrl()}/functions/v1/meta-capi`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.supabaseServiceKey()}` },
+      body: JSON.stringify(cuerpo),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!r.ok) console.error(`[api/lead] meta-capi HTTP ${r.status}`);
+  } catch (e) {
+    console.error(`[api/lead] meta-capi: ${(e as Error).message}`);
   }
 }
