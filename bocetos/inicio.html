@@ -1,0 +1,591 @@
+<title>Inicio de Manu Casaubon</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Poppins:wght@400;500;600;800;900&display=swap">
+<style>
+/* Layout: barra de control fija (versión A/B, celular/escritorio); debajo, la página dentro de un marco de celular de 390 px y al lado la nota de la versión. Marca fija de Manu: un solo look oscuro y crema. Las bandas responden al ancho del marco (container queries), no al de la ventana. */
+:root{
+  --oscuro:#2d2828; --crema:#fffdf6; --rojo:#d0443f; --mostaza:#dda51e;
+  --oscuro-2:#3a3434; --linea-o:#5a5252; --linea-c:#e4dccb; --gris-c:#5e5757; --gris-o:#c9c2b6;
+  --rojo-hover:#b93832; --negro-marco:#151212;
+  --sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--oscuro);color:var(--crema);font-family:var(--sans);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--oscuro-2)}
+p{margin:0}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--mostaza);outline-offset:3px}
+
+/* Barra de control */
+.control{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--oscuro-2);border-bottom:1px solid var(--linea-o);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.control>div{max-width:1160px;margin-inline:auto;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.grupo{display:flex;gap:4px;background:var(--oscuro);border-radius:6px;padding:3px}
+.grupo button{background:none;border:0;color:var(--gris-o);font-weight:600;font-size:.9rem;padding:8px 12px;border-radius:4px;cursor:pointer;min-height:40px}
+.grupo button[aria-pressed="true"]{background:var(--crema);color:var(--oscuro)}
+.control .titulo{font-weight:800;letter-spacing:-.03em;margin-right:auto}
+.control .titulo span{font-weight:500;color:var(--gris-o);letter-spacing:0;margin-left:8px;font-size:.88rem}
+
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.escenario{max-width:1160px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:start}
+.escenario.ancho{grid-template-columns:minmax(0,1fr)}
+@media (max-width:900px){.escenario{grid-template-columns:minmax(0,1fr)}}
+
+/* Marco de celular */
+.marco{width:100%;min-width:0}
+.marco.cel{width:390px;max-width:100%;border:10px solid var(--negro-marco);border-radius:38px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.marco.cel .pantalla{height:760px;overflow-y:auto}
+.marco:not(.cel) .pantalla{border:1px solid var(--linea-o);border-radius:8px;overflow:hidden}
+@media (max-width:440px){.marco.cel{width:100%;border:0;border-radius:0;box-shadow:none}.marco.cel .pantalla{height:auto}}
+.pantalla{container-type:inline-size;background:var(--oscuro)}
+
+/* Nota lateral */
+.nota{display:grid;gap:18px;min-width:0;position:sticky;top:84px}
+.nota h1{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;word-spacing:.12em;line-height:.9;margin:0;font-size:clamp(2rem,5vw,2.8rem);text-wrap:balance}
+.nota .sub{font-family:var(--serif);font-size:1.25rem;color:var(--mostaza)}
+.nota ol{margin:0;padding-left:1.4em;display:grid;gap:6px;color:var(--gris-o)}
+.nota ol b{color:var(--crema);font-weight:600}
+.nota h2{margin:0 0 6px;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-o)}
+.nota .caja{border-top:1px solid var(--linea-o);padding-top:14px}
+.nota .caja p{color:var(--gris-o);font-size:.95rem}
+.nota .caja p+p{margin-top:8px}
+.leyenda{display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:900px){.nota{position:static}}
+
+/* ====== La página ====== */
+.pag h2,.pag h3{margin:0}
+.banda{padding-inline:20px;padding-block:52px}
+@container (min-width:700px){.banda{padding-inline:48px;padding-block:88px}}
+.banda>.in{max-width:940px;margin-inline:auto}
+.crema{background:var(--crema);color:var(--oscuro)}
+.oscuro{background:var(--oscuro);color:var(--crema)}
+
+.pag h2.grande{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;word-spacing:.12em;line-height:.88;text-wrap:balance;font-size:clamp(2.1rem,10cqi,4.2rem)}
+.pag h1{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;word-spacing:.12em;line-height:.9;margin:0;text-wrap:balance;font-size:clamp(2.6rem,12.5cqi,5.8rem)}
+.bajada{font-family:var(--serif);font-size:clamp(1.3rem,4.4cqi,1.75rem);line-height:1.3;color:var(--rojo);max-width:30em}
+.oscuro .bajada{color:var(--mostaza)}
+.texto{max-width:40em;color:var(--gris-c)}
+.oscuro .texto{color:var(--gris-o)}
+.pila{display:grid;gap:20px}
+.pila.amplia{gap:clamp(24px,5cqi,40px)}
+
+/* Encabezado del sitio y franja de la clase */
+.franja{display:block;background:var(--mostaza);color:var(--oscuro);text-decoration:none;font-weight:600;font-size:.88rem;line-height:1.35;padding:10px 20px;text-align:center}
+.franja b{font-weight:800}
+.franja:hover{text-decoration:underline}
+.cabeza{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:18px 20px 0}
+@container (min-width:700px){.cabeza{padding:24px 48px 0}}
+.cabeza .nombre{font-weight:800;letter-spacing:-.03em;font-size:1.05rem}
+.cabeza nav{display:flex;gap:16px;font-size:.9rem}
+.cabeza nav a{color:var(--gris-o);text-decoration:none;font-weight:500}
+.cabeza nav a:hover{color:var(--crema)}
+
+.botones{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+.boton{display:inline-block;background:var(--rojo);color:var(--crema);font-weight:800;letter-spacing:-.02em;text-decoration:none;padding:15px 22px;border-radius:4px;text-align:center;line-height:1.2}
+.boton:hover{background:var(--rojo-hover)}
+.link2{color:inherit;font-weight:600;text-underline-offset:4px}
+.oscuro .link2{color:var(--gris-o)}
+.crema .link2{color:var(--gris-c)}
+
+/* Marcas de boceto */
+.marca{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  border:1.5px dashed currentColor;border-radius:3px;padding:4px 8px;line-height:1.2;width:fit-content}
+.marca.fecha{color:var(--mostaza)}
+.crema .marca.fecha{color:#8a6510}
+.marca.permiso{color:var(--rojo)}
+.marca.define{color:var(--gris-o)}
+.crema .marca.define{color:var(--gris-c)}
+.bloqueado{outline:2px dashed var(--mostaza);outline-offset:-10px}
+.crema.bloqueado{outline-color:#b98a17}
+
+/* Hero A */
+.heroA .promesa{font-weight:800;letter-spacing:-.04em;line-height:1.12;font-size:clamp(1.35rem,5.4cqi,2.2rem);color:var(--mostaza);max-width:22em;text-wrap:balance}
+
+/* Problema */
+.frase{font-weight:900;letter-spacing:-.05em;line-height:1.02;font-size:clamp(1.75rem,7.4cqi,3.2rem);max-width:17em;text-wrap:balance}
+.frase em{font-style:normal;color:var(--rojo)}
+
+/* Los 3 niveles */
+.niveles{display:grid;border-top:2px solid var(--crema)}
+.nivel{display:grid;gap:10px 28px;padding-block:24px;border-bottom:1px solid var(--linea-o)}
+@container (min-width:700px){.nivel{grid-template-columns:minmax(0,15rem) minmax(0,1fr)}}
+.nivel .que{font-family:var(--serif);font-size:1.1rem;color:var(--mostaza)}
+.nivel h3{font-weight:800;font-size:clamp(1.35rem,5cqi,1.8rem);letter-spacing:-.04em;line-height:1.08}
+.nivel p{color:var(--gris-o);max-width:36em}
+.etapas{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+.etapas li{display:grid;grid-template-columns:2.2rem minmax(0,1fr);gap:10px;align-items:baseline;font-size:.95rem;color:var(--gris-o)}
+.etapas li span{font-weight:800;font-variant-numeric:tabular-nums;color:var(--crema);font-size:.9rem;border:1px solid var(--linea-o);border-radius:3px;text-align:center;padding:1px 0}
+.etapas li.meta{color:var(--crema)}
+.etapas li.meta span{background:var(--mostaza);border-color:var(--mostaza);color:var(--oscuro)}
+.disruptiva{font-family:var(--serif);font-size:clamp(1.25rem,4.2cqi,1.6rem);line-height:1.3;color:var(--mostaza);max-width:30em}
+
+/* Online y offline */
+.lados{display:grid;gap:28px}
+@container (min-width:620px){.lados{grid-template-columns:repeat(2,minmax(0,1fr));gap:48px}}
+.lado{min-width:0;border-top:2px solid var(--oscuro);padding-top:16px;display:grid;gap:10px;align-content:start}
+.oscuro .lado{border-top-color:var(--crema)}
+.lado .rotulo{font-size:.76rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-c)}
+.oscuro .lado .rotulo{color:var(--gris-o)}
+.lado h3{font-weight:900;text-transform:uppercase;letter-spacing:-.05em;line-height:.9;font-size:clamp(2rem,9cqi,3.4rem)}
+ul.lista{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+ul.lista li{padding-left:1.1em;position:relative}
+ul.lista li::before{content:"";position:absolute;left:0;top:.62em;width:.45em;height:.45em;background:var(--rojo)}
+.puente{font-weight:800;letter-spacing:-.03em;font-size:clamp(1.1rem,4cqi,1.35rem);line-height:1.25;max-width:30em}
+
+/* Método en una línea (B) */
+.lineas{display:grid;border-top:2px solid var(--oscuro)}
+.linea{display:grid;gap:4px 24px;padding-block:18px;border-bottom:1px solid var(--linea-c)}
+@container (min-width:620px){.linea{grid-template-columns:minmax(0,14rem) minmax(0,1fr);align-items:baseline}}
+.linea b{font-weight:800;letter-spacing:-.03em;font-size:1.15rem}
+.linea span{color:var(--gris-c)}
+.linea em{font-style:normal;font-family:var(--serif);color:var(--rojo);font-size:1.1rem}
+
+/* Qué cambia (B) */
+.cadena{display:grid;gap:0;border-top:2px solid var(--crema)}
+.eslabon{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding-block:18px;border-bottom:1px solid var(--linea-o)}
+@container (min-width:620px){.eslabon{grid-template-columns:minmax(0,12rem) minmax(0,1fr);gap:24px;align-items:baseline}}
+.eslabon b{font-weight:900;text-transform:uppercase;letter-spacing:-.04em;font-size:clamp(1.4rem,5.6cqi,2rem);line-height:1}
+.eslabon span{color:var(--gris-o);max-width:34em}
+.crema .eslabon span{color:var(--gris-c)}
+
+/* Programa */
+.prog{display:grid;gap:22px}
+.pasos{display:grid;gap:22px}
+@container (min-width:700px){.pasos{grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}}
+.paso{min-width:0;border-top:2px solid var(--oscuro);padding-top:14px}
+.paso h3{font-weight:800;letter-spacing:-.03em;font-size:1.2rem;line-height:1.15;margin-bottom:6px}
+.paso p{color:var(--gris-c)}
+
+/* Casos */
+.casos{display:grid;gap:24px}
+@container (min-width:700px){.casos{grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}}
+.caso{min-width:0;border-top:2px solid var(--oscuro);padding-top:14px;display:grid;gap:8px;align-content:start}
+.caso strong{font-weight:900;letter-spacing:-.05em;line-height:1;font-size:clamp(1.7rem,7cqi,2.3rem)}
+.caso h3{font-weight:800;letter-spacing:-.02em;font-size:1.02rem}
+.caso p{color:var(--gris-c);font-size:.98rem}
+.chico{font-size:.92rem;color:var(--gris-c)}
+
+/* Quién soy */
+.bio{display:grid;gap:14px;max-width:42em}
+.bio p{color:var(--gris-o)}
+.cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--linea-o);padding-top:16px}
+.cifras div{min-width:0}
+.cifras strong{display:block;font-weight:900;letter-spacing:-.05em;font-size:clamp(1.4rem,6.4cqi,2.2rem);line-height:1;color:var(--crema);font-variant-numeric:tabular-nums}
+.cifras span{font-size:.82rem;color:var(--gris-o)}
+
+/* La entrada (próxima clase) */
+.entrada{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:var(--crema);color:var(--oscuro);border-radius:6px}
+.dato{padding:16px 18px;min-width:0;border-right:1px solid var(--linea-c);border-bottom:1px solid var(--linea-c)}
+.dato:nth-child(2n){border-right:0}
+.dato span{display:block;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris-c)}
+.dato strong{display:block;font-weight:800;font-size:1.15rem;letter-spacing:-.03em;line-height:1.15;margin-top:4px}
+.talon{grid-column:1/-1;display:flex;padding:14px 18px;border-top:2px dashed var(--oscuro);margin-top:-1px}
+.talon .boton{width:100%}
+@container (min-width:760px){
+  .entrada{grid-template-columns:repeat(4,minmax(0,1fr)) auto}
+  .dato{border-bottom:0}.dato:nth-child(2n){border-right:1px solid var(--linea-c)}
+  .talon{grid-column:auto;border-top:0;border-left:2px dashed var(--oscuro);margin:0 0 0 -1px;align-items:center}
+  .talon .boton{width:auto}
+}
+.crema .entrada{background:var(--oscuro);color:var(--crema)}
+.crema .entrada .dato{border-color:var(--linea-o)}
+.crema .entrada .dato span{color:var(--gris-o)}
+.crema .entrada .talon{border-color:var(--crema)}
+
+/* Escena (hero B) */
+.escena{display:grid;gap:22px}
+.escena .cita{font-weight:900;letter-spacing:-.05em;line-height:.95;font-size:clamp(2.3rem,11cqi,5.2rem);text-wrap:balance;color:var(--crema)}
+.escena .cita em{font-style:normal;color:var(--mostaza)}
+.escena .pre{font-family:var(--serif);font-size:clamp(1.25rem,4.4cqi,1.6rem);line-height:1.3;color:var(--gris-o);max-width:28em}
+.escena .resp{font-weight:800;letter-spacing:-.04em;line-height:1.12;font-size:clamp(1.35rem,5.4cqi,2.2rem);max-width:22em;text-wrap:balance}
+.escena .resp b{color:var(--rojo);font-weight:900}
+
+/* Contacto */
+.contacto{display:grid;gap:22px;justify-items:start}
+.pie{padding:22px 20px;border-top:1px solid var(--linea-o);color:var(--gris-o);font-size:.85rem;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+.pie a{color:var(--gris-o)}
+
+/* Aviso de link */
+.aviso-link{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;background:var(--crema);color:var(--oscuro);
+  padding:12px 16px;border-radius:6px;font-size:.92rem;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:calc(100vw - 32px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<div class="control"><div>
+  <p class="titulo">Inicio · bocetos <span>S8 · 6/11</span></p>
+  <div class="grupo" role="group" aria-label="Versión">
+    <button type="button" data-ver="A" aria-pressed="true">A · Método primero</button>
+    <button type="button" data-ver="B" aria-pressed="false">B · Escenario primero</button>
+  </div>
+  <div class="grupo" role="group" aria-label="Vista">
+    <button type="button" data-vista="cel" aria-pressed="true">Celular</button>
+    <button type="button" data-vista="esc" aria-pressed="false">Escritorio</button>
+  </div>
+</div></div>
+
+<main>
+<div class="escenario" id="escenario">
+  <div class="marco cel" id="marco"><div class="pantalla pag" id="pantalla">
+
+    <!-- Encabezado común -->
+    <a class="franja" href="/evento" data-ruta="/evento">Próxima clase en vivo: <b>miércoles 18/11 en Palermo</b>. Ver la clase →</a>
+    <div class="oscuro">
+      <div class="cabeza">
+        <span class="nombre">Manu Casaubon</span>
+        <nav aria-label="Secciones">
+          <a href="#metodo" data-ancla="metodo">Método</a>
+          <a href="#clase" data-ancla="clase">Clase en vivo</a>
+          <a href="#contacto" data-ancla="contacto">Contacto</a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ================= VERSIÓN A · MÉTODO PRIMERO ================= -->
+    <div data-v="A">
+
+      <section class="banda oscuro heroA"><div class="in pila amplia">
+        <h1>Que tu sector sepa lo que sabés</h1>
+        <p class="promesa">Te ayudo a comunicar lo que sabés y a tener una marca personal que hable por vos, en las redes y arriba del escenario.</p>
+        <p class="texto">Para emprendedores, profesionales y especialistas que saben mucho de lo suyo y todavía no lo están contando.</p>
+        <div class="botones">
+          <a class="boton" href="/evento" data-ruta="/evento">Ver la clase del 18/11</a>
+          <a class="link2" href="https://ig.me/m/casaubon.ar">Escribime por Instagram</a>
+        </div>
+      </div></section>
+
+      <section class="banda crema"><div class="in pila">
+        <p class="frase">Sabés mucho. <em>Pero tu sector todavía no lo sabe.</em></p>
+        <p class="texto">Todos tenemos marca personal. Lo que la potencia no es hacerse viral, ni copiar a otro, ni hacer otro curso: es la comunicación. Hoy la información sobra, y lo que hace que un mensaje tenga efecto es la autoridad de quien lo dice.</p>
+      </div></section>
+
+      <section class="banda oscuro" data-sec="metodo"><div class="in pila amplia">
+        <div class="pila">
+          <h2 class="grande">Los 3 niveles de comunicación</h2>
+          <p class="bajada">Mi método para trabajar marcas personales. Para cada nivel, sabés en qué etapa estás y cuál es la siguiente.</p>
+        </div>
+        <div class="niveles">
+          <div class="nivel">
+            <div><div class="que">Qué decís</div><h3>Comunicación estratégica</h3></div>
+            <div>
+              <p>Qué decís, a quién y cómo, para que te escuchen, te entiendan y te posicionen. Avatar, mensajes clave, enemigo, plan de comunicación y de ventas. Siempre desde tu identidad.</p>
+              <ul class="etapas" aria-label="Etapas de la comunicación estratégica">
+                <li><span>0</span>Sin estrategia</li>
+                <li><span>1</span>Nicho, pero sin diferencial</li>
+                <li class="meta"><span>3</span>Comunicás con posicionamiento: tu sector piensa en vos</li>
+              </ul>
+            </div>
+          </div>
+          <div class="nivel">
+            <div><div class="que">Cómo lo mostrás</div><h3>Comunicación creativa</h3></div>
+            <div>
+              <p>Cómo traducís tu identidad a formatos de contenido. Buscamos tus formatos ganadores: los que te salen fácil o disfrutás, y funcionan.</p>
+              <ul class="etapas" aria-label="Etapas de la comunicación creativa">
+                <li><span>0</span>Copiando</li>
+                <li><span>1</span>Experimentando</li>
+                <li><span>2</span>Tenés un formato ganador</li>
+                <li class="meta"><span>3</span>Tenés un formato único</li>
+              </ul>
+            </div>
+          </div>
+          <div class="nivel">
+            <div><div class="que">Cómo lo decís</div><h3>Comunicación de impacto</h3></div>
+            <div>
+              <p>Oratoria, storytelling, argumentar y articular ideas. Frente a cámara, en un escenario y en el día a día. Se practica.</p>
+              <ul class="etapas" aria-label="Etapas de la comunicación de impacto">
+                <li><span>0</span>Informando, con un guion repetido</li>
+                <li><span>1</span>Presencia básica</li>
+                <li><span>2</span>Autenticidad: sos igual que en persona</li>
+                <li class="meta"><span>3</span>Impacto real</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <p class="disruptiva">Hay que nivelar los tres. Una gran estrategia con mala implementación no funciona. Con los tres alineados, tu comunicación rompe el patrón.</p>
+      </div></section>
+
+      <section class="banda crema"><div class="in pila amplia">
+        <h2 class="grande">En las redes y fuera de ellas</h2>
+        <div class="lados">
+          <div class="lado">
+            <span class="rotulo">Online</span>
+            <h3>Redes y contenido</h3>
+            <ul class="lista">
+              <li>Una bio que explica qué hacés y a quién ayudás.</li>
+              <li>Contenido en los formatos que te salen natural.</li>
+              <li>Videos que te dan orgullo: querés verlos 3 o 4 veces antes de subirlos.</li>
+            </ul>
+          </div>
+          <div class="lado">
+            <span class="rotulo">Offline</span>
+            <h3>Eventos y escenario</h3>
+            <ul class="lista">
+              <li>Charlas, eventos y capacitaciones en tu sector.</li>
+              <li>Presencia frente a una sala, sin armar un personaje.</li>
+              <li>Ideas claras también en una reunión o en un café.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="puente">Es la misma marca en los dos lados: lo que sos, lo que hacés y cómo te ven.</p>
+      </div></section>
+
+      <section class="banda crema bloqueado" style="padding-block-start:0"><div class="in prog">
+        <span class="marca fecha">Se publica desde el 25/11</span>
+        <h2 class="grande">Cómo trabajo</h2>
+        <p class="texto">Mi programa de 4 meses para trabajar tus 3 niveles conmigo. Este bloque no se muestra hasta el 25/11: hasta entonces, el inicio solo lleva a la clase del 18/11.</p>
+        <div class="pasos">
+          <div class="paso"><h3>Diagnóstico</h3><p>Miramos tu bio, tus últimos 30 videos, la claridad para explicar qué hacés y a quién ayudás, y la coherencia entre quién sos y lo que comunicás.</p></div>
+          <div class="paso"><h3>Los 3 niveles</h3><p>Trabajamos estrategia, contenido y oratoria hasta nivelarlos.</p></div>
+          <div class="paso"><h3>Plan a 6 meses</h3><p>Salís con el plan de comunicación para los meses que siguen.</p></div>
+        </div>
+        <span class="marca define">Formato, duración y modalidad: los define Manu</span>
+      </div></section>
+
+      <section class="banda oscuro"><div class="in pila">
+        <h2 class="grande">Quién soy</h2>
+        <div class="bio">
+          <p>Soy Manu Casaubon. Trabajo con personas que tienen algo importante para decir, para que aprendan a comunicarlo siendo ellas mismas, sin armar un personaje.</p>
+          <p>Doy charlas y capacitaciones en universidades y eventos, y cuento mi método en mi canal de YouTube.</p>
+          <div class="cifras">
+            <div><strong>+200.000</strong><span>en TikTok</span></div>
+            <div><strong>+100.000</strong><span>en YouTube</span></div>
+            <div><strong>+30.000</strong><span>nuevos en Instagram desde que cambié de tema</span></div>
+          </div>
+        </div>
+      </div></section>
+
+      <section class="banda crema" data-sec="clase"><div class="in pila amplia">
+        <div class="pila">
+          <h2 class="grande">Próxima clase en vivo</h2>
+          <p class="bajada">Cómo destacar con tu marca personal en 2027. De que nadie te conozca a que te llamen a vos.</p>
+          <p class="texto">3 horas presenciales para trabajar tus 3 niveles de comunicación. Te llevás una auditoría personalizada de tu marca y tu planificación para 2027.</p>
+        </div>
+        <div class="entrada">
+          <div class="dato"><span>Cuándo</span><strong>Miércoles 18/11</strong></div>
+          <div class="dato"><span>Horario</span><strong>18 a 21 h</strong></div>
+          <div class="dato"><span>Dónde</span><strong>Palermo Soho</strong></div>
+          <div class="dato"><span>Entrada</span><strong>USD 27</strong></div>
+          <div class="talon"><a class="boton" href="/evento" data-ruta="/evento">Ver la clase</a></div>
+        </div>
+        <p class="chico">Solo 30 lugares.</p>
+      </div></section>
+
+      <section class="banda oscuro" data-sec="contacto"><div class="in contacto">
+        <h2 class="grande">Hablemos</h2>
+        <p class="bajada">¿Tenés una duda sobre tu marca o sobre la clase? Escribime por Instagram y te respondo yo.</p>
+        <div class="botones">
+          <a class="boton" href="https://ig.me/m/casaubon.ar">Escribime por Instagram</a>
+          <a class="link2" href="https://www.youtube.com/@manuelcasaubon">Mi canal de YouTube</a>
+        </div>
+      </div></section>
+    </div>
+
+    <!-- ================= VERSIÓN B · ESCENARIO PRIMERO ================= -->
+    <div data-v="B" hidden>
+
+      <section class="banda oscuro"><div class="in escena">
+        <p class="pre">Estás en un evento, escuchás al speaker y pensás:</p>
+        <p class="cita"><em>«Sabe, pero no sabe tanto como yo».</em></p>
+        <p class="resp">¿Por qué lo llaman a él? <b>Porque comunica.</b> Te ayudo a que te llamen a vos.</p>
+        <div class="botones">
+          <a class="boton" href="/evento" data-ruta="/evento">Ver la clase del 18/11</a>
+          <a class="link2" href="https://ig.me/m/casaubon.ar">Escribime por Instagram</a>
+        </div>
+      </div></section>
+
+      <section class="banda crema"><div class="in pila amplia">
+        <div class="pila">
+          <h2 class="grande">Qué cambia cuando comunicás</h2>
+          <p class="texto">Todos tenemos marca personal. La diferencia está en cómo la comunicás. En la era de la IA la información sobra: el mensajero importa más que el mensaje.</p>
+        </div>
+        <div class="cadena" style="border-top-color:var(--oscuro)">
+          <div class="eslabon" style="border-bottom-color:var(--linea-c)"><b>Identidad</b><span class="texto">Qué hacés y quién sos.</span></div>
+          <div class="eslabon" style="border-bottom-color:var(--linea-c)"><b>Imagen</b><span class="texto">Cómo te percibe el mundo.</span></div>
+          <div class="eslabon" style="border-bottom-color:var(--linea-c)"><b>Reputación</b><span class="texto">Esa imagen a lo largo del tiempo. Lo que hace que tu sector piense en vos.</span></div>
+        </div>
+        <p class="puente">La señal de que vas bien: querés ver tu video 3, 4 o 5 veces antes de subirlo.</p>
+      </div></section>
+
+      <section class="banda oscuro"><div class="in pila amplia">
+        <h2 class="grande">Online y offline</h2>
+        <div class="lados">
+          <div class="lado">
+            <span class="rotulo">En las redes</span>
+            <h3>Contenido</h3>
+            <ul class="lista">
+              <li>Una bio clara: qué hacés y a quién ayudás.</li>
+              <li>Tus formatos ganadores, los que te salen natural.</li>
+              <li>Videos que te dan orgullo.</li>
+            </ul>
+          </div>
+          <div class="lado">
+            <span class="rotulo">Fuera de las redes</span>
+            <h3>Escenario</h3>
+            <ul class="lista">
+              <li>Charlas, eventos y capacitaciones.</li>
+              <li>Ser el speaker al que llaman.</li>
+              <li>Hablar igual que como sos en persona.</li>
+            </ul>
+          </div>
+        </div>
+      </div></section>
+
+      <section class="banda crema" data-sec="metodo"><div class="in pila amplia">
+        <div class="pila">
+          <h2 class="grande">El método, en 3 niveles</h2>
+          <p class="texto">Hay que nivelar los tres. Con los tres alineados, rompés el patrón.</p>
+        </div>
+        <div class="lineas">
+          <div class="linea"><b>Estratégica</b><span><em>Qué decís.</em> A quién y cómo, para que tu sector piense en vos.</span></div>
+          <div class="linea"><b>Creativa</b><span><em>Cómo lo mostrás.</em> Tus formatos ganadores de contenido.</span></div>
+          <div class="linea"><b>De impacto</b><span><em>Cómo lo decís.</em> Frente a cámara, en un escenario y en el día a día.</span></div>
+        </div>
+      </div></section>
+
+      <section class="banda crema" style="padding-block-start:0"><div class="in pila amplia">
+        <div class="pila">
+          <span class="marca permiso">Pendiente de permiso · no sale en producción sin el OK escrito</span>
+          <h2 class="grande">Algunos alumnos</h2>
+        </div>
+        <div class="casos">
+          <div class="caso"><strong>USD 5.000</strong><h3>Joaco Comar</h3><p>Lo cerró en su primera charla propia, con 12 personas en la sala.</p></div>
+          <div class="caso"><strong>2.000 a 8.700</strong><h3>Fer Di Tomasso</h3><p>Sommelier de más de 45 años. Seguidores en 8 meses, más invitaciones a charlas y capacitaciones.</p></div>
+          <div class="caso"><strong>30.000 a 48.000</strong><h3>Axel Becker</h3><p>Seguidores en 5 a 6 meses. Hoy es referente de finanzas y cripto.</p></div>
+        </div>
+        <p class="chico">Son resultados de cada uno, con su trabajo y su contexto. No son una promesa.</p>
+      </div></section>
+
+      <section class="banda oscuro bloqueado"><div class="in prog">
+        <span class="marca fecha">Se publica desde el 25/11</span>
+        <h2 class="grande">Trabajar conmigo</h2>
+        <p class="texto">Mi programa de 4 meses: diagnóstico de tu marca, tus 3 niveles y un plan a 6 meses. Hasta el 25/11 este bloque no se muestra.</p>
+        <span class="marca define">Formato, duración y modalidad: los define Manu</span>
+      </div></section>
+
+      <section class="banda crema" data-sec="clase"><div class="in pila amplia">
+        <div class="pila">
+          <h2 class="grande">Vení a la próxima clase</h2>
+          <p class="bajada">Cómo destacar con tu marca personal en 2027. De que nadie te conozca a que te llamen a vos.</p>
+        </div>
+        <div class="entrada">
+          <div class="dato"><span>Cuándo</span><strong>Miércoles 18/11</strong></div>
+          <div class="dato"><span>Horario</span><strong>18 a 21 h</strong></div>
+          <div class="dato"><span>Dónde</span><strong>Palermo Soho</strong></div>
+          <div class="dato"><span>Entrada</span><strong>USD 27</strong></div>
+          <div class="talon"><a class="boton" href="/evento" data-ruta="/evento">Ver la clase</a></div>
+        </div>
+        <p class="chico">Clase presencial de 3 horas. Solo 30 lugares.</p>
+      </div></section>
+
+      <section class="banda oscuro" data-sec="contacto"><div class="in contacto">
+        <h2 class="grande">¿Lo hablamos?</h2>
+        <p class="bajada">Soy Manu Casaubon. Si tenés algo importante para decir, escribime por Instagram y lo vemos.</p>
+        <div class="botones">
+          <a class="boton" href="https://ig.me/m/casaubon.ar">Escribime por Instagram</a>
+          <a class="link2" href="https://www.youtube.com/@manuelcasaubon">Mi canal de YouTube</a>
+        </div>
+      </div></section>
+    </div>
+
+    <footer class="pie oscuro">
+      <span>Manu Casaubon · Comunica Tu Marca</span>
+      <a href="https://www.youtube.com/@manuelcasaubon">YouTube</a>
+    </footer>
+  </div></div>
+
+  <!-- Nota de la versión -->
+  <aside class="nota" id="nota" aria-live="polite">
+    <div data-n="A">
+      <h1>A · Método primero</h1>
+      <p class="sub">Explica antes de emocionar. Para quien llega buscando cómo trabajás.</p>
+    </div>
+    <div data-n="B" hidden>
+      <h1>B · Escenario primero</h1>
+      <p class="sub">Emociona antes de explicar. Para quien llega desde un video o una historia.</p>
+    </div>
+    <div class="caja">
+      <h2>Orden de las secciones</h2>
+      <ol data-n="A">
+        <li><b>Promesa</b>: que tu sector sepa lo que sabés</li>
+        <li><b>El problema</b>: sabés, pero tu sector no lo sabe</li>
+        <li><b>Los 3 niveles</b> con sus etapas</li>
+        <li><b>Online y offline</b></li>
+        <li><b>Cómo trabajo</b> (programa, oculto hasta el 25/11)</li>
+        <li><b>Quién soy</b></li>
+        <li><b>Próxima clase</b> → /evento</li>
+        <li><b>Contacto</b> por Instagram</li>
+      </ol>
+      <ol data-n="B" hidden>
+        <li><b>La escena</b> del speaker</li>
+        <li><b>Qué cambia</b>: identidad → imagen → reputación</li>
+        <li><b>Online y offline</b> lado a lado</li>
+        <li><b>El método</b>, una línea por nivel</li>
+        <li><b>Resultados</b> (pendientes de permiso)</li>
+        <li><b>Trabajar conmigo</b> (programa, oculto hasta el 25/11)</li>
+        <li><b>Próxima clase</b> → /evento</li>
+        <li><b>Contacto</b> por Instagram</li>
+      </ol>
+    </div>
+    <div class="caja">
+      <h2>Marcas del boceto</h2>
+      <div class="leyenda">
+        <span class="marca fecha">Se publica desde el 25/11</span>
+        <span class="marca permiso">Pendiente de permiso</span>
+        <span class="marca define">Lo define Manu</span>
+      </div>
+      <p>Los bloques con borde mostaza no salen hasta el 25/11. Hoy el CTA principal es la clase del 18/11 (franja de arriba, hero y bloque "Próxima clase"). Sin precios del programa.</p>
+      <p>Los links a /evento no navegan en este boceto: en el sitio llevan a la landing de la clase.</p>
+    </div>
+  </aside>
+</div>
+</main>
+
+<div class="aviso-link" id="aviso" role="status" hidden></div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const leer = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+  const guardar = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+
+  function setVer(v) {
+    document.querySelectorAll("[data-v]").forEach((el) => el.hidden = el.dataset.v !== v);
+    document.querySelectorAll("[data-n]").forEach((el) => el.hidden = el.dataset.n !== v);
+    document.querySelectorAll("[data-ver]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.ver === v)));
+    $("#pantalla").scrollTop = 0;
+    guardar("inicio-boceto-ver", v);
+  }
+  function setVista(v) {
+    $("#marco").classList.toggle("cel", v === "cel");
+    $("#escenario").classList.toggle("ancho", v === "esc");
+    document.querySelectorAll("[data-vista]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.vista === v)));
+    guardar("inicio-boceto-vista", v);
+  }
+  document.querySelectorAll("[data-ver]").forEach((b) => b.onclick = () => setVer(b.dataset.ver));
+  document.querySelectorAll("[data-vista]").forEach((b) => b.onclick = () => setVista(b.dataset.vista));
+
+  // Anclas internas: scroll dentro del marco, en la versión visible.
+  document.querySelectorAll("[data-ancla]").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault();
+    const visible = document.querySelector(`[data-v]:not([hidden]) [data-sec="${a.dataset.ancla}"]`);
+    visible?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }));
+
+  // Las rutas del sitio no existen en el boceto: avisamos adónde llevan.
+  let t;
+  document.querySelectorAll("[data-ruta]").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault();
+    const av = $("#aviso");
+    av.textContent = "En el sitio, este botón lleva a " + a.dataset.ruta + " (la landing de la clase del 18/11).";
+    av.hidden = false; clearTimeout(t); t = setTimeout(() => av.hidden = true, 3200);
+  }));
+
+
+  setVer(leer("inicio-boceto-ver") === "B" ? "B" : "A");
+  const vista = leer("inicio-boceto-vista");
+  setVista(vista || (window.innerWidth < 440 ? "esc" : "cel"));
+})();
+</script>

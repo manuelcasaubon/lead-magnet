@@ -91,3 +91,20 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 | S9:4 | **El `uso` de cada video se asigna a mano** (`vsl_evento`, `vsl_inicio`): la sincronización no lo pisa. Si hay varios listos con el mismo uso, la web usa el más nuevo. S5 puede hacerlo desde el panel | SQL a mano | Mostrar el video |
 | S9:5 | **Seguridad del CDN de Bunny.** Los videos se sirven por URL directa del CDN (`vz-….b-cdn.net`), sin firmar, así que quien tenga el link puede verlos. Si el VSL tiene que ser privado, hay que activar Token Authentication en Bunny y firmar las URLs desde el servidor | URLs directas | — |
 | S9:6 | **Archivos de otras sesiones que toqué** (mínimo, a revisar por S0): `src/lib/supabase/database.types.ts` (sumé `videos`, `bunny_webhook_events`, `vsl_metricas` y 2 columnas de `settings` a mano; conviene regenerar los tipos) y `package.json` (dependencia `hls.js`) | — | — |
+
+### S8 — Inicio, landing principal ([boceto A/B](https://claude.ai/artifact/FQzFNHhik9rcULfYqcD2Mr))
+
+A, "Método primero": promesa, problema, los 3 niveles con sus etapas, online y offline, programa, quién soy, clase y contacto. B, "Escenario primero": abre con la escena del speaker, sigue con identidad → imagen → reputación, online y offline lado a lado, método en una línea por nivel, casos, programa, clase y contacto.
+
+| # | Pregunta | Por defecto mientras tanto |
+|---|---|---|
+| S8:1 | **Resuelto (6/11, Manu): B "Escenario primero"**, con la animación de la transformación al hacer scroll (sin A/B) y la agenda de Cal.com. Construido en `src/app/page.tsx` y `src/components/inicio/` | — |
+| S8:2 | **Titular.** A dice "Que tu sector sepa lo que sabés"; B abre con «Sabe, pero no sabe tanto como yo», que también es la escena de la clase. ¿Te sirve repetirla en el inicio o preferís dejarla solo para `/evento`? | Cada versión con el suyo |
+| S8:3 | **Etapas de la comunicación estratégica.** Tus notas dicen 0 → 1 → 3, sin etapa 2. ¿Falta la 2 o es así a propósito? | Se muestran 0, 1 y 3, como en las notas |
+| S8:4 | **Programa (desde el 25/11).** El bloque está marcado "se publica desde el 25/11" y dice "programa de 4 meses" con diagnóstico, los 3 niveles y plan a 6 meses (sacados de tu método). ¿Qué incluye de verdad, cómo es el formato (grupal, individual, encuentros por semana) y cómo se llama? Sin precios hasta que lo digas | Bloque oculto hasta el 25/11, con la marca "Formato, duración y modalidad: los define Manu" |
+| S8:5 | **Casos de Joaco, Fer y Axel** (solo en B). Siguen con la marca "pendiente de permiso" (D11). Si no llegan los permisos, ¿B se queda sin la sección o la reemplazamos por algo tuyo (cifras de tu canal, una charla)? | Sin permiso, la sección no sale (hoy no está en el sitio) |
+| S8:6 | **Cifras de quién soy** (+200.000 TikTok, +100.000 YouTube, +30.000 nuevos en Instagram). Vienen del boceto de la clase. ¿Siguen vigentes al 6/11? | Se usan así |
+| S8:7 | **Franja de arriba** "Próxima clase en vivo: miércoles 18/11 en Palermo". ¿La querés en todas las páginas hasta el 18/11? ¿Qué muestra del 19 al 24/11, si la clase online del 24/11 todavía no se anuncia antes del 19/11? | Hasta el 18/11 lleva a `/evento`; después se saca hasta que decidas |
+| S8:8 | **Contacto.** El CTA secundario es Instagram (`ig.me/m/casaubon.ar`) y el pie suma YouTube. ¿Agregamos TikTok, LinkedIn o un mail? | Instagram y YouTube |
+| S8:9 | **Nombre en el pie.** Dice "Manu Casaubon · Comunica Tu Marca". ¿Es el nombre que querés para la marca del sitio? | Así |
+| S8:10 | **Cómo quedó el inicio (6/11).** Escena del speaker → transformación al hacer scroll (nadie te conoce → identidad → imagen → reputación → te llaman a vos) → online y offline → método en 3 niveles → próxima clase (hasta el 18/11) → agenda (6 preguntas, una por pantalla, y el calendario de Cal.com con las respuestas, `metadata[vid]` y las UTM) → contacto. Hasta el 18/11 a las 21 h el botón principal y la franja llevan a `/evento`; después, a la agenda. El programa no aparece (desde el 25/11) y los casos tampoco (sin permiso). Sigue sin indexarse (D17). El WhatsApp se pasa a Cal.com como `+549…` porque ese campo se bloquea al prellenarse | Así |

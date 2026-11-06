@@ -21,7 +21,8 @@
 >
 > **Agenda con Cal.com (6/11/26):** el inicio (`/`) tiene como CTA principal agendar la "Sesión estratégica de marca personal" (`https://cal.com/manuel-casaubon-dct8hc/sesion-estrategica`, id 7804794, 45 min, Google Meet). Antes de la agenda, un formulario propio hace una pregunta por pantalla: `name`, `email`, `whatsapp`, `instagram`, `a-que-te-dedicas` y `que-queres-lograr`. Después se abre el embed de Cal.com con esas respuestas prellenadas y `metadata[vid]` y `metadata[utm_*]`.
 > - Webhook: `https://qzfzswascgitycynwlkk.supabase.co/functions/v1/cal-webhook` (Edge Function `cal-webhook`). Verifica `X-Cal-Signature-256` con el secreto `CAL_WEBHOOK_SECRET` de Supabase. Guarda en `bookings` y `cal_webhook_events`, crea el lead con fuente `cal` y registra `booking_created`, `booking_rescheduled` y `booking_cancelled`.
-> - El inicio va con A/B (S8): A = estructura base; B = animación al hacer scroll que muestra la transformación.
+> - El inicio usa la versión B del boceto S8 (elegida el 6/11), con la animación al hacer scroll que muestra la transformación. Sin A/B. Ver DECISIONES S8:1 y S8:10.
+> - En el navegador, la reserva dispara `Schedule` del pixel con el uid de la reserva como eventID (deduplica con el de `cal-webhook`) y el evento `agenda_booked`.
 >
 > **Conversions API de Meta (6/11/26):** `supabase/functions/_shared/meta.ts` es el único punto de envío. Secretos de Supabase: `META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN` y, opcional, `META_TEST_EVENT_CODE`.
 > - `Lead`: `/api/lead` (paso final) llama a la Edge Function `meta-capi`, autorizada solo con la clave de servidor. Manda IP y navegador solo en ese envío, sin guardarlos, y devuelve `metaEventId` para que el pixel del navegador use el mismo `eventID`.
