@@ -47,6 +47,9 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 | S1: 7 | **Póster del VSL.** Hoy es la escena en texto sobre fondo oscuro. Cuando grabes, ¿querés un cuadro tuyo de fondo en el póster, o se queda en texto? | Solo texto | VSL |
 | S1: 8 | **Bio en B.** En B saqué la línea de "30.000 seguidores nuevos en Instagram" para acortar. ¿La dejamos? | Sin esa línea en B; completa en A | Landing final |
 | S1: 9 | **Precio en la página.** Se muestra "USD 27" y "pagás en pesos". ¿Mostramos también el monto en pesos cuando esté definido (D3)? | Solo USD 27 | Landing final |
+| S1: 10 | **"Quedan N de 30" en la landing A.** Se muestra el número real recién cuando baja de 30; mientras tanto dice "Solo 30 lugares" | Así | — |
+| S1: 11 | **Agotado.** Con `left_public` en 0 (o `sales_open` en false) el formulario se reemplaza por "Agotado" y el link "¿Querés que te avise si se libera un lugar? Mandame TALLER". El link fijo de MP no controla el tope: es solo visual | Así | — |
+| S1: 12 | **Reglas de 2027 y casos de alumnos.** En producción están apagados (`MOSTRAR_REGLAS_2027` y `MOSTRAR_CASOS` en `src/components/landing/contenido.ts`). Las reglas se cargan en `REGLAS_2027` cuando las definas (D6); los casos salen con el permiso escrito (D11) | Apagados | — |
 
 ### S2 — Formulario ([boceto A/B](https://claude.ai/artifact/E9BUStmJjqnDZaLe1pXB7u))
 

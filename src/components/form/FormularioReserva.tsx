@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent, type ReactNode } from "react";
 import { track } from "@/lib/track/cliente";
 import { CONSENT_TEXT, LIMITES, MENSAJES, validar, type Campo, type CodigoError } from "./reglas";
 import s from "./FormularioReserva.module.css";
@@ -15,6 +15,8 @@ type Props = {
   onLead?: (lead: { email: string }) => void | Promise<void>;
   /** Para distinguir dónde está el formulario en el tracking (p. ej. "hero", "final"). */
   lugar?: string;
+  /** Se muestra debajo del error si /api/lead falla (S1: link directo al pago para no perder la venta). */
+  alFallar?: ReactNode;
 };
 
 type Valores = Record<Exclude<Campo, "consentimiento">, string> & { consentimiento: boolean; website: string };
@@ -35,7 +37,7 @@ const SERVIDOR: Record<string, string> = {
   red: "No hay conexión. Revisá internet y probá de nuevo.",
 };
 
-export default function FormularioReserva({ variante, instagramUrl, onLead, lugar = "pagina" }: Props) {
+export default function FormularioReserva({ variante, instagramUrl, onLead, lugar = "pagina", alFallar }: Props) {
   const uid = useId();
   const id = (c: string) => `${uid}-${c}`;
   const ref = useRef<HTMLFormElement>(null);
@@ -239,6 +241,7 @@ export default function FormularioReserva({ variante, instagramUrl, onLead, luga
       </button>
 
       <p className={s.errorServidor} role="alert">{errorServidor}</p>
+      {estado === "error_servidor" && alFallar}
 
       <p className={s.ig}>
         ¿Preferís por Instagram?{" "}
