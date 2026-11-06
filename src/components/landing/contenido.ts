@@ -12,3 +12,8 @@ export const MOSTRAR_CASOS = false;
 export const PRECIO_ARS_POR_DEFECTO = 42000;
 
 export const formatoArs = (n: number) => `ARS ${n.toLocaleString("es-AR", { maximumFractionDigits: 0 })}`;
+
+/** Fotos reales de Manu (charla, clase, capacitación). Van en /public/fotos/ y se cargan acá cuando Manu las pase.
+ *  Sin archivo, el lugar no se muestra. Con FOTOS_BOCETO=1 (solo para el boceto) se ve un recuadro con lo que va. */
+export type Foto = { src: string; alt: string; ancho: number; alto: number } | null;
+export const FOTOS: { charla: Foto; clase: Foto; quien: Foto } = { charla: null, clase: null, quien: null };

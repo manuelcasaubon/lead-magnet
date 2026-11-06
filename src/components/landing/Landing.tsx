@@ -1,17 +1,32 @@
+import Image from "next/image";
 import type { Cupo } from "@/lib/evento";
 import BarraCta from "./BarraCta";
 import LinkInstagram from "./LinkInstagram";
 import Reserva from "./Reserva";
 import Vsl from "./Vsl";
-import { MOSTRAR_CASOS, MOSTRAR_REGLAS_2027, REGLAS_2027, formatoArs } from "./contenido";
+import { FOTOS, MOSTRAR_CASOS, MOSTRAR_REGLAS_2027, REGLAS_2027, formatoArs, type Foto } from "./contenido";
 import s from "./landing.module.css";
 
-// Landing de la clase del 18/11, versión A "Fiel al boceto" (elegida por Manu el 6/11/26).
-// Textos: docs/referencia/landing-boceto.html. Server component: solo el formulario, la barra y los links medidos son de cliente.
+// Landing de la clase del 18/11. Versión A del boceto, con el feedback de Manu del 6/11 (segunda ronda):
+// título centrado → bajada → VSL → datos de la entrada → "Solo 30 lugares" en rojo; dirección y precio, abajo, al reservar.
+// Server component: solo el formulario, la barra y los links medidos son de cliente.
 
 type Props = { cupo: Cupo | null; precioArs: number; agotado: boolean };
 
 const LUGARES_PUBLICOS = 30;
+const BOCETO_FOTOS = process.env.FOTOS_BOCETO === "1";
+
+function FotoReal({ foto, que }: { foto: Foto; que: string }) {
+  if (foto) {
+    return (
+      <figure className={s.foto}>
+        <Image src={foto.src} alt={foto.alt} width={foto.ancho} height={foto.alto} sizes="(max-width: 980px) 100vw, 980px" />
+      </figure>
+    );
+  }
+  if (!BOCETO_FOTOS) return null;
+  return <figure className={`${s.foto} ${s.fotoFalta}`}><span>Foto de Manu: {que}</span></figure>;
+}
 
 export default function Landing({ cupo, precioArs, agotado }: Props) {
   // Siempre el número real (reglas de comunicación). Sin dato de la base, se dice el total.
@@ -27,11 +42,12 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
     <main className={s.raiz}>
       <section className={`${s.banda} ${s.hero}`} id="inicio-evento"><div>
         <p className={s.marca}><b>Manu Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
-        <div>
+        <div className={s.centro}>
           <h1>Cómo destacar con tu marca personal en 2027</h1>
           <p className={s.promesa}>De que nadie te conozca a que te llamen a vos.</p>
         </div>
-        <p className={s.resumen}>3 horas para entender cómo cambiaron las reglas de las redes y de la estrategia de marca, y salir con tu plan para 2027.</p>
+        <p className={`${s.resumen} ${s.centro}`}>3 horas para entender cómo cambiaron las reglas de las redes y de la estrategia de marca, y salir con tu plan de acción para 2027: tu plan de marca y tu plan de contenido.</p>
+        <Vsl />
         <div className={s.entrada}>
           <div className={s.dato}><span>Cuándo</span><strong>Miércoles 18/11</strong></div>
           <div className={s.dato}><span>Horario</span><strong>18 a 21 h</strong></div>
@@ -43,17 +59,13 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
             </a>
           </div>
         </div>
-        <p className={s.aviso}>{lugares} Niceto Vega 4601, CABA. Pagás {precio} por Mercado Pago.</p>
-        <p className={s.secundario}>¿Preferís por Instagram? <LinkInstagram place="hero">Mandame TALLER</LinkInstagram></p>
-      </div></section>
-
-      <section className={`${s.banda} ${s.sinArriba}`} aria-label="Video de presentación"><div>
-        <Vsl />
+        <p className={s.lugares}>{lugares}</p>
       </div></section>
 
       <section className={`${s.banda} ${s.crema}`}><div>
-        <p className={s.frase}>Vas a un evento, escuchás al speaker y pensás: <em>«Sabe, pero no sabe tanto como yo».</em></p>
-        <p className={s.texto}>Entonces, ¿por qué lo llaman a él y a vos no? Porque él está comunicando lo que sabe. En esta clase trabajamos para que tu sector te conozca, en las redes y arriba del escenario, con una comunicación profesional.</p>
+        <p className={s.frase}>Tenés mucho conocimiento y experiencia, <em>pero pocas personas saben lo que sabés.</em></p>
+        <p className={s.texto}>Lo que te falta es comunicar tu marca de manera genuina y auténtica: con claridad y un plan de comunicación, sabiendo qué lenguaje y qué formatos te quedan mejor en tu caso, y mejorando tu comunicación de impacto.</p>
+        <FotoReal foto={FOTOS.charla} que="dando una charla o una conferencia" />
       </div></section>
 
       <section className={s.banda}><div>
@@ -78,23 +90,27 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
       <section className={`${s.banda} ${s.crema}`}><div>
         <h2>Qué te llevás</h2>
         <div className={s.lleva}>
-          <div><h3>Tu planificación para 2027</h3><p>Una planificación completa para saber exactamente dónde poner el foco en tus redes y en tu marca personal.</p></div>
-          <div><h3>Una auditoría personalizada</h3><p>La auditoría de tu marca, mirada en los 3 niveles de comunicación.</p></div>
-          <div><h3>Cómo diferenciarte</h3><p>Entendés cómo cambiaron las reglas del juego y cómo diferenciar tu marca en 2027.</p></div>
-          <div><h3>Tus preguntas, en persona</h3><p>Me preguntás lo que necesites en vivo, cara a cara.</p></div>
+          <div><span className={s.icono} aria-hidden="true">🗓️</span><h3>Tu planificación para 2027</h3><p>Una planificación completa para saber exactamente dónde poner el foco en tus redes y en tu marca personal.</p></div>
+          <div><span className={s.icono} aria-hidden="true">🔍</span><h3>Una auditoría personalizada</h3><p>La auditoría de tu marca, mirada en los 3 niveles de comunicación.</p></div>
+          <div><span className={s.icono} aria-hidden="true">🎯</span><h3>Cómo diferenciarte</h3><p>Entendés cómo cambiaron las reglas del juego y cómo diferenciar tu marca en 2027.</p></div>
+          <div><span className={s.icono} aria-hidden="true">🙋</span><h3>Tus preguntas, en persona</h3><p>Me preguntás lo que necesites en vivo, cara a cara.</p></div>
         </div>
       </div></section>
 
       <section className={s.banda}><div>
         <h2>Qué pasa en las 3 horas</h2>
         <div className={s.prog}>
-          {PROGRAMA.map(([hora, nivel, titulo, texto]) => (
+          {PROGRAMA.map(([hora, nivel, titulo, texto, lleva]) => (
             <div className={s.fila} key={hora}>
               <div className={s.hora}>{hora}</div>
-              <div><div className={s.nivel}>{nivel}</div><h3>{titulo}</h3><p>{texto}</p></div>
+              <div>
+                <div className={s.nivel}>{nivel}</div><h3>{titulo}</h3><p>{texto}</p>
+                {lleva && <p className={s.tellevas}><b>Te llevás:</b> {lleva}</p>}
+              </div>
             </div>
           ))}
         </div>
+        <FotoReal foto={FOTOS.clase} que="dando una clase o una capacitación para un cliente" />
       </div></section>
 
       <section className={`${s.banda} ${s.crema}`}><div>
@@ -106,6 +122,7 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
               <li>Ya tenés una marca personal o la querés empezar.</li>
               <li>Querés una estrategia clara y saber hacia dónde ir en 2027.</li>
               <li>Sabés de lo tuyo y querés que tu sector te conozca.</li>
+              <li>Ya vivís de tu marca o de tu profesión y querés potenciarla.</li>
             </ul>
           </div>
           <div>
@@ -113,7 +130,7 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
             <ul className={`${s.lista} ${s.no}`}>
               <li>Buscás hacerte viral o famoso.</li>
               <li>Esperás resultados de un día para el otro.</li>
-              <li>Querés una fórmula para repetir sin pensar.</li>
+              <li>Querés aprender a crear contenido solo para ganar más dinero.</li>
             </ul>
           </div>
         </div>
@@ -135,8 +152,9 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <h2>Quién la da</h2>
         <div className={s.bio}>
           <p>Soy Manu Casaubon. Trabajo con personas que tienen algo importante para decir, para que aprendan a comunicarlo siendo ellas mismas, sin armar un personaje.</p>
-          <p>Tengo más de 200.000 seguidores en TikTok y más de 100.000 en YouTube. Desde que cambié de tema sumé unos 30.000 seguidores nuevos en Instagram. Doy charlas y capacitaciones en universidades y eventos.</p>
+          <p>Tengo más de 200.000 seguidores en TikTok y más de 100.000 en YouTube. Soy speaker y conferencista en universidades y eventos.</p>
         </div>
+        <FotoReal foto={FOTOS.quien} que="en un escenario o retrato" />
       </div></section>
 
       <section className={`${s.banda} ${s.crema}`}><div>
@@ -144,17 +162,18 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <div className={s.faq}>
           <details><summary>¿Dónde es?</summary><p>En Niceto Vega 4601, Palermo Soho, CABA.</p></details>
           <details><summary>¿Cuánto dura?</summary><p>3 horas, de 18 a 21 h. Las puertas abren a las 17:45.</p></details>
-          <details><summary>Recién empiezo con mi marca, ¿me sirve?</summary><p>Sí. Te llevás una estrategia clara para arrancar y saber dónde poner el foco.</p></details>
-          <details><summary>¿Tengo que tener muchos seguidores?</summary><p>No. Lo que importa es que tengas algo para decir.</p></details>
-          <details><summary>Nunca di una charla, ¿me sirve?</summary><p>Sí. Somos 30 personas y pasar al frente es opcional.</p></details>
-          <details><summary>¿Cómo pago?</summary><p>Con Mercado Pago, en pesos ({precio}). Completás tus datos, pagás y volvés acá a ver tu entrada. Si después entrás a mi programa, la entrada se descuenta. Si preferís, también podés <LinkInstagram place="faq_pago">mandarme TALLER por Instagram</LinkInstagram>.</p></details>
-          <details><summary>¿Y si ese día no puedo ir?</summary><p><LinkInstagram place="faq_no_puedo">Escribime TALLER igual</LinkInstagram> y te cuento lo que sigue.</p></details>
+          <details><summary>Recién empiezo con mi marca, ¿me sirve?</summary><p>Sí, siempre que tengas experiencia en lo que hacés. Te llevás una estrategia clara para arrancar y saber dónde poner el foco. Lo importante es que no estés empezando en tu profesión.</p></details>
+          <details><summary>¿Tengo que tener muchos seguidores?</summary><p>No.</p></details>
+          <details><summary>¿Vamos a aprender a vender por redes?</summary><p>No. Vamos a aprender a generar oportunidades: entre ellas, ventas, pero también charlas, capacitaciones y más.</p></details>
+          <details><summary>¿Cómo pago?</summary><p>Con Mercado Pago, en pesos ({precio}).</p></details>
+          <details><summary>¿Y si ese día no puedo ir porque no estoy en Buenos Aires?</summary><p><LinkInstagram place="faq_no_puedo">Escribime TALLER</LinkInstagram> y te cuento cómo seguir.</p></details>
         </div>
       </div></section>
 
       <section className={`${s.banda} ${s.final}`} id="reservar"><div>
         <h2>Nos vemos el 18/11</h2>
         <p className={s.bajada}>{agotado ? "Se agotaron los lugares." : `${lugares.replace(/\.$/, "")}, miércoles de 18 a 21 h, en Palermo Soho.`}</p>
+        {!agotado && <p className={s.aviso}>Niceto Vega 4601, CABA. Pagás {precio} por Mercado Pago.</p>}
         {agotado ? (
           <div className={s.cerrado} role="status">
             <strong>Agotado</strong>
@@ -174,12 +193,13 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
   );
 }
 
-const PROGRAMA: [string, string, string, string][] = [
-  ["18:00", "Bienvenida", "Las reglas cambiaron", "Qué cambió en las redes sociales y en la estrategia de marca para 2027."],
-  ["18:20", "Comunicación estratégica", "Qué decís", "Trabajás tu mensaje: qué hacés, para quién y por qué te tienen que escuchar a vos."],
-  ["18:50", "Comunicación creativa", "Cómo lo mostrás", "Definís qué tipo de contenido te conviene hacer y cuál es el formato que te sale natural."],
-  ["19:20", "Pausa", "Break", "15 minutos para descansar y conocer a quienes están en la sala."],
-  ["19:35", "Comunicación de impacto", "Cómo lo decís", "Practicamos en vivo. Dos o tres personas pasan al frente y las corrijo ahí mismo, para que todos vean qué cambia."],
-  ["20:05", "Plan 2027", "Tu foco y tus preguntas", "Cerramos tu planificación para 2027 y me hacés tus preguntas en vivo."],
-  ["20:35", "Cierre", "Cómo seguir", "Te cuento cómo es mi programa de 4 meses, para quien quiera seguir trabajando conmigo. A las 21 h terminamos."],
+// [hora, bloque, título, qué pasa, qué se lleva]. "Te llevás" es borrador para que Manu lo revise.
+const PROGRAMA: [string, string, string, string, string | null][] = [
+  ["18:00", "Bienvenida", "Las reglas cambiaron", "Qué cambió en las redes sociales y en la estrategia de marca para 2027.", "Qué cambió y qué deja de funcionar en 2027, para no poner energía donde ya no rinde."],
+  ["18:20", "Comunicación estratégica", "Qué decís", "Trabajás tu mensaje: qué hacés, para quién y por qué te tienen que escuchar a vos.", "Tu mensaje claro, a quién le hablás y en qué etapa está hoy tu comunicación estratégica."],
+  ["18:50", "Comunicación creativa", "Cómo lo mostrás", "Definís qué tipo de contenido te conviene hacer y cuál es el formato que te sale natural.", "Los formatos de contenido que mejor te quedan: los que te salen fácil, disfrutás y funcionan."],
+  ["19:20", "Pausa", "Break", "15 minutos para descansar y conocer a quienes están en la sala.", null],
+  ["19:35", "Comunicación de impacto", "Cómo lo decís", "Practicamos en vivo. Dos o tres personas pasan al frente y las corrijo ahí mismo, para que todos vean qué cambia.", "Las correcciones en vivo y qué practicar para hablar frente a cámara y en un escenario igual que como sos en persona."],
+  ["20:05", "Plan 2027", "Tu foco y tus preguntas", "Armamos tu planificación para 2027 y me hacés tus preguntas en vivo.", "Tu planificación 2027 y tus dudas respondidas en persona."],
+  ["20:35", "Cierre", "La definición final de tu marca para 2027", "Juntamos todo: qué decís, cómo lo mostrás y cómo lo decís. A las 21 h terminamos.", "Tu marca definida para 2027 y el próximo paso concreto."],
 ];

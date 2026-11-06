@@ -32,6 +32,10 @@
 .hero > div { display: grid; gap: clamp(24px, 5vw, 44px); }
 .promesa { font-weight: 800; letter-spacing: -.04em; line-height: 1.1; font-size: clamp(1.4rem, 4.4vw, 2.3rem); color: var(--mostaza); max-width: 22em; text-wrap: balance; margin-top: clamp(14px, 3vw, 24px) !important; }
 .resumen { max-width: 38em; color: var(--gris-o); }
+/* Título, bajada y resumen centrados (feedback de Manu, 6/11). */
+.centro { text-align: center; justify-self: center; margin-inline: auto; }
+.centro .promesa { margin-inline: auto; }
+.lugares { color: var(--rojo); font-weight: 900; text-transform: uppercase; letter-spacing: -.03em; font-size: clamp(1.3rem, 4.4vw, 1.8rem); text-align: center; }
 
 /* La entrada */
 .entrada { display: grid; grid-template-columns: repeat(4, 1fr) auto; background: var(--crema); color: var(--oscuro); border-radius: 6px; }
@@ -67,7 +71,8 @@
 .texto { max-width: 40em; margin-top: 22px !important; color: var(--gris-c); }
 
 .preguntas { list-style: none; margin: clamp(24px, 4vw, 36px) 0 0; padding: 0; border-top: 2px solid var(--crema); }
-.preguntas li { font-weight: 900; letter-spacing: -.05em; line-height: 1.05; font-size: clamp(1.5rem, 5.4vw, 2.7rem); padding-block: 16px; border-bottom: 1px solid var(--linea-o); text-wrap: balance; }
+/* Las preguntas, en serif (más livianas que el título en Poppins negra). */
+.preguntas li { font-family: var(--serif); font-weight: 400; letter-spacing: 0; line-height: 1.2; font-size: clamp(1.5rem, 5vw, 2.3rem); padding-block: 16px; border-bottom: 1px solid var(--linea-o); text-wrap: balance; }
 .remate { margin-top: 22px !important; font-family: var(--serif); font-size: clamp(1.3rem, 3.4vw, 1.7rem); line-height: 1.3; color: var(--mostaza); }
 
 .reglas { list-style: none; margin: clamp(24px, 4vw, 36px) 0 0; padding: 0; display: grid; gap: 12px; }
@@ -77,6 +82,7 @@
 .lleva > div { min-width: 0; border-top: 2px solid var(--oscuro); padding-top: 14px; }
 .lleva h3, .dos h3 { margin: 0 0 6px; font-weight: 800; letter-spacing: -.03em; font-size: clamp(1.2rem, 2.8vw, 1.5rem); line-height: 1.15; }
 .lleva p { color: var(--gris-c); }
+.icono { display: block; font-size: 2rem; line-height: 1; margin-bottom: 10px; }
 
 .prog { display: grid; margin-top: clamp(28px, 5vw, 44px); border-top: 2px solid var(--crema); }
 .fila { display: grid; grid-template-columns: 5.2rem minmax(0, 1fr); gap: 8px 24px; padding-block: 22px; border-bottom: 1px solid var(--linea-o); }
@@ -84,6 +90,13 @@
 .fila h3 { margin: 0; font-weight: 800; font-size: clamp(1.3rem, 3.4vw, 1.75rem); letter-spacing: -.04em; line-height: 1.1; }
 .fila p { margin-top: 6px !important; color: var(--gris-o); max-width: 38em; }
 .nivel { font-family: var(--serif); font-size: 1.06rem; color: var(--mostaza); }
+.fila p.tellevas { margin-top: 10px !important; color: var(--crema); border-left: 3px solid var(--rojo); padding-left: 12px; }
+.tellevas b { color: var(--mostaza); font-weight: 800; }
+
+/* Fotos reales de Manu */
+.foto { margin: clamp(28px, 5vw, 44px) 0 0; border-radius: 6px; overflow: hidden; }
+.foto img { width: 100%; height: auto; display: block; }
+.fotoFalta { aspect-ratio: 3 / 2; display: grid; place-items: center; border: 2px dashed currentColor; opacity: .55; text-align: center; padding: 16px; font-weight: 700; }
 
 .dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 5vw, 56px); margin-top: clamp(24px, 4vw, 36px); }
 .lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
