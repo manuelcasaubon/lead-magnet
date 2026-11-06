@@ -7,7 +7,7 @@
 // Firma (doc oficial de Bunny Stream): cada POST trae X-BunnyStream-Signature-Version: v1,
 // X-BunnyStream-Signature-Algorithm: hmac-sha256 y X-BunnyStream-Signature = HMAC-SHA256 en hex del cuerpo
 // crudo, con la API key de SOLO LECTURA de la librería como clave. Se valida con el secreto de Supabase
-// BUNNY_STREAM_READONLY_KEY (esa misma key, copiada desde Bunny). Sin firma válida → 401.
+// BUNNY_STREAM_READONLY_KEY (esa misma key, copiada desde Bunny), si está cargado. Sin firma válida → 401.
 //
 // Idempotente: el EventId es el mismo en los reintentos. El estado nunca se toma del aviso: con el VideoGuid se
 // vuelve a leer el video en la Stream API y se hace upsert, así que un aviso repetido o fuera de orden deja
@@ -16,7 +16,11 @@ import { db, json, leerConfig, leerVideo, guardarVideos, resolverHostname, secre
 
 const BORRADO = 32;
 
+// Si no está BUNNY_STREAM_READONLY_KEY (decisión de Manu, 6/11: no hace falta), el aviso se acepta sin verificar
+// la firma: el estado nunca se toma del aviso, se vuelve a leer de la Stream API con BUNNY_STREAM_API_KEY, así que un
+// aviso falso solo provoca una lectura de más. Si algún día se carga la clave, la firma pasa a ser obligatoria.
 async function firmaValida(cuerpo: Uint8Array, h: Headers): Promise<boolean> {
+  if (!Deno.env.get("BUNNY_STREAM_READONLY_KEY")) return true;
   const firma = (h.get("x-bunnystream-signature") ?? "").trim().toLowerCase();
   if (h.get("x-bunnystream-signature-version") !== "v1" || h.get("x-bunnystream-signature-algorithm") !== "hmac-sha256") return false;
   if (firma.length !== 64) return false;

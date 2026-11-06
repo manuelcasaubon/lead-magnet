@@ -30,6 +30,7 @@ Cada sesión suma acá lo que necesita que decidas. Se revisa todo junto cuando 
 | D24 | **Mails: a dónde llegan las pruebas y tu aviso de venta.** Ahora se configura en la base (`settings.email_test_recipients`, `settings.manu_notify_email`), sin tocar Vercel. ¿Qué mail uso? | Vacíos: no sale ningún mail | Mails |
 | D25 | **Secretos que sobran.** `MP_ACCESS_TOKEN` en Vercel ya no se usa (lo usa la Edge Function); se puede borrar de Vercel. `MP_PUBLIC_KEY`, `MP_CLIENT_ID`, `MP_CLIENT_SECRET` y `NEXT_PUBLIC_CLARITY_PROJECT_ID` en Supabase tampoco se usan | — | — |
 | D26 | **Evento de Cal.com** creado el 6/11: 45 min, Google Meet, aviso mínimo de 12 h, 15 min de margen después, preguntas: WhatsApp, Instagram o web, a qué te dedicás y qué querés lograr en 6 meses (todas obligatorias). ¿Duración, aviso mínimo y preguntas están bien? | Como está | Inicio |
+| D27 | **Webhook de Bunny sin firma (6/11, Manu).** No se carga `BUNNY_STREAM_READONLY_KEY`: el aviso se acepta sin verificar la firma, porque el estado del video siempre se relee de la API de Bunny. Webhook configurado por Manu en la librería 801645 | Activo | — |
 | D14 | **Esfuerzo de las sesiones.** Las sesiones se crean con Opus 5.5. El nivel de esfuerzo "medio" no se puede fijar al crearlas: se ajusta en cada sesión con `/effort` | — | — |
 
 ## Decisiones de diseño (las suman las sesiones de bocetos)
