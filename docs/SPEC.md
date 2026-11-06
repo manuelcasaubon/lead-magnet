@@ -17,9 +17,9 @@ Escrito el 5/11/26. Si algo de acá choca con lo que diga Manu, vale lo que diga
 | # | Sesión | Modelo | Rama | Es dueña de | Estado |
 |---|---|---|---|---|---|
 | S0 | Base de datos y contratos (esta) | Opus 5.5 | `claude/charming-allen-ywp6of` | `supabase/`, `src/lib/supabase/`, `src/lib/env.ts`, `src/lib/evento.ts`, `src/lib/email/enviar.ts`, `src/lib/track/catalogo.ts`, `src/middleware.ts`, `docs/SPEC.md`, `docs/DECISIONES.md` | Hecha |
-| S1 | Bocetos de la página | Opus 5.5, esfuerzo medio | `claude/bocetos-pagina` | `bocetos/pagina*.html` (y después `src/app/(landing)/`, `src/components/landing/`) | Se lanza ahora |
-| S2 | Formulario | Opus 5.5, esfuerzo medio | `claude/formulario` | `bocetos/formulario*.html`, `src/components/form/`, `src/app/api/lead/`, `src/lib/track/cliente.ts`, `src/app/api/t/` | Se lanza ahora |
-| S3 | Pagos con Mercado Pago y comprobante | Opus 5.5, esfuerzo medio | `claude/pagos-mp` | `bocetos/conexion*.html`, `src/lib/mercadopago/`, `src/app/api/checkout/`, `src/app/api/mp/`, `src/app/entrada/`, `src/components/comprobante/`, `src/lib/pagos/` | Se lanza ahora |
+| S1 | Bocetos de la página | Opus 5.5, esfuerzo medio | `claude/bocetos-pagina` | `bocetos/pagina*.html` (y después `src/app/(landing)/`, `src/components/landing/`) | Bocetos listos, esperando elección |
+| S2 | Formulario | Opus 5.5, esfuerzo medio | `claude/formulario` | `bocetos/formulario*.html`, `src/components/form/`, `src/app/api/lead/`, `src/lib/track/cliente.ts`, `src/app/api/t/` | Unida a `main` el 6/11 (falta elegir boceto A/B) |
+| S3 | Pagos con Mercado Pago y comprobante | Opus 5.5, esfuerzo medio | `claude/pagos-mp` | `bocetos/conexion*.html`, `src/lib/mercadopago/`, `src/app/api/checkout/`, `src/app/api/mp/`, `src/app/entrada/`, `src/components/comprobante/`, `src/lib/pagos/` | Unida a `main` el 6/11 (falta elegir boceto A/B y probar con claves de prueba) |
 | S4 | Tracking completo y VSL | Opus 5.5 | `claude/tracking-vsl` | `src/components/track/`, `src/components/vsl/`, consultas de métricas | Después de S1–S3 |
 | S5 | Panel privado | Opus 5.5 | `claude/panel` | `src/app/panel/`, `src/app/api/panel/` | Después de S1–S3 |
 | S6 | Mails con Resend | Opus 5.5 | `claude/mails` | `src/lib/email/` (salvo `enviar.ts`), `src/app/api/resend/`, `src/app/api/cron/`, `src/app/baja/`, `src/app/api/baja/`, plantillas de campaña | Después de S1–S3 |

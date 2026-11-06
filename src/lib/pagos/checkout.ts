@@ -5,6 +5,7 @@ import { enviarPlantilla } from "@/lib/email/enviar";
 import { crearPreferencia } from "@/lib/mercadopago/cliente";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
+import { CONSENT_TEXT } from "@/components/form/reglas";
 import { esUuid, registrarEvento } from "./eventos";
 
 // Inicio del pago (docs/SPEC.md §2.5): upsert_lead → reserve_order → preferencia → set_order_preference → checkout_start.
@@ -45,7 +46,8 @@ export async function iniciarCheckout(entrada: Pick<EntradaCheckout, "email"> & 
   const { data: lead, error: e1 } = await db.rpc("upsert_lead", {
     p_email: entrada.email, p_name: entrada.name, p_phone: entrada.phone, p_instagram: entrada.instagram,
     p_brand_url: entrada.brand_url, p_goal: entrada.goal, p_source: "checkout", p_consent: entrada.consent ?? false,
-    p_consent_text: entrada.consent ? entrada.consent_text : undefined, p_visitor_id: vid ?? undefined,
+    // El texto aceptado lo fija el servidor: no se guarda lo que mande el navegador.
+    p_consent_text: entrada.consent ? CONSENT_TEXT : undefined, p_visitor_id: vid ?? undefined,
     p_utm: utm as Json, p_referrer: ctx.referrer ?? undefined, p_path: ctx.path ?? "/api/checkout", p_experiments: exps as Json,
   });
   if (e1 || !lead?.[0]) {

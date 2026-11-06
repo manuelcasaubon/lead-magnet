@@ -12,6 +12,14 @@ update settings set price_ars = 40000, capacity_max = 3, capacity_public = 2;
 select * from upsert_lead('Ana@Mail.com', 'Ana', null, '@ana', null, null, 'form', true, 'acepto', null, '{"utm_source":"ig"}');
 select * from upsert_lead('ana@mail.com', '', '1155', null, null, null, 'instagram_dm');
 select email, name, phone, instagram, marketing_consent, first_source from people;
+-- Con cookie de visitante (caso real de la web): une visitante y eventos previos a la persona
+insert into visitors (id) values ('11111111-1111-4111-8111-111111111111');
+insert into events (visitor_id, name) values ('11111111-1111-4111-8111-111111111111', 'page_view');
+select * from upsert_lead('Vis@x.com', 'Vis', p_visitor_id => '11111111-1111-4111-8111-111111111111');
+do $$ begin
+  if (select person_id from visitors where id = '11111111-1111-4111-8111-111111111111') is null then raise exception 'visitante sin persona'; end if;
+  if exists (select 1 from events where visitor_id = '11111111-1111-4111-8111-111111111111' and person_id is null) then raise exception 'eventos sin persona'; end if;
+end $$;
 select count(*) as toques from lead_touches;
 
 -- Reserva: reutiliza la orden pendiente de la misma persona

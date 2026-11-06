@@ -1,4 +1,4 @@
--- S3 (pagos). PROPUESTA, SIN APLICAR: la revisa y aplica S0.
+-- S3 (pagos). Revisada y aplicada en Supabase por S0 el 6/11/26.
 -- Problema: unique (template_id, to_email) hace que 'aviso_manu' (siempre al mismo mail, MANU_NOTIFY_EMAIL)
 -- salga una sola vez en toda la venta: desde la segunda compra enviarPlantilla devuelve 'duplicate'.
 -- Cambio: la unicidad pasa a (plantilla, mail, persona). procesarPago manda aviso_manu con person_id = quien compró,

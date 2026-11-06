@@ -1,4 +1,4 @@
--- S3 (pagos). CORRECCIÓN URGENTE, SIN APLICAR: la revisa y aplica S0.
+-- S3 (pagos). Revisada y aplicada en Supabase por S0 el 6/11/26.
 -- Bug: upsert_lead() devuelve una columna llamada person_id, y dentro hace
 --   update public.visitors set person_id = v_id where id = p_visitor_id and person_id is null
 -- PL/pgSQL no sabe si "person_id" es la columna o la variable de salida y falla con
