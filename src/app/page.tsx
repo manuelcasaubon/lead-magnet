@@ -4,6 +4,8 @@ import { RUTAS } from "@/lib/rutas";
 import Tracker from "@/components/track/Tracker";
 import Transformacion from "@/components/inicio/Transformacion";
 import Agenda from "@/components/inicio/Agenda";
+import VideoBunny from "@/components/video/VideoBunny";
+import { getVideo } from "@/lib/video/getVideo";
 import s from "@/components/inicio/inicio.module.css";
 
 // Inicio del sitio central: landing de la oferta principal (docs/SPEC.md §5.8). Versión B "Escenario primero" del
@@ -12,7 +14,7 @@ import s from "@/components/inicio/inicio.module.css";
 // los casos de alumnos no salen sin permiso escrito (D11) y el inicio no se indexa.
 // Hasta que termina la clase del 18/11, la franja y el CTA principal llevan a /evento; después, a la agenda.
 
-export const revalidate = 3600;
+export const revalidate = 300;
 export const metadata: Metadata = {
   title: { absolute: "Manu Casaubon · Comunica Tu Marca" },
   description: "Te ayudo a comunicar lo que sabés y a tener una marca personal que hable por vos, en las redes y arriba del escenario.",
@@ -23,7 +25,9 @@ const FIN_CLASE = Date.parse("2026-11-18T21:00:00-03:00");
 const IG = "https://ig.me/m/casaubon.ar";
 const YT = "https://www.youtube.com/@manuelcasaubon";
 
-export default function Inicio() {
+export default async function Inicio() {
+  // VSL de la página principal (Bunny, uso "vsl_principal"). Sin video listo, el reproductor muestra el póster de texto.
+  const vsl = await getVideo("vsl_principal");
   const antesDeLaClase = Date.now() < FIN_CLASE;
 
   return (
@@ -65,6 +69,10 @@ export default function Inicio() {
                 </>
               )}
             </div>
+            <VideoBunny
+              video={vsl} uso="vsl_principal" titulo="Video de presentación: cómo trabajo tu marca personal"
+              posterTexto={<p className={s.resp}>Cómo pasar de saber mucho a que tu sector piense en vos.</p>}
+            />
           </div>
         </section>
 
