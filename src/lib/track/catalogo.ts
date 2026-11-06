@@ -27,6 +27,11 @@ export const EVENTOS = {
   vsl_quartile: "Cuartil alcanzado (props.q: 25|50|75|100)",
   vsl_end: "Terminó el video",
   exp_exposure: "Vio una variante (props.exp, props.variant)",
+  agenda_view: "Agenda de Cal.com visible en la página",
+  agenda_step: "Respondió una pregunta del formulario previo a la agenda (props.step, props.field)",
+  booking_created: "Reservó una sesión en Cal.com (servidor, webhook)",
+  booking_rescheduled: "Reprogramó la sesión (servidor, webhook)",
+  booking_cancelled: "Canceló la sesión (servidor, webhook)",
 } as const;
 
 export type NombreEvento = keyof typeof EVENTOS;

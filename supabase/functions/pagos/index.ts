@@ -17,6 +17,12 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VENTANA_MIN = 60;
 const PENDIENTE = ["pending", "in_process", "authorized"];
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
+// Origen legible para el aviso de venta.
+const ORIGENES: Record<string, string> = {
+  mp_link: "Link de Mercado Pago", form: "Formulario de la web", checkout: "Pago desde la web",
+  instagram_dm: "Instagram (mensaje)", manual: "Carga manual", cal: "Agenda (Cal.com)", directo: "Directo",
+};
+const origenLegible = (s?: string | null) => (s ? ORIGENES[s] ?? s : "Directo");
 const ars = (n: number | string) => `ARS ${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(Number(n))}`;
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
@@ -78,7 +84,7 @@ async function avisarEntrada(orderId: string) {
         templateKey: "aviso_manu", to: s.manu_notify_email, personId: p.id,
         vars: {
           nombre: p.name ?? p.email, email: p.email, codigo: t.code + (t.overbooked ? " (pasado del tope)" : ""),
-          monto: ars(pago?.transaction_amount ?? o.amount_ars), origen: o.source ?? "directo",
+          monto: ars(pago?.transaction_amount ?? o.amount_ars), origen: origenLegible(o.source),
           vendidas: c?.sold ?? "?", cupo: c?.capacity_public ?? 30, tope: c?.capacity_max ?? 40,
         },
       })
