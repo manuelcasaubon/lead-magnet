@@ -8,10 +8,15 @@ import s from "./FormularioReserva.module.css";
 export type Variante = "un-paso" | "dos-pasos";
 
 type Props = {
-  variante: Variante;
+  /** Elegida por Manu el 6/11: "dos-pasos". "un-paso" queda para el A/B (S7). */
+  variante?: Variante;
   /** Link de "Mandame TALLER" (EVENTO.instagramDm). */
   instagramUrl: string;
-  /** Lo encadena S3 con el pago. Si no está, se muestra "¡Listo! Te escribimos con el link de pago". */
+  /**
+   * Opcional: reemplaza el paso al pago. Si no está, al terminar se llama a POST /api/checkout
+   * (contrato de S3, docs/SPEC.md §2) y se redirige a Mercado Pago. Si eso falla, el botón de pago
+   * queda en el mismo formulario.
+   */
   onLead?: (lead: { email: string }) => void | Promise<void>;
   /** Para distinguir dónde está el formulario en el tracking (p. ej. "hero", "final"). */
   lugar?: string;
@@ -19,14 +24,14 @@ type Props = {
 
 type Valores = Record<Exclude<Campo, "consentimiento">, string> & { consentimiento: boolean; website: string };
 type Errores = Partial<Record<Campo, CodigoError>>;
-type Estado = "editando" | "enviando" | "listo" | "error_servidor";
+type Estado = "editando" | "enviando" | "pagar" | "redirigiendo" | "error_servidor";
 
 const VACIO: Valores = { email: "", nombre: "", telefono: "", marca: "", objetivo: "", consentimiento: false, website: "" };
 
 // Campos de cada pantalla, en orden. Los obligatorios llevan true.
 const PANTALLAS: Record<Variante, [Campo, boolean][][]> = {
-  "un-paso": [[["nombre", true], ["email", true], ["telefono", false], ["marca", false]]],
-  "dos-pasos": [[["email", true]], [["nombre", true], ["marca", false], ["objetivo", false]]],
+  "un-paso": [[["nombre", true], ["email", true], ["telefono", true], ["marca", false]]],
+  "dos-pasos": [[["email", true]], [["nombre", true], ["telefono", true], ["marca", false], ["objetivo", false]]],
 };
 
 const SERVIDOR: Record<string, string> = {
@@ -35,7 +40,17 @@ const SERVIDOR: Record<string, string> = {
   red: "No hay conexión. Revisá internet y probá de nuevo.",
 };
 
-export default function FormularioReserva({ variante, instagramUrl, onLead, lugar = "pagina" }: Props) {
+// Respuestas de POST /api/checkout (S3). Texto amable y sin urgencia inventada.
+const PAGO: Record<string, string> = {
+  sold_out: "Se completaron los lugares. Escribime TALLER por Instagram y vemos qué se puede hacer.",
+  sales_closed: "La venta de entradas está cerrada.",
+  no_price: "Tus datos ya están guardados. El pago todavía no está abierto: probá de nuevo en un rato.",
+  already_has_ticket: "Ya tenés tu entrada con este mail. Te la reenvío.",
+  red: "No hay conexión. Revisá internet y probá de nuevo.",
+  error: "No pudimos abrir el pago. Probá de nuevo en un momento.",
+};
+
+export default function FormularioReserva({ variante = "dos-pasos", instagramUrl, onLead, lugar = "pagina" }: Props) {
   const uid = useId();
   const id = (c: string) => `${uid}-${c}`;
   const ref = useRef<HTMLFormElement>(null);
@@ -45,6 +60,7 @@ export default function FormularioReserva({ variante, instagramUrl, onLead, luga
   const [paso, setPaso] = useState(0);
   const [estado, setEstado] = useState<Estado>("editando");
   const [errorServidor, setErrorServidor] = useState("");
+  const [errorPago, setErrorPago] = useState("");
 
   const pantallas = PANTALLAS[variante];
   const ultimo = paso === pantallas.length - 1;
@@ -146,7 +162,7 @@ export default function FormularioReserva({ variante, instagramUrl, onLead, luga
         return;
       }
       if (onLead) await onLead({ email: v.email.trim().toLowerCase() });
-      setEstado("listo");
+      else await irAPagar();
     } catch (err) {
       const code = err instanceof TypeError ? "red" : (err as Error).message;
       track("form_error", { ...base, field: "servidor", code, step: paso + 1 });
@@ -155,11 +171,49 @@ export default function FormularioReserva({ variante, instagramUrl, onLead, luga
     }
   }
 
-  if (estado === "listo" && !onLead) {
+  // Crea la preferencia de Mercado Pago (POST /api/checkout, de S3) y redirige.
+  // Si algo falla, el formulario queda en "pagar": datos guardados y el botón de pago ahí mismo.
+  async function irAPagar() {
+    setErrorPago("");
+    setEstado("redirigiendo");
+    let code = "error";
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: v.email.trim().toLowerCase() }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { url?: string; code?: string };
+      if (res.ok && typeof json.url === "string" && /^https:\/\//.test(json.url)) {
+        window.location.assign(json.url);
+        return;
+      }
+      code = json.code && PAGO[json.code] ? json.code : res.status === 404 ? "sin_endpoint" : "error";
+    } catch {
+      code = "red";
+    }
+    track("checkout_error", { ...base, code });
+    setErrorPago(PAGO[code] ?? PAGO.error);
+    setEstado("pagar");
+  }
+
+  if (estado === "pagar" || estado === "redirigiendo") {
+    const yendo = estado === "redirigiendo";
     return (
-      <div className={s.listo} role="status">
-        <p className={s.listoTitulo}>¡Listo!</p>
-        <p>Te escribimos con el link de pago.</p>
+      <div className={s.listo} role="status" aria-busy={yendo}>
+        <p className={s.listoTitulo}>{yendo ? "Vamos al pago" : "Tus datos están guardados"}</p>
+        <p>{yendo ? "Te llevamos a Mercado Pago para pagar tu entrada." : "Falta el pago para reservar tu lugar."}</p>
+        {errorPago && <p className={s.errorServidor} role="alert">{errorPago}</p>}
+        <button type="button" className={s.boton} disabled={yendo} onClick={() => void irAPagar()}>
+          {yendo ? "Abriendo Mercado Pago…" : "Pagar con Mercado Pago"}
+        </button>
+        <p className={s.ig}>
+          ¿Preferís por Instagram?{" "}
+          <a href={instagramUrl} target="_blank" rel="noopener noreferrer"
+            onClick={() => track("instagram_click", { place: `pago_${lugar}`, variant: variante })}>
+            Mandame TALLER
+          </a>
+        </p>
       </div>
     );
   }

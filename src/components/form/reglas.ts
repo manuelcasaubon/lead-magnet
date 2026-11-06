@@ -18,7 +18,7 @@ export type CodigoError = "required" | "invalid" | "too_long";
 export const MENSAJES: Record<Campo, Partial<Record<CodigoError, string>>> = {
   email: { required: "Escribí tu mail.", invalid: "Revisá el mail: falta algo (por ejemplo, nombre@gmail.com).", too_long: "El mail es demasiado largo." },
   nombre: { required: "Escribí tu nombre.", too_long: "El nombre es demasiado largo." },
-  telefono: { invalid: "Usá solo números, espacios y el + del código de país.", too_long: "El número es demasiado largo." },
+  telefono: { required: "Escribí tu WhatsApp.", invalid: "Usá solo números, espacios y el + del código de país.", too_long: "El número es demasiado largo." },
   marca: { invalid: "Escribí tu usuario de Instagram (@tuusuario) o la dirección de tu web.", too_long: "Es demasiado largo." },
   objetivo: { too_long: "Es un poco largo: resumilo en hasta 500 caracteres." },
   consentimiento: {},

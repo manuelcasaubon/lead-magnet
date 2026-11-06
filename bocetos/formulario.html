@@ -97,14 +97,15 @@ textarea.input{resize:vertical;min-height:88px}
 <div class="control"><div>
   <span class="marca">Formulario · boceto</span>
   <div class="grupo" role="group" aria-label="Versión">
-    <button type="button" data-ver="A" aria-pressed="true">A · Un paso</button>
-    <button type="button" data-ver="B" aria-pressed="false">B · Dos pasos</button>
+    <button type="button" data-ver="B" aria-pressed="true">B · Dos pasos (elegida)</button>
+    <button type="button" data-ver="A" aria-pressed="false">A · Un paso</button>
   </div>
   <div class="grupo" role="group" aria-label="Vista">
     <button type="button" data-vista="cel" aria-pressed="true">Celular</button>
     <button type="button" data-vista="esc" aria-pressed="false">Escritorio</button>
   </div>
-  <label class="sim"><input type="checkbox" id="simError"> Simular error del servidor</label>
+  <label class="sim"><input type="checkbox" id="simError"> Simular error al guardar</label>
+  <label class="sim"><input type="checkbox" id="simPago"> Simular que el pago no abre</label>
 </div></div>
 
 <main><div class="escenario">
@@ -119,14 +120,22 @@ textarea.input{resize:vertical;min-height:88px}
 
   <div class="nota">
     <div>
-      <h1 id="titulo">Versión A: un paso</h1>
-      <p class="sub" id="bajada">Todo en una pantalla y un solo botón.</p>
+      <h1 id="titulo">Versión B: dos pasos</h1>
+      <p class="sub" id="bajada">Primero el mail, después el resto.</p>
     </div>
     <div class="cambia">
+      <h3>Decidido por Manu (6/11)</h3>
+      <ul>
+        <li>Va la <b>B</b>. La A queda solo como alternativa para el A/B.</li>
+        <li>WhatsApp <b>obligatorio</b>, con la ayuda "Por si hay un cambio de último momento".</li>
+        <li>El mail del paso 1 se guarda enseguida, por si la persona no termina.</li>
+        <li>Al terminar se va directo a Mercado Pago. Si el pago no abre, el botón queda ahí mismo, sin "te escribimos".</li>
+        <li>Instagram y web en el mismo campo.</li>
+      </ul>
       <h3>Qué cambia entre A y B</h3>
       <ul>
         <li><b>A</b> pide nombre, mail, WhatsApp e Instagram o web juntos. Menos clics, pero la primera impresión es más larga.</li>
-        <li><b>B</b> pide solo el mail para empezar. El mail ya queda guardado aunque no termine, así se puede escribirle después. El nombre y el resto van en el paso 2. No pide WhatsApp y suma "¿Qué te gustaría resolver?".</li>
+        <li><b>B</b> pide solo el mail para empezar. El mail ya queda guardado aunque no termine, así se puede escribirle después. El nombre, el WhatsApp y el resto van en el paso 2, que suma "¿Qué te gustaría resolver?".</li>
         <li>El botón final: <b>A</b> "Reservar mi lugar"; <b>B</b> "Ir a pagar".</li>
       </ul>
     </div>
@@ -157,14 +166,14 @@ textarea.input{resize:vertical;min-height:88px}
   const MSJ = {
     email: { required: "Escribí tu mail.", invalid: "Revisá el mail: falta algo (por ejemplo, nombre@gmail.com)." },
     nombre: { required: "Escribí tu nombre." },
-    telefono: { invalid: "Usá solo números, espacios y el + del código de país." },
+    telefono: { required: "Escribí tu WhatsApp.", invalid: "Usá solo números, espacios y el + del código de país." },
     marca: { invalid: "Escribí tu usuario de Instagram (@tuusuario) o la dirección de tu web." },
   };
   const VERS = {
     A: { variante: "un-paso", titulo: "Versión A: un paso", bajada: "Todo en una pantalla y un solo botón.",
-      pantallas: [[["nombre", 1], ["email", 1], ["telefono", 0], ["marca", 0]]], final: "Reservar mi lugar" },
+      pantallas: [[["nombre", 1], ["email", 1], ["telefono", 1], ["marca", 0]]], final: "Reservar mi lugar" },
     B: { variante: "dos-pasos", titulo: "Versión B: dos pasos", bajada: "Primero el mail, después el resto.",
-      pantallas: [[["email", 1]], [["nombre", 1], ["marca", 0], ["objetivo", 0]]], final: "Ir a pagar" },
+      pantallas: [[["email", 1]], [["nombre", 1], ["telefono", 1], ["marca", 0], ["objetivo", 0]]], final: "Ir a pagar" },
   };
   const MEDIMOS = {
     A: `<h3>Qué medimos en A</h3><ul>
@@ -173,16 +182,18 @@ textarea.input{resize:vertical;min-height:88px}
       <li><code>form_field_focus</code> y <code>form_field_blur</code> por campo, con "completo" y "válido". Nunca lo que escribió.</li>
       <li><code>form_error</code> con el campo y el tipo de error.</li>
       <li><code>form_submit</code> y, en el servidor, <code>lead_created</code>.</li>
+      <li><code>checkout_error</code> si el pago no abre, con el motivo.</li>
       <li><code>instagram_click</code> en "Mandame TALLER".</li>
       <li>Con esto sale el campo donde más se abandona: el último que tocó quien empezó y no envió.</li></ul>`,
     B: `<h3>Qué medimos en B</h3><ul>
       <li>Lo mismo que en A, con el número de paso en cada evento.</li>
       <li><code>lead_created</code> dos veces: con <code>step=mail</code> al terminar el paso 1 y con <code>step=final</code> al terminar.</li>
       <li>La comparación clave: cuántos pasan del paso 1 al 2 y cuántos terminan, contra la tasa de A.</li>
+      <li><code>checkout_error</code> si el pago no abre, con el motivo.</li>
       <li><code>instagram_click</code> en "Mandame TALLER".</li></ul>`,
   };
 
-  let ver = "A", paso = 0, vals = {}, errs = {}, empezo = false, estado = "editando", errServ = "";
+  let ver = "B", paso = 0, vals = {}, errs = {}, empezo = false, estado = "editando", errServ = "", errPago = "";
   const $ = (s) => document.querySelector(s);
   const raiz = $("#raiz"), log = $("#log");
   const guardar = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -207,10 +218,15 @@ textarea.input{resize:vertical;min-height:88px}
   function render() {
     const V = VERS[ver], P = V.pantallas, ultimo = paso === P.length - 1;
     $("#titulo").textContent = V.titulo; $("#bajada").textContent = V.bajada; $("#medimos").innerHTML = MEDIMOS[ver];
-    if (estado === "listo") {
-      raiz.innerHTML = `<div class="listo" role="status"><p class="t">¡Listo!</p><p>Te escribimos con el link de pago.</p>
-        <p class="vacio" style="color:var(--gris-c)">En la versión final, acá se pasa directo a Mercado Pago.</p>
+    if (estado === "pagar" || estado === "yendo") {
+      const yendo = estado === "yendo";
+      raiz.innerHTML = `<div class="listo" role="status" aria-busy="${yendo}"><p class="t">${yendo ? "Vamos al pago" : "Tus datos están guardados"}</p>
+        <p>${yendo ? "Te llevamos a Mercado Pago para pagar tu entrada." : "Falta el pago para reservar tu lugar."}</p>
+        <p class="alerta" role="alert">${errPago}</p>
+        <button type="button" class="boton" id="pagar" ${yendo ? "disabled" : ""}>${yendo ? '<span class="giro" aria-hidden="true"></span>Abriendo Mercado Pago…' : "Pagar con Mercado Pago"}</button>
+        <p class="vacio" style="color:var(--gris-c)">${yendo ? "En la versión real, acá se abre Mercado Pago. En el boceto se queda así." : "Esta pantalla aparece solo si el pago no abre (probalo con \"Simular que el pago no abre\")."}</p>
         <button type="button" class="otra" id="otra">Probar de nuevo</button></div>`;
+      $("#pagar").onclick = irAPagar;
       $("#otra").onclick = () => { reset(); render(); };
       return;
     }
@@ -292,15 +308,27 @@ textarea.input{resize:vertical;min-height:88px}
         track("form_error", { ...base(), field: "servidor", code: "server_error" }); render(); return;
       }
       track("lead_created", { ...base(), servidor: "sí", step: ultimo ? "final" : "mail" });
-      if (ultimo) { estado = "listo"; render(); return; }
+      if (ultimo) { irAPagar(); return; }
       paso++; estado = "editando"; render(); $(`#f-${V.pantallas[paso][0][0]}`).focus();
     }, 900);
   }
 
-  function reset() { paso = 0; vals = {}; errs = {}; empezo = false; estado = "editando"; errServ = ""; }
+  function irAPagar() {
+    errPago = ""; estado = "yendo"; render();
+    setTimeout(() => {
+      if ($("#simPago").checked) {
+        errPago = "No pudimos abrir el pago. Probá de nuevo en un momento.";
+        track("checkout_error", { variant: VERS[ver].variante, code: "error" });
+        estado = "pagar"; render(); return;
+      }
+      track("checkout_start", { servidor: "sí" });
+    }, 900);
+  }
+
+  function reset() { paso = 0; vals = {}; errs = {}; empezo = false; estado = "editando"; errServ = ""; errPago = ""; }
 
   function setVer(v) {
-    ver = v; reset(); guardar("form-boceto-ver", v);
+    ver = v; reset(); guardar("form-boceto-ver2", v);
     document.querySelectorAll("[data-ver]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.ver === v)));
     render(); track("form_view", { variant: VERS[v].variante });
   }
@@ -313,6 +341,6 @@ textarea.input{resize:vertical;min-height:88px}
   // El marco de 390 px no entra en pantallas angostas: ahí se muestra directo.
   const vistaGuardada = leer("form-boceto-vista");
   setVista(vistaGuardada || (window.innerWidth < 440 ? "esc" : "cel"));
-  setVer(leer("form-boceto-ver") === "B" ? "B" : "A");
+  setVer(leer("form-boceto-ver2") === "A" ? "A" : "B");
 })();
 </script>

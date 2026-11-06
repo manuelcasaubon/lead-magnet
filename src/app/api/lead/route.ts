@@ -28,7 +28,9 @@ const Lead = z.object({
   // Trampa para bots: campo oculto que una persona nunca completa.
   website: z.string().optional(),
 }).superRefine((d, ctx) => {
+  // Paso final: nombre y WhatsApp obligatorios (decisión de Manu, 6/11).
   if (d.paso === "final" && !d.nombre) ctx.addIssue({ code: "custom", path: ["nombre"], message: "required" });
+  if (d.paso === "final" && !d.telefono) ctx.addIssue({ code: "custom", path: ["telefono"], message: "required" });
 });
 
 // Límite simple: 5 envíos por minuto por vid (en memoria de la instancia; alcanza contra el abuso casual).
