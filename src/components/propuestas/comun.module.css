@@ -1,0 +1,94 @@
+/* Base compartida de las propuestas (/prueba/propuestas). Mismos tokens y escala que landing.module.css. */
+
+.raiz { background: var(--oscuro); color: var(--crema); }
+.raiz p { margin: 0; }
+.raiz h1, .raiz h2 {
+  font-weight: 900; text-transform: uppercase; letter-spacing: -.05em; word-spacing: .12em; line-height: .88;
+  margin: 0; text-wrap: balance;
+}
+.raiz h1 { font-size: clamp(1.8rem, 7.8vw, 4.4rem); line-height: .92; }
+.raiz h2 { font-size: clamp(2.1rem, 8vw, 4.4rem); }
+.raiz h3 { margin: 0; }
+/* Celular: tipografía un 15% más chica, como la landing real. */
+@media (max-width: 600px) {
+  :global(html):has(.raiz) { font-size: 85%; }
+  .raiz { font-size: 14.5px; }
+}
+
+/* Cada propuesta es una banda independiente. */
+.banda {
+  position: relative; isolation: isolate; overflow: clip;
+  padding-inline: 16px; padding-block: clamp(48px, 9vw, 96px);
+}
+.banda > .ancho { max-width: 980px; margin-inline: auto; position: relative; }
+.oscuro { background: var(--oscuro); color: var(--crema); }
+.crema { background: var(--crema); color: var(--oscuro); }
+/* Luces cálidas suaves de fondo. */
+.lucesO { background:
+  radial-gradient(60% 40% at 10% 6%, rgba(221, 165, 30, .13), transparent 70%),
+  radial-gradient(50% 38% at 95% 40%, rgba(208, 68, 63, .14), transparent 70%), var(--oscuro); color: var(--crema); }
+.lucesC { background:
+  radial-gradient(45% 55% at 0% 0%, rgba(221, 165, 30, .16), transparent 70%),
+  radial-gradient(40% 50% at 100% 100%, rgba(208, 68, 63, .10), transparent 70%), var(--crema); color: var(--oscuro); }
+
+.rojo { color: var(--rojo); }
+.mostaza { color: var(--mostaza); }
+
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--rojo); color: var(--crema); font: inherit; font-weight: 800; font-size: 1.1rem;
+  letter-spacing: -.02em; text-decoration: none; padding: 14px 24px; min-height: 52px; border: 0; border-radius: 6px;
+  text-align: center; line-height: 1.2; cursor: pointer; box-shadow: 0 10px 24px -10px rgba(208, 68, 63, .7);
+}
+.boton:hover { background: var(--rojo-hover); }
+
+/* Paso a mano con número en círculo rojo. */
+.paso { font-family: var(--mano); font-weight: 700; font-size: clamp(1.9rem, 5.5vw, 2.4rem); line-height: 1;
+  display: flex; align-items: center; justify-content: center; gap: 12px; }
+.paso span { font-family: var(--sans); font-weight: 700; font-size: 1rem; width: 2.1rem; height: 2.1rem; border: 2px solid var(--rojo); color: var(--rojo);
+  border-radius: 50%; display: inline-grid; place-items: center; flex: none; transform: rotate(-6deg); }
+
+/* Maqueta del VSL */
+.vsl {
+  position: relative; aspect-ratio: 16 / 9; background:
+    radial-gradient(70% 60% at 80% 10%, rgba(208, 68, 63, .22), transparent 70%), #1f1b1b;
+  border-radius: 10px; overflow: hidden; display: grid; align-content: end; padding: clamp(16px, 4vw, 32px); color: var(--crema);
+}
+.escena { font-weight: 900; letter-spacing: -.04em; line-height: 1.05; font-size: clamp(1.05rem, 3.8vw, 2.1rem); max-width: 20em; text-wrap: balance; }
+.escena em { font-style: normal; color: var(--mostaza); }
+.play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -70%); width: 64px; height: 64px; border-radius: 50%;
+  background: var(--rojo); color: var(--crema); display: grid; place-items: center; padding-left: 4px; box-shadow: 0 0 0 10px rgba(208, 68, 63, .22); }
+@media (max-width: 460px) { .vsl { aspect-ratio: 4 / 5; } .play { transform: translate(-50%, -110%); } }
+
+/* Logos */
+.logosClaros img, .logosOscuros img { flex: none; max-height: 24px; max-width: 104px; width: auto; height: auto; object-fit: contain; }
+.logosClaros img { filter: grayscale(1) brightness(0) invert(1); opacity: .55; }
+.logosOscuros img { filter: grayscale(1) brightness(0); opacity: .55; }
+.logosClaros img.sinInvertir, .logosOscuros img.sinInvertir { filter: grayscale(1); opacity: .6; max-height: 32px; }
+
+/* Formulario (maqueta) */
+.form { display: grid; gap: 14px; width: 100%; max-width: 30rem; border-radius: 12px; padding: clamp(18px, 4vw, 26px); text-align: left; }
+.form_crema { background: var(--crema); color: var(--oscuro); box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .6); }
+.form_blanco { background: #fff; color: var(--oscuro); box-shadow: 0 24px 60px -28px rgba(45, 40, 40, .45); }
+.form_oscuro { background: var(--oscuro-2); color: var(--crema); border: 1px solid var(--linea-o); }
+.campo { display: grid; gap: 4px; }
+.campo label { font-weight: 700; font-size: .98rem; letter-spacing: -.01em; }
+.campo label span { color: var(--rojo); }
+.ayuda { font-size: .84rem; opacity: .75; }
+.campo input { font: inherit; min-height: 48px; border-radius: 6px; padding: 10px 12px; border: 1.5px solid var(--linea-c); background: #fff; color: var(--oscuro); }
+.form_oscuro .campo input { background: var(--oscuro); border-color: var(--linea-o); color: var(--crema); }
+.campo input::placeholder { color: #9b9389; }
+.consent { display: flex; gap: 10px; align-items: center; font-size: .92rem; }
+.consent input { width: 20px; height: 20px; accent-color: var(--rojo); margin: 0; }
+.form .boton { width: 100%; margin-top: 4px; }
+.ig { font-size: .92rem; text-align: center; opacity: .9; }
+.ig a { color: var(--rojo); font-weight: 700; }
+.form_oscuro .ig a { color: var(--mostaza); }
+
+/* Marcas a mano */
+.subrayado { position: relative; display: inline-block; white-space: nowrap; }
+.subrayado svg { position: absolute; left: -2%; width: 104%; bottom: -.16em; height: .26em; overflow: visible; }
+.circulado { position: relative; display: inline-block; padding-inline: .22em; margin-inline: .12em; }
+.circulado svg { position: absolute; left: -6%; top: -26%; width: 112%; height: 152%; overflow: visible; pointer-events: none; }
+/* Los formularios claros con controles claros (el sitio usa color-scheme: dark). */
+.form_crema, .form_blanco { color-scheme: light; }

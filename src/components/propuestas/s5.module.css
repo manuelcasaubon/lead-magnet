@@ -1,0 +1,73 @@
+/* Sección 5 · Qué pasa en las 3 horas */
+.nivel { display: block; font-weight: 600; font-size: .76rem; letter-spacing: .07em; text-transform: uppercase; }
+.a summary, .b summary, .c summary { list-style: none; cursor: pointer; }
+.a summary::-webkit-details-marker, .b summary::-webkit-details-marker, .c summary::-webkit-details-marker { display: none; }
+.a h3, .b h3, .c h3 { font-weight: 800; letter-spacing: -.04em; line-height: 1.1; font-size: clamp(1.25rem, 3.4vw, 1.7rem); }
+
+/* A · línea de tiempo */
+.aLinea { position: relative; margin-top: clamp(28px, 5vw, 44px); padding-left: 30px; }
+.aLinea::before { content: ""; position: absolute; left: 7px; top: 14px; bottom: 14px; width: 2px; background: linear-gradient(var(--rojo), rgba(208, 68, 63, .25)); }
+.aItem { position: relative; padding-block: 14px; }
+.aItem summary { display: grid; grid-template-columns: 4.6rem minmax(0, 1fr) auto; gap: 4px 16px; align-items: start; }
+.aPunto { position: absolute; left: -30px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: var(--oscuro); border: 3px solid var(--rojo); }
+.aItem[open] .aPunto { background: var(--rojo); box-shadow: 0 0 0 6px rgba(208, 68, 63, .25); }
+.aHora { font-family: var(--mano); font-weight: 700; font-size: 1.9rem; line-height: 1; color: var(--mostaza); padding-top: 2px; }
+.aTit .nivel { color: var(--gris-o); }
+.aMas { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--linea-o); display: grid; place-items: center; color: var(--mostaza); transition: transform .2s; }
+.aItem[open] .aMas { transform: rotate(45deg); border-color: var(--mostaza); }
+.aCuerpo { padding: 12px 0 6px calc(4.6rem + 16px); display: grid; gap: 12px; }
+.aCuerpo p { color: var(--gris-o); max-width: 38em; }
+.aCuerpo p.aLleva { background: var(--crema); color: var(--oscuro); border-radius: 10px; padding: 12px 14px; border-left: 5px solid var(--rojo); }
+.aLleva b { color: var(--rojo); }
+.aPausa h3 { color: var(--gris-o); }
+@media (max-width: 500px) {
+  .aItem summary { grid-template-columns: minmax(0, 1fr) auto; }
+  .aHora { grid-column: 1; }
+  .aTit { grid-column: 1; }
+  .aMas { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .aCuerpo { padding-left: 0; }
+}
+
+/* B · tarjetas */
+.bLista { display: grid; gap: 12px; margin-top: clamp(28px, 5vw, 44px); }
+.bCard { background: #fff; border-radius: 14px; box-shadow: 0 14px 34px -24px rgba(45, 40, 40, .55); border: 1px solid rgba(45, 40, 40, .06); }
+.bCard summary { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 16px; }
+.bHora { background: var(--oscuro); color: var(--crema); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; border-radius: 999px; padding: 6px 12px; font-size: .98rem; }
+.bTit .nivel { color: var(--rojo); }
+.bFlecha { width: 34px; height: 34px; border-radius: 50%; background: var(--crema); display: grid; place-items: center; color: var(--oscuro); transition: transform .2s; }
+.bCard[open] .bFlecha { transform: rotate(180deg); background: var(--rojo); color: var(--crema); }
+.bCuerpo { padding: 0 16px 16px; display: grid; gap: 12px; }
+.bCuerpo p { color: var(--gris-c); }
+.bCuerpo p.bLleva { display: flex; gap: 10px; align-items: flex-start; background: rgba(221, 165, 30, .16); color: var(--oscuro); border-radius: 10px; padding: 12px 14px; }
+.bLleva > span:first-child { color: #9a6f06; line-height: 0; padding-top: 3px; }
+.bPausa { background: transparent; box-shadow: none; border: 1.5px dashed rgba(45, 40, 40, .3); }
+.bPausa .bHora { background: transparent; color: var(--oscuro); border: 1.5px solid var(--oscuro); }
+@media (max-width: 460px) {
+  .bCard summary { grid-template-columns: minmax(0, 1fr) auto; }
+  .bHora { justify-self: start; grid-column: 1; }
+  .bTit { grid-column: 1; }
+  .bFlecha { grid-column: 2; grid-row: 1 / span 2; }
+}
+
+/* C · barra */
+.cBarra { display: flex; gap: 3px; height: 34px; margin-top: clamp(28px, 5vw, 44px); border-radius: 8px; overflow: hidden; }
+.cBarra span { flex-basis: 0; background: var(--rojo); display: grid; place-items: center; color: var(--crema); font-weight: 800; font-size: .85rem; }
+.cBarra span:nth-child(2n) { background: var(--mostaza); color: var(--oscuro); }
+.cBarra span.cBarraPausa { background: var(--oscuro-2); color: var(--gris-o); }
+.cExtremos { position: relative; height: 1.4em; margin-top: 6px; font-size: .8rem; font-weight: 600; color: var(--gris-o); font-variant-numeric: tabular-nums; }
+.cExtremos span { position: absolute; top: 0; padding-left: 4px; border-left: 1.5px solid var(--linea-o); line-height: 1.4; }
+.cLista { margin-top: 20px; border-top: 2px solid var(--crema); }
+.cFila { border-bottom: 1px solid var(--linea-o); }
+.cFila summary { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding-block: 18px; }
+.cNum { width: 44px; height: 44px; border-radius: 10px; background: var(--rojo); color: var(--crema); font-weight: 900; font-size: 1.3rem; display: grid; place-items: center; }
+.cFila:nth-child(2n) .cNum { background: var(--mostaza); color: var(--oscuro); }
+.cPausa .cNum { background: var(--oscuro-2); color: var(--gris-o); }
+.cMeta { display: block; font-size: .8rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--gris-o); }
+.cMeta b { color: var(--mostaza); font-weight: 800; }
+.cMas { color: var(--crema); transition: transform .2s; }
+.cFila[open] .cMas { transform: rotate(45deg); color: var(--rojo); }
+.cCuerpo { padding: 0 0 20px calc(44px + 14px); display: grid; gap: 12px; }
+.cCuerpo p { color: var(--gris-o); max-width: 38em; }
+.cCuerpo p.cLleva { color: var(--crema); border: 1.5px solid var(--mostaza); border-radius: 10px; padding: 12px 14px; }
+.cLleva b { color: var(--mostaza); }
+@media (max-width: 460px) { .cCuerpo { padding-left: 0; } }
