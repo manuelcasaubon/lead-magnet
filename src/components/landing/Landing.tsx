@@ -5,6 +5,7 @@ import LinkInstagram from "./LinkInstagram";
 import Reserva from "./Reserva";
 import Vsl from "./Vsl";
 import { LogosFondo, MarcasTexto, Paso } from "./Detalles";
+import { IconoCalendario, IconoCharla, IconoLupa, IconoObjetivo } from "./Iconos";
 import { FOTOS, MOSTRAR_CASOS, MOSTRAR_REGLAS_2027, REGLAS_2027, formatoArs, type Foto } from "./contenido";
 import s from "./landing.module.css";
 
@@ -44,10 +45,8 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
   return (
     <main className={s.raiz}>
       <section className={`${s.banda} ${s.hero}`} id="inicio-evento"><div>
-        <p className={s.marca}><b>Manuel Casaubon</b><span>Clase en vivo presencial en Buenos Aires</span></p>
         <div className={s.centro}>
           <h1>Cómo destacar con tu marca personal en 2027</h1>
-          <p className={s.promesa}>De que nadie te conozca a que te llamen <span className={s.acento}>a vos</span>.</p>
         </div>
         <p className={`${s.resumen} ${s.centro}`}>3 horas para entender cómo <strong className={s.resalta}>cambiaron las reglas</strong> de las redes y de la estrategia de marca, y salir con tu plan de acción para 2027: tu plan de marca y tu plan de contenido.</p>
         <div className={s.conPaso}>
@@ -110,10 +109,10 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
       <section className={`${s.banda} ${s.crema}`}><div>
         <h2>Qué te llevás</h2>
         <div className={s.lleva}>
-          <div><span className={s.icono} aria-hidden="true">🗓️</span><h3>Tu planificación para 2027</h3><p>Una planificación completa para saber exactamente dónde poner el foco en tus redes y en tu marca personal.</p></div>
-          <div><span className={s.icono} aria-hidden="true">🔍</span><h3>Una auditoría personalizada</h3><p>La auditoría de tu marca, mirada en los 3 niveles de comunicación.</p></div>
-          <div><span className={s.icono} aria-hidden="true">🎯</span><h3>Cómo diferenciarte</h3><p>Entendés cómo cambiaron las reglas del juego y cómo diferenciar tu marca en 2027.</p></div>
-          <div><span className={s.icono} aria-hidden="true">🙋</span><h3>Tus preguntas, en persona</h3><p>Me preguntás lo que necesites en vivo, cara a cara.</p></div>
+          <div><span className={s.icono} aria-hidden="true"><IconoCalendario /></span><h3>Tu planificación para 2027</h3><p>Una planificación completa para saber exactamente dónde poner el foco en tus redes y en tu marca personal.</p></div>
+          <div><span className={s.icono} aria-hidden="true"><IconoLupa /></span><h3>Una auditoría personalizada</h3><p>La auditoría de tu marca, mirada en los 3 niveles de comunicación.</p></div>
+          <div><span className={s.icono} aria-hidden="true"><IconoObjetivo /></span><h3>Cómo diferenciarte</h3><p>Entendés cómo cambiaron las reglas del juego y cómo diferenciar tu marca en 2027.</p></div>
+          <div><span className={s.icono} aria-hidden="true"><IconoCharla /></span><h3>Tus preguntas, en persona</h3><p>Me preguntás lo que necesites en vivo, cara a cara.</p></div>
         </div>
       </div></section>
 
