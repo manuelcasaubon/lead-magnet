@@ -1,0 +1,16 @@
+/* S7 · ¿Por qué yo? (variante A: retrato a sangre). */
+.seccion { background: var(--oscuro); color: var(--crema); }
+.seccion.conFoto { padding-top: 0; }
+.foto { margin: 0 calc(50% - 50vw); position: relative; height: clamp(420px, 120vw, 640px); }
+.foto img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; }
+.foto::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(45, 40, 40, 0) 45%, rgba(45, 40, 40, .7) 78%, var(--oscuro) 100%); }
+.conFoto .texto { margin-top: clamp(-120px, -18vw, -80px); }
+.seccion .texto h2 { font-size: clamp(2.6rem, 11vw, 5rem); text-shadow: 0 2px 24px rgba(0, 0, 0, .45); position: relative; }
+.bio { display: grid; gap: 16px; margin-top: 22px; max-width: 40em; color: var(--gris-o); font-size: 1.05em; position: relative; }
+.bio b { color: var(--mostaza); font-weight: 800; }
+@media (min-width: 821px) {
+  .seccion.conFoto { padding: 0; display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+  .conFoto .foto { margin: 0; height: 640px; grid-column: 2; grid-row: 1; }
+  .conFoto .foto::after { background: linear-gradient(90deg, var(--oscuro) 0%, rgba(45, 40, 40, 0) 40%); }
+  .conFoto > .texto { grid-column: 1; grid-row: 1; margin: 0; max-width: none; padding: 64px 24px 64px max(16px, calc(50vw - 490px)); }
+}

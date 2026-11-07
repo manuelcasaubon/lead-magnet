@@ -4,10 +4,9 @@ import s from "./landing.module.css";
 
 // Toques tomados de comunicatumarca.com/v2: pasos con número en círculo y los logos de las marcas detrás del VSL.
 
-export function Paso({ n, children }: { n: number; children: ReactNode }) {
-  return <p className={s.paso}><span aria-hidden="true">{n}</span>{children}</p>;
+export function Paso({ n, children, className }: { n: number; children: ReactNode; className?: string }) {
+  return <p className={className ? `${s.paso} ${className}` : s.paso}><span aria-hidden="true">{n}</span>{children}</p>;
 }
-
 
 // Logos de las marcas alrededor del VSL, en movimiento (pedido de Manu, 7/11): una fila arriba y otra abajo que se
 // deslizan en sentidos opuestos y, en pantallas anchas, una columna a cada lado que sube y baja. Nunca quedan debajo del video.

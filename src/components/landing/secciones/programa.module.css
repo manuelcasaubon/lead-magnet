@@ -1,0 +1,25 @@
+/* S5 · Qué pasa en las 3 horas (variante A: línea de tiempo desplegable). */
+.linea { position: relative; margin-top: clamp(28px, 5vw, 44px); padding-left: 30px; }
+.linea::before { content: ""; position: absolute; left: 7px; top: 14px; bottom: 14px; width: 2px; background: linear-gradient(var(--rojo), rgba(208, 68, 63, .25)); }
+.item { position: relative; padding-block: 14px; }
+.item summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 4.6rem minmax(0, 1fr) auto; gap: 4px 16px; align-items: start; }
+.item summary::-webkit-details-marker { display: none; }
+.item h3 { font-weight: 800; letter-spacing: -.04em; line-height: 1.1; font-size: clamp(1.25rem, 3.4vw, 1.7rem); }
+.nivel { display: block; font-weight: 600; font-size: .76rem; letter-spacing: .07em; text-transform: uppercase; color: var(--gris-o); }
+.punto { position: absolute; left: -30px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: var(--oscuro); border: 3px solid var(--rojo); }
+.item[open] .punto { background: var(--rojo); box-shadow: 0 0 0 6px rgba(208, 68, 63, .25); }
+.hora { font-family: var(--mano); font-weight: 700; font-size: 1.9rem; line-height: 1; color: var(--mostaza); padding-top: 2px; }
+.mas { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--linea-o); display: grid; place-items: center; color: var(--mostaza); transition: transform .2s; }
+.item[open] .mas { transform: rotate(45deg); border-color: var(--mostaza); }
+.cuerpo { padding: 12px 0 6px calc(4.6rem + 16px); display: grid; gap: 12px; }
+.cuerpo p { color: var(--gris-o); max-width: 38em; }
+.cuerpo p.lleva { background: var(--crema); color: var(--oscuro); border-radius: 10px; padding: 12px 14px; border-left: 5px solid var(--rojo); }
+.lleva b { color: var(--rojo); }
+.pausa h3 { color: var(--gris-o); }
+@media (max-width: 500px) {
+  .item summary { grid-template-columns: minmax(0, 1fr) auto; }
+  .hora, .tit { grid-column: 1; }
+  .mas { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .cuerpo { padding-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .mas { transition: none; } }
