@@ -2,6 +2,7 @@
 // firma TUS para que el navegador suba el archivo directo a Bunny (la API key nunca sale de Supabase).
 //
 // POST { titulo: string, uso?: string }  con  Authorization: Bearer <access_token de Supabase del admin>
+//   o con el header x-cron-secret (clave de Vault, para subidas que arma Claude desde la base)
 // → { ok, guid, libraryId, endpoint, expire, signature }
 // El navegador sube con tus-js-client a `endpoint`, con los headers:
 //   AuthorizationSignature = signature, AuthorizationExpire = expire, VideoId = guid, LibraryId = libraryId
@@ -27,13 +28,17 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
   if (req.method !== "POST") return json({ ok: false }, 405, cors);
 
-  // 1) Quién es: JWT de Supabase → usuario → tiene que estar en admins.
-  const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  if (!jwt) return json({ ok: false, error: "sin sesión" }, 401, cors);
-  const { data: u, error: eu } = await db.auth.getUser(jwt);
-  if (eu || !u?.user) return json({ ok: false, error: "sesión inválida" }, 401, cors);
-  const { data: admin } = await db.from("admins").select("user_id").eq("user_id", u.user.id).maybeSingle();
-  if (!admin) return json({ ok: false, error: "no sos admin" }, 403, cors);
+  // 1) Quién es: la clave interna del cron (subidas armadas por Claude, que nunca sale de la base) o un admin del panel.
+  const cron = req.headers.get("x-cron-secret");
+  const { data: cronOk } = cron ? await db.rpc("check_cron_secret", { p_secret: cron }) : { data: false };
+  if (!cronOk) {
+    const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+    if (!jwt) return json({ ok: false, error: "sin sesión" }, 401, cors);
+    const { data: u, error: eu } = await db.auth.getUser(jwt);
+    if (eu || !u?.user) return json({ ok: false, error: "sesión inválida" }, 401, cors);
+    const { data: admin } = await db.from("admins").select("user_id").eq("user_id", u.user.id).maybeSingle();
+    if (!admin) return json({ ok: false, error: "no sos admin" }, 403, cors);
+  }
 
   // 2) Datos.
   let body: { titulo?: unknown; uso?: unknown };
