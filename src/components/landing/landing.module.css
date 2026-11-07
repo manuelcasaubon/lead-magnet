@@ -24,7 +24,7 @@
 .crema { background: var(--crema); color: var(--oscuro); }
 .crema a:focus-visible, .crema button:focus-visible, .crema summary:focus-visible { outline-color: var(--oscuro); }
 
-.bajada { font-family: var(--serif); font-size: clamp(1.3rem, 3.4vw, 1.7rem); line-height: 1.3; color: var(--mostaza); }
+.bajada { font-family: var(--sans); font-weight: 600; letter-spacing: -.02em; font-size: clamp(1.15rem, 3vw, 1.45rem); line-height: 1.3; color: var(--mostaza); }
 /* Encabezado centrado: el nombre en Poppins y el formato en EB Garamond (pedido de Manu, 6/11). */
 .marca { font-family: var(--serif); font-weight: 400; font-size: clamp(1.05rem, 3vw, 1.2rem); line-height: 1.25; display: grid; justify-items: center; text-align: center; gap: 2px; color: var(--gris-o); }
 .marca b { font-family: var(--sans); color: var(--crema); font-weight: 800; font-size: clamp(1.2rem, 3.6vw, 1.4rem); letter-spacing: -.03em; }
@@ -34,6 +34,8 @@
 /* Bajada en EB Garamond blanca, con «a vos» en rojo (pedido de Manu, 6/11). */
 .promesa { font-family: var(--serif); font-weight: 500; letter-spacing: -.01em; line-height: 1.15; font-size: clamp(1.6rem, 5.2vw, 2.6rem); color: var(--crema); max-width: 22em; text-wrap: balance; margin-top: clamp(14px, 3vw, 24px) !important; }
 .resumen { max-width: 34em; color: var(--gris-o); font-family: var(--serif); font-size: clamp(1.15rem, 3.4vw, 1.35rem); line-height: 1.4; }
+/* En el celular el hero va resumido: sin este párrafo (pedido de Manu, 7/11). */
+@media (max-width: 600px) { .resumen { display: none; } }
 /* Título, bajada y resumen centrados (feedback de Manu, 6/11). */
 .centro { text-align: center; justify-self: center; margin-inline: auto; }
 .centro .promesa { margin-inline: auto; }
@@ -73,9 +75,9 @@
 .texto { max-width: 40em; margin-top: 22px !important; color: var(--gris-c); }
 
 .preguntas { list-style: none; margin: clamp(24px, 4vw, 36px) 0 0; padding: 0; border-top: 2px solid var(--crema); }
-/* Las preguntas, en serif (más livianas que el título en Poppins negra). */
-.preguntas li { font-family: var(--serif); font-weight: 400; letter-spacing: 0; line-height: 1.2; font-size: clamp(1.5rem, 5vw, 2.3rem); padding-block: 16px; border-bottom: 1px solid var(--linea-o); text-wrap: balance; }
-.remate { margin-top: 22px !important; font-family: var(--serif); font-size: clamp(1.3rem, 3.4vw, 1.7rem); line-height: 1.3; color: var(--mostaza); }
+/* Las preguntas en Poppins media (más livianas que el título en Poppins negra). Pedido de Manu, 7/11. */
+.preguntas li { font-family: var(--sans); font-weight: 500; letter-spacing: -.02em; line-height: 1.25; font-size: clamp(1.25rem, 4.2vw, 1.9rem); padding-block: 16px; border-bottom: 1px solid var(--linea-o); text-wrap: balance; }
+.remate { margin-top: 22px !important; font-family: var(--sans); font-weight: 600; letter-spacing: -.02em; font-size: clamp(1.15rem, 3vw, 1.45rem); line-height: 1.3; color: var(--mostaza); }
 
 .reglas { list-style: none; margin: clamp(24px, 4vw, 36px) 0 0; padding: 0; display: grid; gap: 12px; }
 .reglas li { border-top: 2px solid var(--oscuro); padding-top: 14px; font-weight: 800; letter-spacing: -.02em; }
@@ -100,7 +102,7 @@
 .hora { font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--mostaza); font-size: 1.15rem; line-height: 1.3; }
 .fila h3 { margin: 0; font-weight: 800; font-size: clamp(1.3rem, 3.4vw, 1.75rem); letter-spacing: -.04em; line-height: 1.1; }
 .fila p { margin-top: 6px !important; color: var(--gris-o); max-width: 38em; }
-.nivel { font-family: var(--serif); font-size: 1.06rem; color: var(--mostaza); }
+.nivel { font-family: var(--sans); font-weight: 600; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--mostaza); }
 .fila p.tellevas { margin-top: 10px !important; color: var(--crema); border-left: 3px solid var(--rojo); padding-left: 12px; }
 .tellevas b { color: var(--mostaza); font-weight: 800; }
 

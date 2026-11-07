@@ -13,7 +13,7 @@
 .campo { display: grid; gap: 6px; min-width: 0; }
 .label { font-weight: 800; letter-spacing: -.02em; font-size: 1rem; }
 .opcional { font-weight: 400; color: var(--gris-c); letter-spacing: 0; }
-.ayuda { margin: -2px 0 0; font-family: var(--serif); font-size: 1.02rem; color: var(--gris-c); }
+.ayuda { margin: -2px 0 0; font-family: var(--sans); font-size: .9rem; color: var(--gris-c); }
 .input {
   font: inherit; font-size: 1.0625rem; color: var(--oscuro); background: #fff;
   border: 1.5px solid #b9b0a2; border-radius: 4px; padding: 11px 13px; min-height: 48px; width: 100%;
