@@ -2,32 +2,28 @@ import type { ReactNode } from "react";
 import { MARCAS } from "./contenido";
 import s from "./landing.module.css";
 
-// Toques "a mano" tomados de comunicatumarca.com/v2: pasos con número en círculo y la tira de marcas.
+// Toques tomados de comunicatumarca.com/v2: pasos con número en círculo y los logos de las marcas detrás del VSL.
 
 export function Paso({ n, children }: { n: number; children: ReactNode }) {
   return <p className={s.paso}><span aria-hidden="true">{n}</span>{children}</p>;
 }
 
-// Marcas con las que trabajó Manu, pasando en loop (se duplica la lista para que el giro no tenga corte).
-// Sin logos cargados no se muestra; con FOTOS_BOCETO=1 se ven recuadros con el lugar.
-export function Marcas() {
-  const boceto = process.env.FOTOS_BOCETO === "1";
-  const lista = MARCAS.length ? MARCAS : boceto ? Array.from({ length: 8 }, (_, i) => ({ nombre: `Logo ${i + 1}`, src: "", ancho: 120, alto: 40 })) : [];
-  if (!lista.length) return null;
+
+// Logos de las marcas de fondo, detrás del VSL: todos visibles, quietos y tenues (pedido de Manu, 7/11).
+// La lista se repite para llenar el fondo; para lectores de pantalla va una sola vez, en el texto de abajo.
+export function LogosFondo() {
+  if (!MARCAS.length) return null;
+  const relleno = Array.from({ length: 4 }, () => MARCAS).flat();
   return (
-    <section className={s.franjaMarcas} aria-label="Marcas con las que trabajé"><div className={s.marcas}>
-      <p className={s.marcasTitulo}>Con la confianza de +40 marcas como:</p>
-      <div className={s.cinta} role="list">
-        <div className={s.cintaIn}>
-          {[...lista, ...lista].map((m, i) => (
-            <span key={i} role="listitem" aria-hidden={i >= lista.length} className={s.logo}>
-              {m.src
-                ? <img src={m.src} alt={m.nombre} width={m.ancho} height={m.alto} loading="lazy" /> // eslint-disable-line @next/next/no-img-element
-                : <span className={s.logoFalta}>{m.nombre}</span>}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div></section>
+    <div className={s.logosFondo} aria-hidden="true">
+      {relleno.map((m, i) => (
+        <img key={i} src={m.src} alt="" width={m.ancho} height={m.alto} loading="lazy" className={m.sinInvertir ? s.sinInvertir : undefined} /> // eslint-disable-line @next/next/no-img-element
+      ))}
+    </div>
   );
+}
+
+export function MarcasTexto() {
+  if (!MARCAS.length) return null;
+  return <p className={s.marcasTexto}>Con la confianza de marcas como {MARCAS.map((m) => m.nombre).join(", ").replace(/, ([^,]*)$/, " y $1")}.</p>;
 }

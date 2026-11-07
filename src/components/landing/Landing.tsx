@@ -4,7 +4,7 @@ import BarraCta from "./BarraCta";
 import LinkInstagram from "./LinkInstagram";
 import Reserva from "./Reserva";
 import Vsl from "./Vsl";
-import { Marcas, Paso } from "./Detalles";
+import { LogosFondo, MarcasTexto, Paso } from "./Detalles";
 import { FOTOS, MOSTRAR_CASOS, MOSTRAR_REGLAS_2027, REGLAS_2027, formatoArs, type Foto } from "./contenido";
 import s from "./landing.module.css";
 
@@ -52,7 +52,11 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         <p className={`${s.resumen} ${s.centro}`}>3 horas para entender cómo <strong className={s.resalta}>cambiaron las reglas</strong> de las redes y de la estrategia de marca, y salir con tu plan de acción para 2027: tu plan de marca y tu plan de contenido.</p>
         <div className={s.conPaso}>
           <Paso n={1}>Mirá el video</Paso>
-          <Vsl />
+          <div className={s.vslMarco}>
+            <LogosFondo />
+            <div className={s.vslFrente}><Vsl /></div>
+          </div>
+          <MarcasTexto />
         </div>
         <div className={s.entrada}>
           <div className={s.dato}><span>Cuándo</span><strong>Miércoles 18/11</strong></div>
@@ -72,7 +76,6 @@ export default function Landing({ cupo, precioArs, agotado }: Props) {
         </p>
       </div></section>
 
-      <Marcas />
 
       <section className={`${s.banda} ${s.crema}`}><div>
         <p className={s.frase}>Tenés mucho conocimiento y experiencia, <em>pero pocas personas saben lo que sabés.</em></p>

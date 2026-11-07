@@ -24,13 +24,14 @@ export const FOTOS: { charla: Foto; clase: Foto; quien: Foto } = {
 
 /** Logos de marcas con las que trabajó Manu (tira que pasa debajo de los datos). Archivos en /public/marcas/,
  *  en blanco o gris claro sobre transparente (SVG o PNG). Vacío = la tira no se muestra. */
-export type Marca = { nombre: string; src: string; ancho: number; alto: number };
+/** sinInvertir: logos con fondo propio (un círculo, por ejemplo), que al pasarlos a blanco quedarían como un bloque liso. */
+export type Marca = { nombre: string; src: string; ancho: number; alto: number; sinInvertir?: boolean };
 // Las de la landing anterior (comunicatumarca.com/v2) que se leen en la captura; logos de los sitios oficiales de cada marca.
 export const MARCAS: Marca[] = [
   { nombre: "Tiendanube", src: "/marcas/tiendanube.svg", ancho: 160, alto: 40 },
   { nombre: "Coderhouse", src: "/marcas/coderhouse.svg", ancho: 137, alto: 40 },
   { nombre: "Takenos", src: "/marcas/takenos.svg", ancho: 140, alto: 16 },
-  { nombre: "Universidad Torcuato Di Tella", src: "/marcas/di-tella.svg", ancho: 40, alto: 40 },
+  { nombre: "Universidad Torcuato Di Tella", src: "/marcas/di-tella.svg", ancho: 40, alto: 40, sinInvertir: true },
   { nombre: "Nescafé", src: "/marcas/nescafe.png", ancho: 135, alto: 40 },
   { nombre: "Bensimon", src: "/marcas/bensimon.png", ancho: 140, alto: 20 },
 ];

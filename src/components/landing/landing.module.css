@@ -194,18 +194,6 @@
 /* "cambiaron las reglas" resaltado en el resumen. */
 .resalta { color: var(--mostaza); font-weight: 500; }
 
-/* Franja de marcas: fondo crema y texto oscuro de la paleta (pedido de Manu, 6/11). */
-.franjaMarcas { background: var(--crema); color: var(--oscuro); padding-block: 22px 26px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.marcas { display: grid; gap: 14px; max-width: 980px; margin-inline: auto; }
-.marcasTitulo { text-align: center; font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--oscuro); }
-.cinta { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.cintaIn { display: flex; gap: clamp(32px, 6vw, 56px); width: max-content; align-items: center; animation: cinta 34s linear infinite; }
-.cinta:hover .cintaIn { animation-play-state: paused; }
-@keyframes cinta { to { transform: translateX(calc(-50% - clamp(16px, 3vw, 28px))); } }
-@media (prefers-reduced-motion: reduce) { .cintaIn { animation: none; flex-wrap: wrap; width: auto; justify-content: center; } }
-.logo { display: inline-flex; align-items: center; height: 40px; flex: none; }
-.logo img { height: 100%; width: auto; max-width: 140px; object-fit: contain; filter: grayscale(1) brightness(.35); opacity: .8; }
-.logoFalta { display: inline-grid; place-items: center; height: 36px; padding: 0 18px; border: 1.5px dashed var(--gris-c); border-radius: 4px; color: var(--gris-c); font-size: .8rem; font-weight: 600; white-space: nowrap; }
 
 /* Botón extra de reserva en el medio de la página (lleva al formulario y de ahí a Mercado Pago). */
 .ctaMedio { display: flex; justify-content: center; margin-top: clamp(24px, 4vw, 36px); }
@@ -214,3 +202,14 @@
 /* "Quedan solo 30 lugares": con ventas, el 30 tachado y al lado los que quedan (número real de la base). */
 .tachado { text-decoration: line-through; text-decoration-thickness: .12em; color: var(--gris-o); }
 .restan { color: var(--crema); background: var(--rojo); padding: 0 .3em; border-radius: 3px; }
+
+/* VSL con los logos de las marcas de fondo (pedido de Manu, 7/11): grilla quieta y tenue que asoma alrededor del video. */
+.vslMarco { position: relative; padding-block: clamp(36px, 7vw, 64px); isolation: isolate; }
+.logosFondo { position: absolute; inset: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); z-index: -1; overflow: hidden;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); grid-auto-rows: clamp(36px, 7vw, 64px);
+  align-items: center; justify-items: center; gap: 0 clamp(12px, 3vw, 32px); padding-inline: 8px;
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,.25) 35%, #000 75%); mask-image: radial-gradient(ellipse at center, rgba(0,0,0,.25) 35%, #000 75%); }
+.logosFondo img { max-height: 26px; max-width: 100px; width: auto; height: auto; object-fit: contain; filter: grayscale(1) brightness(0) invert(1); opacity: .22; }
+.logosFondo img.sinInvertir { filter: grayscale(1); opacity: .3; max-height: 34px; }
+.vslFrente { position: relative; max-width: 860px; margin-inline: auto; box-shadow: 0 18px 50px rgba(0, 0, 0, .5); border-radius: 6px; }
+.marcasTexto { text-align: center; font-size: .82rem; color: var(--gris-o); max-width: 40em; margin-inline: auto !important; }
